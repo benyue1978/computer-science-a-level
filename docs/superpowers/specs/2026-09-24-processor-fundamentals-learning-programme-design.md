@@ -19,6 +19,21 @@ The programme covers all of AS section 4, supplies the prerequisites needed by a
 
 The design uses one coherent processor model wherever topics genuinely share machine state. Topics such as ports, performance, pipelining, parallel architectures and virtual machines use specialised models inside the same application rather than being forced into the small instruction engine.
 
+### 1.1 Shared teaching principle: state, action, change and reason
+
+The programme uses the parent's four questions as its organising principle for explaining computation:
+
+1. **What is the current state?** / 当前的状态是什么？
+2. **What action happens?** / 发生了什么操作？
+3. **What changes, and what stays unchanged?** / 什么改变了，什么保持不变？
+4. **Why does that happen?** / 为什么会发生这样的变化？
+
+Apply this pattern to introductory activities, processor steps, program traces, videos and parent prompts. Show only the state relevant to the current idea, establish it before acting, invite a prediction, and then compare before and after. Explicitly identify relevant unchanged values: reading does not remove the stored value; copying does not clear its source. The explanation must name the rule causing the result, not merely describe an animation.
+
+The same pattern works at increasing levels of detail: a memory read, a register transfer, a complete instruction, or a program statement. Use **Next step** for a detailed teaching action and **Next instruction** for a complete instruction where supported. An instruction groups smaller steps that the learner can inspect; both levels must agree on the resulting state. Avoid the ambiguous label “Next cycle”; teach the distinction between clock cycles and instruction cycles explicitly.
+
+The introductory activities establish this visual and reasoning language before they connect to the processor engine. They need not implement a CPU to teach a truthful state change. This principle supports later programming topics without expanding the current scope or replacing explanations of abstraction, correctness and efficiency.
+
 ## 2. Outcomes and success criteria
 
 The learner should be able to:
@@ -279,6 +294,7 @@ Every lesson package contains:
 - English and Mandarin title, explanation, terminology and parent prompts;
 - paired technical terms and approved abbreviations;
 - misconception list and corrective explanation;
+- for each demonstrated action: relevant initial state, action, changed and unchanged values, and the rule explaining the result, with a prediction prompt before reveal;
 - video scene sequence and language-specific narration timing;
 - pause points and prediction prompts;
 - scenario ID, initial state, allowed controls and expected event invariants;

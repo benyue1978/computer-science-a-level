@@ -12,6 +12,17 @@ Start with an observable action, ask the learner to explain or predict it, then 
 
 Each bite contains one short explanation, a visual example, one guided action and one changed example the learner explains to the parent. A failed check returns to a simpler example; the parent may stop and resume without losing the thread. Avoid timers, scores and forced progression in this introductory experience.
 
+Use the programme's [four-question teaching principle](2026-09-24-processor-fundamentals-learning-programme-design.md#11-shared-teaching-principle-state-action-change-and-reason) in every bite: **current state → action → what changes and stays unchanged → why**. Invite the learner to predict before revealing the result. These small activities teach how to understand the state changes later exposed by the simulator's Next step and Next instruction controls; they are the beginning of that same learning experience.
+
+For Bite 1, make the pattern concrete:
+
+| Current state | Action | Changed and unchanged | Reason |
+|---|---|---|---|
+| Address 11 contains 42 | Read address 11 | The readout shows 42; all stored values and address labels remain unchanged | Reading retrieves a value without replacing or removing it |
+| Address 11 contains 42 | Replace its contents with 6 | That cell now contains 6; its address is still 11 and other cells are unchanged | Writing replaces the value at the selected location, not the location's address |
+
+The readout is part of the activity interface, not an unintroduced processor register. Distinguish a change in the displayed selection/readout from a change in stored memory. Ask the learner to explain the rule rather than simply repeat what moved on screen.
+
 ## 2. Introductory sequence
 
 | Bite | Main question | Prerequisite supplied | Later curriculum connection |
