@@ -6,14 +6,15 @@ The programme combines short English/Mandarin Remotion videos, a browser-based p
 
 ## Plans and specifications
 
+- [Start here: Foundations Before RTN](docs/superpowers/specs/2026-09-25-foundations-before-rtn-design.md) — small teaching bites; the first activity explains memory, addresses and contents.
 - [Whole-programme delivery roadmap](docs/superpowers/plans/2026-09-25-programme-delivery-roadmap.md) — all 34 lessons and their delivery milestones.
-- [First milestone: Memory to Fetch](docs/superpowers/plans/2026-09-25-memory-to-fetch-milestone-plan.md) — implementation tasks for a complete guided RTN/fetch lesson.
+- [Later milestone: Memory to Fetch](docs/superpowers/plans/2026-09-25-memory-to-fetch-milestone-plan.md) — implementation tasks for a complete guided RTN/fetch lesson.
 - [Learning programme specification](docs/superpowers/specs/2026-09-24-processor-fundamentals-learning-programme-design.md) — curriculum, interaction, bilingual media and assessment design.
 - [PL24-v1 architecture specification](docs/superpowers/specs/2026-09-24-pl24-v1-processor-architecture.md) — internal teaching-processor design and correctness requirements.
 
 ## Status
 
-Planning stage. No browser app or simulator has been implemented yet. Test and coverage requirements in the plans describe future acceptance criteria, not current test results.
+Planning stage. The immediate next step is a tiny memory/address/content activity, followed by one foundational idea at a time. The complete simulator and hybrid RTN lesson remain later goals. No browser app or simulator has been implemented yet. Test and coverage requirements in the plans describe future acceptance criteria, not current test results.
 
 The proposed processor is a project-specific implementation of Cambridge's example instruction meanings. Its encoding, widths and controller layout remain engineering details behind a stable teaching interface. Architecture changes must revalidate affected examples.
 

@@ -158,6 +158,8 @@ They cover the broad syllabus headings but are not an executable specification. 
 
 ## 7. Curriculum
 
+**Teaching sequence refinement (25 September 2026):** [Foundations Before RTN](2026-09-25-foundations-before-rtn-design.md) introduces eight small teaching bites ahead of the full fetch milestone. The first deliverable is memory, addresses and contents only. These are subdivisions of the existing curriculum, not additional full lesson/video packages. Prerequisites must be taught separately and checked, rather than compressed into a warm-up before Lesson 10. The complete processor and hybrid-media architecture below remains the destination, not a prerequisite for building the first activity.
+
 Each row below is one guided learning bite. Concept videos normally last 3–6 minutes. Practice and challenge briefings normally last 1–3 minutes.
 
 | # | Level | Lesson and outcome | Video asset | Processor Lab activity | Exam transfer |
@@ -199,9 +201,9 @@ Each row below is one guided learning bite. Concept videos normally last 3–6 m
 
 ### 7.1 RTN prerequisite placement
 
-RTN will be taught as the opening segment of Lesson 10, immediately before it is applied to the fetch sequence. It will not be placed in the Bridge unit because its symbols refer to registers and memory transfers that the learner has not yet encountered there. Its prerequisite chain is explicit:
+RTN is first introduced in M0 Bite 7, after the earlier foundational bites, and combined into a fetch in Bite 8. These become reusable components of the eventual Lesson 10 package. At M1, Lesson 10 recaps that notation, integrates it with the executable simulator and checks independent understanding; it does not treat a brief primer as the learner’s first exposure. The prerequisite concepts and their full-curriculum homes are:
 
-- Lesson 2 supplies binary values and the idea of incrementing a stored numeric value.
+- A small decimal value and increment-by-one are enough for introductory RTN and are introduced before the +1 expression in Bite 7. Binary representation is taught in Lesson 2 but is not a prerequisite for the first decimal RTN example.
 - Lesson 3 supplies the distinction between a memory address and the value stored at that address, including one-hop and two-hop lookup.
 - Lesson 4 supplies the idea that an operation changes a before-state into an after-state.
 - Lesson 5 supplies the stored-program model in which instructions and data occupy the IAS.
@@ -209,7 +211,7 @@ RTN will be taught as the opening segment of Lesson 10, immediately before it is
 - Lesson 7 supplies the roles and contents of PC, MAR, MDR and CIR.
 - Lesson 9 supplies the physical transfer paths and control signals that RTN abbreviates.
 
-Lesson 10 has two short chapters. The first teaches RTN as a small language for describing state changes. The second applies that language to the four Cambridge fetch transfers. Before the fetch sequence becomes a recall task, the learner must complete without hints a five-part RTN-reading gate covering transfer direction and copy semantics, `[R]`, `[[R]]`, `[R] + 1`, and an ordered two-line state trace. Every part must be correct; an incorrect answer returns the learner to the relevant worked example before a changed gate attempt. This keeps the foundation close to its assessed use while ensuring it is taught rather than assumed.
+The eventual Lesson 10 has two short chapters, reusing M0 Bites 7–8. The first recaps RTN as a small language for describing state changes. The second integrates it with the four Cambridge fetch transfers. The earlier bites supply address/content, copy/state, component, register and bus concepts; they do not imply completion of every outcome in the full lessons named above. Before the fetch sequence becomes a recall task, the learner must complete without hints a five-part RTN-reading gate covering transfer direction and copy semantics, `[R]`, `[[R]]`, `[R] + 1`, and an ordered two-line state trace. Every part must be correct; an incorrect answer returns the learner to the relevant worked example before a changed gate attempt. This keeps the foundation close to its assessed use while ensuring it is taught rather than assumed.
 
 ## 8. Product architecture
 
@@ -795,7 +797,7 @@ The design is successfully implemented when:
 
 This specification defines the complete programme and the interfaces between its units. The implementation plan should order work as vertical, reviewable slices. Each slice should include the relevant content package, video, scenario, interaction, parent card and exam check rather than building all videos separately from all simulator work.
 
-The first slice should be chosen during implementation planning using these criteria:
+The first slice is now the small memory/address/content activity in the linked foundations design. It validates teaching granularity before the engineering-heavy M1. Subsequent hybrid slices should use these criteria:
 
 - validates the shared lesson-package contract;
 - exercises the deterministic event model;

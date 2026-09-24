@@ -16,14 +16,16 @@
 
 Approved specifications:
 
+- [Foundations before RTN](../specs/2026-09-25-foundations-before-rtn-design.md) — supersedes the previous compressed prerequisite warm-up and defines the new first step.
+
 - [Learning programme](../specs/2026-09-24-processor-fundamentals-learning-programme-design.md), especially sections 7, 8.3, 9, 15 and 18–20.
 - [PL24-v1 architecture](../specs/2026-09-24-pl24-v1-processor-architecture.md), including the architecture replacement boundary.
 
-Workspace root: `/Users/song.yue/git/computer-science-a-level`. As inspected on 25 September 2026, it contains the source notes and specifications but no application/package manifest and is not a Git repository. This plan creates neither implementation code nor a repository. At implementation start, inspect again; preserve anything added since planning. Initialise Git locally if still absent, then commit scoped changes. A remote, publishing or deployment is not required.
+Workspace root: `/Users/song.yue/git/computer-science-a-level`. The public planning repository now exists, but no application has been implemented. At implementation start, inspect again and preserve existing files. The newly approved M0 first step precedes the larger M1 plan; do not bootstrap the complete processor/video stack just to teach addresses and contents.
 
-This document is a whole-programme delivery roadmap, not a claim that every later milestone already has an execution-ready task plan. The approved scope is fully assigned below. Before each later milestone, write its own detailed plan against the unchanged programme coverage and the working interfaces established by earlier milestones. The first such plan is [Memory to Fetch](2026-09-25-memory-to-fetch-milestone-plan.md).
+This document is a whole-programme delivery roadmap, not a claim that every later milestone already has an execution-ready task plan. The approved scope is fully assigned below. Before each later milestone, write its own detailed plan against the unchanged programme coverage and the working interfaces established by earlier milestones. The [Memory to Fetch plan](2026-09-25-memory-to-fetch-milestone-plan.md) remains available for later M1 work. The immediate work is the small first activity in the foundations design; each subsequent bite is designed after observing the previous one.
 
-Milestone numbers are construction order, not teaching order. The learner's curriculum remains Lessons 1–34. Unbuilt lessons are not presented as available. We avoid promising calendar dates before measuring content-authoring, rendering and parent/learner review effort in M1.
+Milestone numbers are construction order, not teaching order. The learner's curriculum remains Lessons 1–34. Unbuilt lessons are not presented as available. We avoid promising calendar dates before observing the small foundational activities and later measuring media-production effort.
 
 ### File ownership and dependency direction
 
@@ -53,7 +55,8 @@ Each final lesson has one canonical package, one Vxx video composition rendered 
 
 | Milestone | Final lessons / videos owned | Working learner outcome | Engineering additions | Dependencies |
 |---|---|---|---|---|
-| M1 — Memory to Fetch | 10 / V10 | Read RTN and independently reconstruct/predict fetch | Contracts, raw-word fetch/decode, adapter, diagram, bilingual media, predictions, evidence, recovery | Approved design |
+| M0 — Foundations before RTN | Subdivisions reused within existing lessons; no extra Vxx assets | Understand one new idea at a time, beginning only with addresses versus contents | Small independent visual activities; no full processor dependency | Approved foundations design and actual parent-guided feedback |
+| M1 — Memory to Fetch | 10 / V10 | Read RTN and independently reconstruct/predict fetch | Contracts, raw-word fetch/decode, adapter, diagram, bilingual media, predictions, evidence, recovery | M0 foundations understood; revisit M1 pacing before execution |
 | M2 — Foundations and complete cycle | 1–9 and 11 / V01–V09, V11 | Build the prerequisite concepts and connect fetch to decode/execute/repetition | Complete state journey, number/address activities, architecture explorer, register/bus views; minimal LDM/LDD/END execution | M1 |
 | M3 — Instruction and program reasoning | 15–21 / V15–V21 | Trace data movement, addressing, arithmetic, I/O, comparisons, branches and loops | Remaining non-bitwise instruction execution, flags, instruction playground, structured program builder, program runner, breakpoints and input wait | M2 |
 | M4 — Interrupts | 14 / V14 | Explain detection, priority, save/service/return and resume | Controller queue, context frames, monitor return, nested/deferred scenarios; primary UI starts with one simple ISR | M3 |
@@ -64,13 +67,20 @@ Each final lesson has one canonical package, one Vxx video composition rendered 
 | M9 — Parallel systems and VMs | 32–34 / V32–V34 | Classify stream architectures, explain large-scale parallelism and VMs | Parallel Architecture and Virtual Machine labs | M7, M8 |
 | M10 — Whole-programme acceptance | All 34 audited, no additional lesson IDs | Complete navigable AS programme with separate later A Level extension | Cross-topic retrieval, full coverage audit, media/accessibility review and user-trial fixes | M1–M9 |
 
-M1's prerequisite warm-up previews ideas from Lessons 1–7 and 9 but creates no extra lesson IDs or additional Vxx deliverable. It never awards mastery of those earlier lessons. M2 completes their full independent packages. V10 remains focused on RTN and fetch; its warm-up is an interactive pre-lesson preparation sequence.
+M0 replaces the compressed prerequisite warm-up with eight separately taught bites. Only Bite 1 is the first deliverable. Later bites supply processor/register/copy/bus/cycle knowledge before notation is combined into a full fetch. These subdivisions are reused in the existing 34 lesson packages and do not automatically count as full-lesson mastery. V10 remains focused on RTN and fetch.
 
 ### Milestone task templates and completion evidence
 
-#### M1 — Execution-ready plan exists
+#### M0 — New first step
 
-- [ ] Execute the linked M1 plan and preserve its raw-word execution and teaching-interface boundaries.
+- [ ] Use the foundations design to create the small address/content activity and bilingual parent card.
+- [ ] Try the changed example with the parent and learner; record actual understanding and navigation issues.
+- [ ] Revise this activity before adding more entities if it assumes unintroduced knowledge.
+- [ ] Design Bite 2 only after this check; continue the introductory sequence one bite at a time.
+
+#### M1 — Retained for later execution
+
+- [ ] After M0, revisit M1 preparation and pace; then execute the linked M1 plan and preserve its raw-word execution and teaching-interface boundaries.
 - [ ] Deliver V10 EN/ZH editions, both subtitle languages, parent guidance and an independent changed-value fetch task.
 - [ ] Record software/media verification separately from the actual parent/novice trial. A trial cannot be replaced with an agent pretending to be the learner.
 
@@ -132,7 +142,7 @@ M1's prerequisite warm-up previews ideas from Lessons 1–7 and 9 but creates no
 
 Every milestone ends with a working teaching slice and evidence, rather than an engine-only or video-only delivery. Later lesson plans may change implementation order after the M1 trial; lesson coverage and identifiers must not disappear. No scheduled background work, external messaging or paid narration service is implied. Public GitHub publication of these planning documents is separately authorised. Production app deployment to Vercel is conditional on the user verifying the working app; do not deploy merely because automated checks pass.
 
-Maintain a milestone status table in this file during execution: planned → building → software verified → learner trial pending (where applicable) → accepted. At authoring time all milestones are planned. Do not mark M1 or the entire programme learned/accepted from an automated test alone.
+Maintain a milestone status table in this file during execution: planned → building → software verified → learner trial pending (where applicable) → accepted. All milestones remain planned; M0 Bite 1 is the next delivery target. Do not mark M1 or the entire programme learned/accepted from an automated test alone.
 
 ### Processor correctness and coverage gates
 

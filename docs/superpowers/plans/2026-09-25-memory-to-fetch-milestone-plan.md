@@ -1,4 +1,4 @@
-# Memory to Fetch — First Milestone Implementation Plan
+# Memory to Fetch — Later M1 Implementation Plan
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -10,13 +10,17 @@
 
 ---
 
+## Sequencing update — 25 September 2026
+
+This plan is retained, but is no longer the first implementation step. The user approved [Foundations Before RTN](../specs/2026-09-25-foundations-before-rtn-design.md): teach eight small bites separately, beginning only with memory, addresses and contents. M0 replaces this plan's compressed prerequisite warm-up. Do not run the toolchain/processor/media tasks below to deliver Bite 1. Revisit the preparation tasks and pacing after the foundational activities have been understood; the later engine and hybrid-lesson requirements remain valid.
+
 ## Chunk 1: Boundaries, contracts and an executable fetch
 
 ### Context and scope
 
 Workspace: `/Users/song.yue/git/computer-science-a-level`. Read the approved [programme specification](../specs/2026-09-24-processor-fundamentals-learning-programme-design.md) and [architecture contract](../specs/2026-09-24-pl24-v1-processor-architecture.md), especially programme §§7.1, 8.3, 9, 15 and architecture §§2, 4–7, 10, 12. The [delivery roadmap](2026-09-25-programme-delivery-roadmap.md) assigns every remaining lesson.
 
-M1 delivers L10/V10 only. An interactive prerequisite warm-up supplies essential ideas from L1–7 and L9 before RTN. It does not award completion of those lessons or replace their later full packages. The warm-up covers input/process/output/storage, a stored numeric value and increment, address versus contents, instructions as stored items, the CU/clock's coordinating role, PC/MAR/MDR/CIR and buses. Binary calculation proficiency is not needed for this decimal fetch example; its full treatment remains L2.
+M1 eventually delivers the complete L10/V10 package. M0 provides the exact prerequisites needed here: memory address versus contents; processor and temporary register storage; copying and before/after state; address/data/control paths and CU coordination; instruction-cycle versus clock-cycle distinction; fetch-register roles; a small decimal increment; RTN expressions and an initial complete fetch explanation. M1 preparation recaps these ideas. M0 does not teach the full input/process/output/storage pathway or binary representation, and it does not award mastery of the full L1/L2 or other later lesson packages. Binary calculation proficiency is not required for this decimal fetch example.
 
 The learner path is prepare → RTN primer → five-part RTN gate → guided fetch → altered independent fetch → English exam response with bilingual guidance → later retrieval. Preparation is revisitable, not a skip into an unexplained diagram. A suggested session is 15–25 minutes, split into two sessions if needed; this is a starting assumption to validate, not a learner time limit.
 
@@ -257,4 +261,4 @@ export interface TeachingFrame {
 
 Use the existing approved architecture; no design change to PL24 is requested by this plan. When splitting work among implementation agents, assign bounded files/tasks and keep engine semantics, content facts and teaching projection reviewed together. Use task-scoped commits; do not stage unrelated workspace files. The public repository's first planning commit precedes these implementation commits.
 
-M1 is ready for implementation when this plan is reviewed. Running tests, rendering media and observing the learner are future work: none is claimed complete by writing this document.
+M1 is deferred until M0 foundations have been taught and this plan’s preparation/pacing has been revisited. Running tests, rendering media and observing the learner are future work: none is claimed complete by writing this document.
