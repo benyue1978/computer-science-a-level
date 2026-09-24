@@ -1,0 +1,13 @@
+.DS_Store
+.superpowers/
+work/
+outputs/
+node_modules/
+dist/
+artifacts/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
