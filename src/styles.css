@@ -259,10 +259,11 @@ h2:focus-visible {
 .cycle-computer { border-left: 1px solid var(--line); padding-left: 28px; }
 .cycle-event { min-height: 92px; display: flex; align-items: center; padding: 16px; margin: 12px 0; background: #eef0e6; border: 1px solid #c4c8b7; }
 .cycle-clock > p:not(.eyebrow) { max-width: 790px; color: var(--muted); }
-.clock-pulses { display: flex; align-items: center; gap: 24px; margin: 24px 0; padding: 18px; background: #fffdf7; border: 1px solid var(--line); }
+.clock-pulses { display: flex; align-items: center; gap: 18px; margin: 24px 0 12px; padding: 18px; background: #fffdf7; border: 1px solid var(--line); }
 .clock-pulses figcaption { font-weight: 600; white-space: nowrap; }
-.clock-wave { display: flex; align-items: center; justify-content: space-around; gap: 12px; flex: 1; height: 44px; border-bottom: 2px solid #637a63; }
-.clock-wave span { display: block; height: 30px; width: 2px; background: #637a63; }
+.clock-wave { flex: 1; width: 100%; max-width: 300px; height: 50px; overflow: visible; }
+.clock-wave path { fill: none; stroke: #637a63; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.clock-example { max-width: 790px; margin: 12px 0 18px; padding: 14px 16px; border-left: 3px solid #637a63; background: #eef0e6; }
 .clock-distinction { border-left: 3px solid var(--accent); padding: 10px 14px; background: #f1e9dc; }
 .bus-home-illustration {
   align-self: center;
@@ -1132,7 +1133,7 @@ footer {
   .cycle-arrow { position: static; display: block; transform: rotate(90deg); justify-self: center; line-height: 1; }
   .cycle-walkthrough, .cycle-instructions { grid-template-columns: 1fr; }
   .cycle-computer { border-left: 0; border-top: 1px solid var(--line); padding: 22px 0 0; }
-  .clock-pulses { align-items: stretch; flex-direction: column; gap: 10px; margin-inline: 0; }
+  .clock-pulses { align-items: flex-start; flex-direction: column; gap: 8px; margin-inline: 0; }
   .clock-wave { width: 100%; flex: none; }
   .bus-cpu { min-height:55px; }
   .bus-endpoints { grid-template-columns:1fr 1fr; grid-template-rows:1fr; }

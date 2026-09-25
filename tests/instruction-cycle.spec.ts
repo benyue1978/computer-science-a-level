@@ -9,8 +9,10 @@ test("home opens the instruction-cycle lesson directly and explains the clock se
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("The instruction cycle");
   await page.reload();
   await expect(page).toHaveTitle(/The instruction cycle/);
-  await expect(page.getByRole("img", { name: "A visual showing regular clock timing pulses" })).toBeVisible();
-  await expect(page.getByText(/A clock tick is one timing signal, not a whole instruction cycle/)).toBeVisible();
+  await expect(page.getByRole("img", { name: "A visual showing one clock cycle as a regular timing beat" })).toBeVisible();
+  await expect(page.getByText(/coordinates one very small processor action/)).toBeVisible();
+  await expect(page.getByText(/puts an address onto the address bus/)).toBeVisible();
+  await expect(page.getByText(/In our step-by-step model, we can zoom in and see several small actions/)).toBeVisible();
   expect(errors).toEqual([]);
 });
 

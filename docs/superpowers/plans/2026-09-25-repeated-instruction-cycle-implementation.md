@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a bilingual, accessible Bite 5 web lesson that teaches the repeating fetch–decode–execute cycle and distinguishes it from clock timing pulses.
+**Goal:** Add a bilingual, accessible Bite 5 web lesson that teaches the repeating fetch–decode–execute cycle and distinguishes small clock-coordinated actions from a complete instruction cycle.
 
 **Architecture:** Follow the existing stand-alone lesson pattern with a focused bilingual content file and a React page component mounted at a direct URL from `App.tsx`. Keep the illustrative two-card walkthrough local to the lesson; its displayed computer events are not part of the PL24 engine. One state machine moves through six high-level events, while the clock illustration remains explanatory rather than a tick simulator.
 
@@ -42,10 +42,10 @@
 
 **Files:** Modify `src/InstructionCycle.tsx`; modify `src/styles.css`; modify `src/InstructionCycle.test.tsx`.
 
-- [ ] **Step 1: Add failing tests** that require a visible Fetch→Decode→Execute direction/loop, text explaining a clock tick is a timing pulse rather than a whole instruction cycle, and no one-tick-per-stage claim. Require a semantic named clock illustration and selectable text.
+- [ ] **Step 1: Add failing tests** that require a visible Fetch→Decode→Execute direction/loop, one clock cycle coordinating a tiny processor action, the previous lesson's address-on-bus example, and several such small actions in a full instruction cycle. Require a semantic named clock illustration and selectable text.
 - [ ] **Step 2: Run the focused Vitest file and confirm these tests fail.**
 - [ ] **Step 3: Implement the three-phase cycle diagram.** Use labelled nodes and a return-arrow label; do not put registers, bus microsteps or RTN in this diagram. Highlight the phase associated with the current computer event using border/text/icon cues in addition to colour.
-- [ ] **Step 4: Add a separate static clock-pulse strip below the completed cycle explanation.** Text must say the clock provides regular timing signals and the instruction cycle is a larger process; do not align pulses one-for-one with phases or assign durations, frequencies or counts.
+- [ ] **Step 4: Add a separate static clock-cycle illustration below the completed instruction-cycle explanation.** Show a single timing beat paired with the familiar action of placing an address on a bus. Explain that the lesson's step-by-step model expands one instruction cycle (fetch, decode and execute) into several small actions; do not map one clock cycle to each large phase or claim a universal number of cycles per instruction.
 - [ ] **Step 5: Add responsive and reduced-motion styling.** Stack the three phases and loop indication on narrow screens without horizontal scrolling. Keep state changes instant under reduced motion.
 - [ ] **Step 6: Rerun the focused Vitest file and confirm visual semantics, clock distinction and narrow-screen class hooks pass.**
 

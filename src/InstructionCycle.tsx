@@ -70,10 +70,13 @@ export default function InstructionCycle({ language }: Props) {
         <p className="eyebrow">{language === "en" ? "TIMING" : "计时"}</p>
         <h2 id="clock-heading">{t.clockHeading}</h2>
         <p>{t.clockMeaning}</p>
-        <figure className="clock-pulses" role="img" aria-label={t.clockImageLabel}>
-          <figcaption>{t.clockTick}</figcaption>
-          <div className="clock-wave" aria-hidden="true"><span /><span /><span /><span /><span /><span /></div>
+        <figure className="clock-pulses" aria-label={t.clockImageLabel}>
+          <svg className="clock-wave" viewBox="0 0 180 50" role="img" aria-label={t.clockImageLabel}>
+            <path d="M0 36 H40 V12 H110 V36 H180" />
+          </svg>
+          <figcaption>{t.clockCycleLabel}</figcaption>
         </figure>
+        <p className="clock-example">{t.clockExample}</p>
         <p className="clock-distinction">{t.clockDistinction}</p>
       </section>
     </main>

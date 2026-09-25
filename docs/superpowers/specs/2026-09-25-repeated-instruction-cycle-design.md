@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Build a first mental model for how a processor repeatedly handles instructions. The learner should explain an instruction as a direction for the processor, name and order fetch, decode and execute, and show how finishing one instruction leads the processor to fetch the next. Then introduce the system clock as a timing source and distinguish a clock tick from a whole instruction cycle.
+Build a first mental model for how a processor repeatedly handles instructions. The learner should explain an instruction as a direction for the processor, name and order fetch, decode and execute, and show how finishing one instruction leads the processor to fetch the next. Then introduce the system clock as a timing source and distinguish one small clock-coordinated step from the complete process of handling an instruction.
 
 This is Bite 5 of the introductory foundations sequence. It connects the bus roles from Bite 4 to the named fetch registers in Bite 6. It is a concept lesson, not a register trace, complete Cambridge fetch sequence or PL24 simulation.
 
@@ -23,8 +23,8 @@ By the end, the learner can:
 1. Explain that an instruction is a direction the processor can carry out.
 2. State the ordered stages: fetch an instruction, decode it, execute it.
 3. Explain that the processor returns to fetch to handle the next instruction; these stages repeat while the program continues.
-4. Explain that the system clock provides regular timing signals that coordinate processor activity.
-5. Distinguish a clock tick (one timing signal) from the full fetch–decode–execute instruction cycle. Do not assign a fixed number of ticks to every instruction or present each stage as exactly one tick.
+4. Explain that the system clock provides regular timing signals. In this lesson's simplified step-by-step model, one clock cycle coordinates one very small processor action, such as putting an address onto the address bus.
+5. Explain that an instruction cycle is the complete process of handling one instruction through fetch, decode and execute. When zooming in with this lesson's step-by-step model, the learner can observe several small actions, each coordinated with a clock cycle. Do not claim that every real instruction or processor design must take several clock cycles, map each named fetch–decode–execute stage to one clock cycle, or give precise cycle counts, durations or frequencies.
 
 ## Prerequisites and teaching boundaries
 
@@ -33,9 +33,10 @@ Reuse the earlier ideas that memory can hold instructions as well as data, that 
 - Introduce the F–E cycle as a repeating process of the processor, not a sequence of learner actions.
 - Define *fetch* in plain language as obtaining the next instruction from memory; *decode* as working out what that instruction means; *execute* as carrying it out.
 - Explain that the cycle starts again with the next instruction. Do not add branches, interrupts, instruction-specific micro-operations or stop behaviour here.
-- Introduce clock timing only after the learner has seen the complete cycle. A tick is a regular timing signal, not a complete instruction cycle. Keep the relationship qualitative; give no duration, frequency, performance comparison, or fixed tick count.
+- Introduce clock timing only after the learner has seen the complete cycle. Explain that clock signals coordinate small steps; for this lesson's simplified model, one clock cycle corresponds to one very small step. Use the single familiar example of placing an address on a bus, without replaying the bus transaction.
+- Contrast this with an instruction cycle: the complete handling of one instruction through fetch, decode and execute. In this lesson's step-by-step representation, one instruction is expanded into several small actions. State this as the teaching model, not a universal property of all processor designs; keep cycle counts, durations and frequencies qualitative.
 - Do not introduce PC, MAR, MDR, CIR, ACC, register transfer notation, instruction encoding, assembly mnemonics, binary, bus-width/word-size/addressing details, or a step-by-step memory bus transaction. These belong to subsequent bites.
-- Avoid suggesting that the processor waits for one clock tick between each of the three named stages. The high-level stages and the clock's finer timing role are distinct descriptions.
+- Avoid mapping one clock cycle to each of the three named stages. Fetch/decode/execute are the larger stages; clock cycles coordinate smaller actions within that process.
 
 ## Teaching example and visual sequence
 
@@ -43,7 +44,7 @@ Use a small illustrative list of two natural-language directions, such as `Displ
 
 The visual cycle has three named stages arranged in order: **Fetch → Decode → Execute**, with a clear return arrow from Execute to Fetch for the next instruction. On each pass, the active instruction card is identified and the active stage is highlighted. The second pass uses the second card so the learner sees that completion leads to another fetch. Use text, labels and direction marks as well as colour.
 
-Separate the clock into a final short visual. Show evenly spaced timing pulses under the conceptual processor cycle, clearly at a different visual scale. Explain that clock pulses coordinate hardware activity, whereas the instruction cycle is the larger process. Do not align exactly one pulse with each F–E stage or claim that all instructions take the same number of ticks.
+Separate the clock into a final short visual. Show one clock cycle as a simple regular beat, paired with one familiar small action: the processor places an address onto the address bus, as seen in Bite 4. Then explain that the instruction cycle is the complete handling of one instruction—fetch, decode and execute—and that this lesson's step-by-step view expands it into several small actions. Do not align one clock cycle with each F–E stage or imply that every processor design uses a fixed/universal number of cycles per instruction.
 
 ## Interaction model
 
@@ -65,7 +66,7 @@ All steps are keyboard operable with visible focus. Use semantic buttons and hea
 - A new learner can explain instruction, fetch, decode and execute from the page itself.
 - The three stages appear in the correct order and visibly form a repeatable loop.
 - The second instruction is fetched only after the first instruction has been executed; prediction and computer events remain distinct.
-- Clock pulses are explained after the F–E model; no learner-facing detail implies one pulse equals one complete instruction cycle or one stage.
+- Clock cycles are explained after the F–E model as coordinating small actions; an address-on-bus example grounds the idea. The page distinguishes this from the larger instruction cycle, which handles one instruction and is expanded into several small actions in this step-by-step teaching model. It makes no universal hardware timing claim.
 - The page does not leak named fetch registers, RTN, bit widths, implementation encoding, interrupts or bus-level microsteps.
 - English and Chinese remain equivalent and preserve current interaction state when switched.
 - Keyboard, reduced-motion and mobile requirements pass; automated tests cover cycle order/repetition, prediction separation, clock distinction and reset/language preservation, followed by browser walkthroughs on desktop and mobile.
