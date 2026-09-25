@@ -1,6 +1,6 @@
 # Bite 2 — Processor and registers
 
-**Status:** Proposal for discussion; not approved for implementation.
+**Status:** Approved for implementation by the owner on 25 September 2026.
 **Date:** 25 September 2026
 **Place in programme:** Foundations Bite 2, contributing prerequisites to L5–7. This is not completion of those full syllabus lessons.
 

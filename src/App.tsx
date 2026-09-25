@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { content, type Language } from "./content";
 import { readMemory, resetMemory, writeMemory } from "./memory";
+import ProcessorRegisters from "./ProcessorRegisters";
+import { processorContent } from "./processorContent";
 
 export default function App() {
   const [language, setLanguage] = useState<Language>("en");
@@ -13,13 +15,19 @@ export default function App() {
   const [written, setWritten] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   const t = content[language];
-  const lesson =
+  const memoryLesson =
     window.location.pathname.replace(/\/$/, "") === "/learn/memory";
+  const processorLesson =
+    window.location.pathname.replace(/\/$/, "") ===
+    "/learn/processor-registers";
   const home = window.location.pathname === "/";
   useEffect(() => {
     document.documentElement.lang = language === "en" ? "en" : "zh-Hans";
-    document.title = t.title + " · " + t.brand;
-  }, [language, t]);
+    document.title =
+      (processorLesson ? processorContent[language].title : t.title) +
+      " · " +
+      t.brand;
+  }, [language, processorLesson, t]);
   const move = (to: number) => {
     setStage(to);
     setSelected(null);
@@ -130,9 +138,41 @@ export default function App() {
               </span>
             </div>
           </section>
+          <section className="lesson-invitation second-lesson">
+            <div className="invitation-copy">
+              <p className="eyebrow">
+                {language === "en"
+                  ? "YOUR SECOND EXPLORATION"
+                  : "你的第二次探索"}
+              </p>
+              <h2>{processorContent[language].title}</h2>
+              <p>
+                {language === "en"
+                  ? "What carries out instructions? Where does it hold information while working? Explore the processor and the storage locations inside it."
+                  : "什么负责执行指令？处理器工作时把信息暂时存在哪里？一起认识处理器和它内部的存储位置。"}
+              </p>
+              <a className="primary-link" href="/learn/processor-registers">
+                {language === "en" ? "Explore processors" : "探索处理器"}
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <div className="processor-home-illustration" aria-hidden="true">
+              <span>{processorContent[language].processor}</span>
+              <div>
+                <small>{processorContent[language].registerA}</small>
+                <strong>7</strong>
+              </div>
+              <div>
+                <small>{processorContent[language].registerB}</small>
+                <strong>42</strong>
+              </div>
+            </div>
+          </section>
           <p className="home-note">{t.homeNote}</p>
         </main>
-      ) : !lesson ? (
+      ) : processorLesson ? (
+        <ProcessorRegisters language={language} />
+      ) : !memoryLesson ? (
         <main id="main" className="home">
           <h1>{t.unknown}</h1>
           <a href="/">{t.backHome}</a>
