@@ -66,11 +66,29 @@ export const copyingContent = {
       "This diagram shows the result, not the physical route. The next exploration introduces buses.",
     memoryRecallTitle: "Optional address and contents check",
     memoryRecallQuestion: "What are the contents at address 11?",
+    memoryRecallCorrection:
+      "11 is the address label; 42 is its contents. The copy reads the contents, not the address label.",
     revisitMemory: "Revisit memory",
     registerSourcePrediction: "What will Register A contain after the copy?",
     registerDestinationPrediction: "What will Register B contain after the copy?",
     registerResult:
       "Register A stays 7 because it is the source. Register B changes from 42 to 7 because it is the destination. The source value is read and the destination’s old contents are replaced.",
+    memorySourcePrediction: "What will address 11 contain after the copy?",
+    memoryDestinationPrediction: "What will Register A contain after the copy?",
+    memoryResult:
+      "Address 11 still contains 42 because memory is the source. Register A changes from 7 to 42 because it is the destination. The address label, source contents and other memory cells stay unchanged.",
+    example1: "Example 1",
+    example2: "Example 2",
+    freshQuestions: [
+      "which location is the source?",
+      "which location is the destination?",
+      "what is the source’s final value?",
+      "what is the destination’s final value?",
+    ],
+    freshResult1:
+      "Register B stays 3 because it is the source. Register A changes from 9 to 3 because it is the destination.",
+    freshResult2:
+      "Address 21 stays 4 because memory is the source. Register B changes from 8 to 4 because it is the destination. Different locations use the same copy rule: preserve the source and replace the destination.",
   },
   zh: {
     title: "复制数值",
@@ -136,10 +154,27 @@ export const copyingContent = {
     physicalRoute: "这幅图展示复制结果，不表示实际传送路径。下一次探索会介绍总线。",
     memoryRecallTitle: "可选：检查地址和内容",
     memoryRecallQuestion: "地址 11 的内容是什么？",
+    memoryRecallCorrection:
+      "11 是地址标签；42 才是其中的内容。复制时读取的是内容，而不是地址标签。",
     revisitMemory: "回顾内存",
     registerSourcePrediction: "复制后，寄存器 A 的内容是什么？",
     registerDestinationPrediction: "复制后，寄存器 B 的内容是什么？",
     registerResult:
       "寄存器 A 是来源，所以仍然是 7。寄存器 B 是目标，所以从 42 变为 7。读取来源的数值，并用它替换目标原来的内容。",
+    memorySourcePrediction: "复制后，地址 11 的内容是什么？",
+    memoryDestinationPrediction: "复制后，寄存器 A 的内容是什么？",
+    memoryResult:
+      "内存是来源，所以地址 11 的内容仍然是 42。寄存器 A 是目标，所以从 7 变为 42。地址标签、来源内容和其他内存单元都不变。",
+    example1: "例子 1",
+    example2: "例子 2",
+    freshQuestions: [
+      "哪个位置是来源？",
+      "哪个位置是目标？",
+      "来源最后的数值是什么？",
+      "目标最后的数值是什么？",
+    ],
+    freshResult1: "寄存器 B 是来源，所以仍然是 3。寄存器 A 是目标，所以从 9 变为 3。",
+    freshResult2:
+      "内存是来源，所以地址 21 仍然是 4。寄存器 B 是目标，所以从 8 变为 4。位置不同，复制规则相同：保留来源，替换目标。",
   },
 } as const;

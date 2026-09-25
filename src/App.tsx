@@ -186,7 +186,7 @@ export default function App() {
               <h2>{copyingContent[language].title}</h2>
               <p>
                 {language === "en"
-                  ? "What stays the same when a value is copied? Predict what changes as a copy moves between registers and from memory into the processor."
+                  ? "What stays the same when a value is copied? Predict what changes when copying between registers and from memory into the processor."
                   : "复制数值时，什么保持不变？先预测结果，再观察寄存器之间以及从内存到处理器的复制。"}
               </p>
               <a className="primary-link" href="/learn/copying-values">

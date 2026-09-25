@@ -103,3 +103,151 @@ test("a spoken register prediction also enables the copy", async () => {
   );
   expect(screen.getByRole("button", { name: "Show copy" })).toBeEnabled();
 });
+
+test("wrong predictions receive the same causal explanation without scoring", async () => {
+  const user = userEvent.setup();
+  render(<CopyingValues language="en" />);
+  await next(user);
+
+  const wrongSource = within(
+    screen.getByRole("group", {
+      name: "What will Register A contain after the copy?",
+    }),
+  ).getByRole("button", { name: "42" });
+  const wrongDestination = within(
+    screen.getByRole("group", {
+      name: "What will Register B contain after the copy?",
+    }),
+  ).getByRole("button", { name: "42" });
+  await user.click(wrongSource);
+  await user.click(wrongDestination);
+  await user.click(screen.getByRole("button", { name: "Show copy" }));
+
+  expect(screen.getByRole("status")).toHaveTextContent(
+    "Register A stays 7 because it is the source. Register B changes from 42 to 7 because it is the destination.",
+  );
+  expect(screen.queryByText(/score|points|seconds|timer/i)).not.toBeInTheDocument();
+  expect(wrongSource).toHaveAttribute("aria-disabled", "true");
+  expect(wrongDestination).toHaveAttribute("aria-disabled", "true");
+});
+
+test("memory copy keeps address 11 and its contents while replacing Register A", async () => {
+  const user = userEvent.setup();
+  render(<CopyingValues language="en" />);
+  await next(user, 2);
+
+  const memory = screen.getByRole("group", { name: "Main memory" });
+  expect(within(memory).getByRole("group", { name: "Address 10" })).toHaveTextContent("7");
+  expect(within(memory).getByRole("group", { name: "Address 11" })).toHaveTextContent("42");
+  expect(within(memory).getByRole("group", { name: "Address 12" })).toHaveTextContent("9");
+
+  await user.click(
+    within(
+      screen.getByRole("group", { name: "Optional address and contents check" }),
+    ).getByRole("button", { name: "11" }),
+  );
+  expect(screen.getByRole("link", { name: "Revisit memory" })).toHaveAttribute(
+    "href",
+    "/learn/memory",
+  );
+  expect(screen.getByText(/11 is the address label; 42 is its contents/)).toBeVisible();
+
+  const show = screen.getByRole("button", { name: "Show copy" });
+  expect(show).toBeDisabled();
+  const memoryPrediction = within(
+    screen.getByRole("group", {
+      name: "What will address 11 contain after the copy?",
+    }),
+  ).getByRole("button", { name: "42" });
+  await user.click(memoryPrediction);
+  expect(show).toBeDisabled();
+  await user.click(
+    within(
+      screen.getByRole("group", {
+        name: "What will Register A contain after the copy?",
+      }),
+    ).getByRole("button", { name: "42" }),
+  );
+  expect(show).toBeEnabled();
+  await user.click(show);
+
+  const result = screen.getByTestId("memory-copy-result");
+  const after = within(result).getByRole("group", { name: "After" });
+  expect(within(after).getByRole("group", { name: "Address 10" })).toHaveTextContent("7");
+  expect(within(after).getByRole("group", { name: "Address 11" })).toHaveTextContent("42");
+  expect(within(after).getByRole("group", { name: "Address 12" })).toHaveTextContent("9");
+  expect(within(after).getByRole("group", { name: "Register A" })).toHaveTextContent("42");
+  expect(memoryPrediction).toHaveAttribute("aria-disabled", "true");
+  expect(
+    within(
+      screen.getByRole("group", { name: "Optional address and contents check" }),
+    ).getByRole("button", { name: "11" }),
+  ).toHaveAttribute("aria-disabled", "true");
+  expect(screen.getByText(/result, not the physical route/)).toHaveTextContent(
+    "next exploration introduces buses",
+  );
+});
+
+test("fresh examples reveal together only after all eight predictions", async () => {
+  const user = userEvent.setup();
+  render(<CopyingValues language="en" />);
+  await next(user, 3);
+
+  const predictions: [string, string][] = [
+    ["Example 1: which location is the source?", "Register B"],
+    ["Example 1: which location is the destination?", "Register A"],
+    ["Example 1: what is the source’s final value?", "3"],
+    ["Example 1: what is the destination’s final value?", "3"],
+    ["Example 2: which location is the source?", "Address 21"],
+    ["Example 2: which location is the destination?", "Register B"],
+    ["Example 2: what is the source’s final value?", "4"],
+    ["Example 2: what is the destination’s final value?", "4"],
+  ];
+  for (const [index, [question, choice]] of predictions.entries()) {
+    await user.click(
+      within(screen.getByRole("group", { name: question })).getByRole(
+        "button",
+        { name: choice },
+      ),
+    );
+    if (index < 7) expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  }
+
+  expect(screen.getAllByRole("status")).toHaveLength(2);
+  const first = screen.getByRole("group", { name: "Example 1 After" });
+  expect(within(first).getByRole("group", { name: "Register B" })).toHaveTextContent("3");
+  expect(within(first).getByRole("group", { name: "Register A" })).toHaveTextContent("3");
+  const second = screen.getByRole("group", { name: "Example 2 After" });
+  expect(within(second).getByRole("group", { name: "Address 21" })).toHaveTextContent("4");
+  expect(within(second).getByRole("group", { name: "Register B" })).toHaveTextContent("4");
+  expect(
+    within(screen.getByRole("group", { name: predictions[0][0] })).getByRole(
+      "button",
+      { name: predictions[0][1] },
+    ),
+  ).toHaveAttribute("aria-disabled", "true");
+});
+
+test("language changes preserve an attempt while section re-entry and reset clear it", async () => {
+  const user = userEvent.setup();
+  const view = render(<CopyingValues language="en" />);
+  await next(user);
+  const spoken = screen.getByRole("button", { name: "I have made my prediction" });
+  await user.click(spoken);
+  await user.click(screen.getByRole("button", { name: "Show copy" }));
+
+  view.rerender(<CopyingValues language="zh" />);
+  expect(screen.getByRole("button", { name: "显示复制结果" })).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
+  await user.click(screen.getByRole("button", { name: "上一小节" }));
+  await user.click(screen.getByRole("button", { name: "2. 寄存器之间复制" }));
+  expect(screen.getByRole("button", { name: "显示复制结果" })).toBeDisabled();
+
+  await user.click(screen.getByRole("button", { name: "重新开始" }));
+  expect(
+    screen.getByRole("button", { name: "1. 来源与目标" }),
+  ).toHaveAttribute("aria-current", "step");
+  expect(screen.getByRole("heading", { name: "复制数值" })).toBeVisible();
+});
