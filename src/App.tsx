@@ -13,6 +13,8 @@ import FetchRegisters from "./FetchRegisters";
 import { fetchRegistersContent } from "./fetchRegistersContent";
 import RTNNotation from "./RTNNotation";
 import { rtnNotationContent } from "./rtnNotationContent";
+import FetchCycle from "./FetchCycle";
+import { fetchCycleContent } from "./fetchCycleContent";
 
 export default function App() {
   const [language, setLanguage] = useState<Language>("en");
@@ -40,11 +42,15 @@ export default function App() {
     window.location.pathname.replace(/\/$/, "") === "/learn/fetch-registers";
   const rtnNotationLesson =
     window.location.pathname.replace(/\/$/, "") === "/learn/rtn-notation";
+  const fetchCycleLesson =
+    window.location.pathname.replace(/\/$/, "") === "/learn/fetch-cycle";
   const home = window.location.pathname === "/";
   useEffect(() => {
     document.documentElement.lang = language === "en" ? "en" : "zh-Hans";
     document.title =
-      (rtnNotationLesson
+      (fetchCycleLesson
+        ? fetchCycleContent[language].title
+        : rtnNotationLesson
         ? rtnNotationContent[language].title
         : fetchRegistersLesson
         ? fetchRegistersContent[language].title
@@ -59,7 +65,7 @@ export default function App() {
           : t.title) +
       " · " +
       t.brand;
-  }, [busesLesson, copyingLesson, fetchRegistersLesson, instructionCycleLesson, language, processorLesson, rtnNotationLesson, t]);
+  }, [busesLesson, copyingLesson, fetchCycleLesson, fetchRegistersLesson, instructionCycleLesson, language, processorLesson, rtnNotationLesson, t]);
   const move = (to: number) => {
     setStage(to);
     setSelected(null);
@@ -281,6 +287,19 @@ export default function App() {
               <span>MDR ← [[MAR]]</span>
             </div>
           </section>
+          <section className="lesson-invitation eighth-lesson">
+            <div className="invitation-copy">
+              <p className="eyebrow">{fetchCycleContent[language].eyebrow}</p>
+              <h2>{fetchCycleContent[language].title}</h2>
+              <p>{fetchCycleContent[language].homeIntro}</p>
+              <a className="primary-link" href="/learn/fetch-cycle">
+                {fetchCycleContent[language].explore}<span aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <div className="fetch-cycle-home-illustration" aria-hidden="true">
+              <span>Fetch</span><b>→</b><span>Decode</span><b>→</b><span>Execute</span><b>↶</b>
+            </div>
+          </section>
           <p className="home-note">{t.homeNote}</p>
         </main>
       ) : copyingLesson ? (
@@ -293,6 +312,8 @@ export default function App() {
         <FetchRegisters language={language} />
       ) : rtnNotationLesson ? (
         <RTNNotation language={language} />
+      ) : fetchCycleLesson ? (
+        <FetchCycle language={language} />
       ) : processorLesson ? (
         <ProcessorRegisters language={language} />
       ) : !memoryLesson ? (
