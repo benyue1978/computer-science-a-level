@@ -1,6 +1,6 @@
 # Computer Science A Level — Processor Lab
 
-Planning documents for a parent-guided learning programme aligned with Cambridge International AS & A Level Computer Science 9618, targeting the 2027 AS examination.
+A browser app and planning documents for a parent-guided learning programme aligned with Cambridge International AS & A Level Computer Science 9618, targeting the 2027 AS examination.
 
 The programme combines short English/Mandarin Remotion videos, a browser-based processor simulator, guided activities and exam-transfer checks. It is an independent teaching project, not an official Cambridge product.
 
@@ -14,10 +14,43 @@ The programme combines short English/Mandarin Remotion videos, a browser-based p
 
 ## Status
 
-Planning stage. The immediate next step is a tiny memory/address/content activity, followed by one foundational idea at a time. The complete simulator and hybrid RTN lesson remain later goals. No browser app or simulator has been implemented yet. Test and coverage requirements in the plans describe future acceptance criteria, not current test results.
+The first browser activity introduces memory, addresses and contents through six small, parent-guided stages, with English and Mandarin support. The home page is at `/`; the activity is at `/learn/memory`. The complete simulator and hybrid RTN lesson remain later goals. The parent/child learning trial is still pending; automated checks cannot establish whether the teaching is understood. Processor-engine coverage requirements in the wider plans apply to future work.
 
 The proposed processor is a project-specific implementation of Cambridge's example instruction meanings. Its encoding, widths and controller layout remain engineering details behind a stable teaching interface. Architecture changes must revalidate affected examples.
 
 The eventual hosting target is Vercel, after the working app has been verified by the project owner. The browser build will run simulation locally; media will be rendered before deployment.
 
 Referenced local study notes and source PDFs are not included in this repository. Links to the official syllabus and relevant public sources are listed in the specifications.
+
+## Run locally
+
+Use Node.js 22.12 or newer and npm.
+
+```sh
+npm ci
+npm run dev
+```
+
+Open the local URL printed by the development server. Progress stays in memory only: resetting or refreshing starts the activity again. Switching language within the activity preserves the current stage and selection.
+
+## Verify the app
+
+```sh
+npm test
+npm run build
+npm run test:e2e
+```
+
+Current automated verification: 11 unit/interface tests and 6 desktop/mobile browser checks pass.
+
+For the first browser-test run, install Chromium with `npx playwright install chromium`. Browser tests exercise the production preview. To try that build yourself:
+
+```sh
+npm run preview
+```
+
+## Publish later
+
+After the owner has tried and approved the working app, import this repository into Vercel as a Vite project. Use the repository root, build command `npm run build`, and output directory `dist`. The included `vercel.json` supports opening and refreshing lesson links directly. Vercel publishes the built app; planning documents and local source notes are not automatically website pages.
+
+No Vercel project or automatic deployment has been set up as part of this implementation. No backend, account, environment secret or database is required.

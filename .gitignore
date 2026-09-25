@@ -11,3 +11,7 @@ test-results/
 .env
 .env.*
 !.env.example
+
+*.tsbuildinfo
+
+.playwright-mcp/
