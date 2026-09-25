@@ -216,6 +216,54 @@ h2:focus-visible {
   margin-top: 24px;
 }
 .fourth-lesson { margin-top: 24px; }
+.fifth-lesson { margin-top: 24px; }
+.cycle-home-illustration {
+  align-self: center;
+  justify-self: center;
+  display: grid;
+  width: min(100%, 380px);
+  gap: 8px;
+  text-align: center;
+  color: #3c5142;
+}
+.cycle-home-illustration span { padding: 8px 12px; border: 1px solid #7b8877; background: #eef0e6; }
+.cycle-home-illustration b { color: var(--accent); }
+.cycle-home-illustration small { color: var(--muted); }
+.cycle-lesson { padding-bottom: 60px; }
+.cycle-heading { padding: 58px 0 25px; max-width: 790px; }
+.cycle-heading h1 { font-size: clamp(42px, 6vw, 68px); margin: 12px 0 16px; }
+.cycle-heading > p:last-child { color: var(--muted); font-size: 18px; }
+.cycle-definition { border-left: 3px solid #73816b; padding: 12px 18px; margin-bottom: 34px; max-width: 780px; background: #eff0e7; }
+.cycle-diagram, .cycle-example, .cycle-walkthrough, .cycle-clock { border-top: 1px solid var(--line); padding: 28px 0; }
+.cycle-phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; padding: 0; margin: 0; list-style: none; }
+.cycle-phases li { position: relative; display: grid; align-content: start; gap: 8px; min-height: 150px; padding: 18px; border: 1px solid #c4c8b7; background: #fffdf7; }
+.cycle-phases li.active { border: 3px solid #526947; background: #eff2e8; padding: 16px; }
+.cycle-phase-number { color: var(--muted); font-size: 11px; letter-spacing: .12em; }
+.cycle-phases strong { font-family: "Newsreader", Georgia, serif; font-size: 28px; }
+.cycle-phases li > span:last-of-type { color: var(--muted); font-size: 14px; }
+.cycle-arrow { position: absolute; right: -20px; top: 42%; z-index: 1; color: var(--accent); font-size: 23px; }
+.cycle-loop { text-align: center; color: var(--accent); margin-top: 17px; }
+.cycle-meaning { text-align: center; color: var(--muted); margin-top: 8px; }
+.cycle-loop span { font-size: 22px; vertical-align: middle; }
+.cycle-example > .eyebrow { margin-bottom: 14px; }
+.cycle-instructions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.cycle-instruction { display: grid; gap: 8px; border: 1px solid var(--line); background: #fffdf7; padding: 18px; }
+.cycle-instruction.active { border-color: #526947; box-shadow: inset 4px 0 #526947; }
+.cycle-instruction span { color: var(--muted); font-size: 12px; }
+.cycle-instruction strong { font-family: "Newsreader", Georgia, serif; font-size: 24px; }
+.cycle-walkthrough { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
+.cycle-prediction h2, .cycle-clock h2 { font-size: 32px; margin: 10px 0 16px; }
+.cycle-choices { display: grid; gap: 8px; margin-top: 18px; }
+.cycle-choices button { text-align: left; padding: 11px 14px; border: 1px solid var(--line); background: #fffdf7; }
+.cycle-feedback { margin-top: 12px; color: #3e6040; }
+.cycle-computer { border-left: 1px solid var(--line); padding-left: 28px; }
+.cycle-event { min-height: 92px; display: flex; align-items: center; padding: 16px; margin: 12px 0; background: #eef0e6; border: 1px solid #c4c8b7; }
+.cycle-clock > p:not(.eyebrow) { max-width: 790px; color: var(--muted); }
+.clock-pulses { display: flex; align-items: center; gap: 24px; margin: 24px 0; padding: 18px; background: #fffdf7; border: 1px solid var(--line); }
+.clock-pulses figcaption { font-weight: 600; white-space: nowrap; }
+.clock-wave { display: flex; align-items: center; justify-content: space-around; gap: 12px; flex: 1; height: 44px; border-bottom: 2px solid #637a63; }
+.clock-wave span { display: block; height: 30px; width: 2px; background: #637a63; }
+.clock-distinction { border-left: 3px solid var(--accent); padding: 10px 14px; background: #f1e9dc; }
 .bus-home-illustration {
   align-self: center;
   justify-self: center;
@@ -1079,6 +1127,13 @@ footer {
     margin: 20px 0;
   }
   .bus-flow-diagram { grid-template-columns:1fr; }
+  .cycle-phases { grid-template-columns: 1fr; gap: 10px; }
+  .cycle-phases li { min-height: 0; }
+  .cycle-arrow { position: static; display: block; transform: rotate(90deg); justify-self: center; line-height: 1; }
+  .cycle-walkthrough, .cycle-instructions { grid-template-columns: 1fr; }
+  .cycle-computer { border-left: 0; border-top: 1px solid var(--line); padding: 22px 0 0; }
+  .clock-pulses { align-items: stretch; flex-direction: column; gap: 10px; margin-inline: 0; }
+  .clock-wave { width: 100%; flex: none; }
   .bus-cpu { min-height:55px; }
   .bus-endpoints { grid-template-columns:1fr 1fr; grid-template-rows:1fr; }
   .bus-lane { grid-template-columns:1fr; gap:3px; }

@@ -7,6 +7,8 @@ import CopyingValues from "./CopyingValues";
 import { copyingContent } from "./copyingContent";
 import BusesControl from "./BusesControl";
 import { busesControlContent } from "./busesControlContent";
+import InstructionCycle from "./InstructionCycle";
+import { instructionCycleContent } from "./instructionCycleContent";
 
 export default function App() {
   const [language, setLanguage] = useState<Language>("en");
@@ -28,11 +30,15 @@ export default function App() {
     window.location.pathname.replace(/\/$/, "") === "/learn/copying-values";
   const busesLesson =
     window.location.pathname.replace(/\/$/, "") === "/learn/buses-and-control";
+  const instructionCycleLesson =
+    window.location.pathname.replace(/\/$/, "") === "/learn/instruction-cycle";
   const home = window.location.pathname === "/";
   useEffect(() => {
     document.documentElement.lang = language === "en" ? "en" : "zh-Hans";
     document.title =
-      (busesLesson
+      (instructionCycleLesson
+        ? instructionCycleContent[language].title
+        : busesLesson
         ? busesControlContent[language].title
         : copyingLesson
         ? copyingContent[language].title
@@ -41,7 +47,7 @@ export default function App() {
           : t.title) +
       " · " +
       t.brand;
-  }, [busesLesson, copyingLesson, language, processorLesson, t]);
+  }, [busesLesson, copyingLesson, instructionCycleLesson, language, processorLesson, t]);
   const move = (to: number) => {
     setStage(to);
     setSelected(null);
@@ -221,12 +227,28 @@ export default function App() {
               <span>{busesControlContent[language].controlBus}</span>
             </div>
           </section>
+          <section className="lesson-invitation fifth-lesson">
+            <div className="invitation-copy">
+              <p className="eyebrow">{instructionCycleContent[language].homeEyebrow}</p>
+              <h2>{instructionCycleContent[language].title}</h2>
+              <p>{instructionCycleContent[language].homeIntro}</p>
+              <a className="primary-link" href="/learn/instruction-cycle">
+                {instructionCycleContent[language].explore}<span aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <div className="cycle-home-illustration" aria-hidden="true">
+              {instructionCycleContent[language].phases.map((phase, index) => <span key={phase}>{phase}{index < 2 && <b> → </b>}</span>)}
+              <small>↶ {instructionCycleContent[language].loopLabel}</small>
+            </div>
+          </section>
           <p className="home-note">{t.homeNote}</p>
         </main>
       ) : copyingLesson ? (
         <CopyingValues language={language} />
       ) : busesLesson ? (
         <BusesControl language={language} />
+      ) : instructionCycleLesson ? (
+        <InstructionCycle language={language} />
       ) : processorLesson ? (
         <ProcessorRegisters language={language} />
       ) : !memoryLesson ? (
