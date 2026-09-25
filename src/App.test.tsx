@@ -123,6 +123,20 @@ test("home links to the third lesson and its direct route renders", () => {
   expect(screen.getByRole("heading", { name: "Copying values" })).toBeVisible();
   expect(document.title).toContain("Copying values");
 });
+
+test("home links to fetch registers and its direct route renders a localized title", () => {
+  window.history.replaceState({}, "", "/");
+  const home = render(<App />);
+  expect(screen.getByRole("link", { name: /Explore the fetch registers/ })).toHaveAttribute(
+    "href",
+    "/learn/fetch-registers",
+  );
+  home.unmount();
+  window.history.replaceState({}, "", "/learn/fetch-registers");
+  render(<App />);
+  expect(screen.getByRole("heading", { name: "Four registers, four jobs" })).toBeVisible();
+  expect(document.title).toContain("Four registers, four jobs");
+});
 test("revisiting the first example restores 42 and clears prior read and write attempts", async () => {
   const user = userEvent.setup();
   render(<App />);

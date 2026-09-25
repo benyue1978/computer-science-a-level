@@ -4,6 +4,8 @@
 **Programme:** Cambridge International AS & A Level Computer Science 9618, 2027–2029  
 **Audience:** A learner beginning with no assumed computer-science knowledge, learning with a guide
 
+**Implementation status:** Complete. The bilingual lesson is available at `/learn/fetch-registers`; automated verification covers its register relay, learner checks, language preservation, reset, desktop/mobile layout and direct route.
+
 ## Purpose
 
 Introduce the four registers most visible in the fetch path: Program Counter (PC), Memory Address Register (MAR), Memory Data Register (MDR) and Current Instruction Register (CIR). The learner should know their full names, understand that each is a small storage location inside the processor with a different job, and follow how an instruction and its address relate to the address, data and control buses.

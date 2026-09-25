@@ -9,6 +9,8 @@ import BusesControl from "./BusesControl";
 import { busesControlContent } from "./busesControlContent";
 import InstructionCycle from "./InstructionCycle";
 import { instructionCycleContent } from "./instructionCycleContent";
+import FetchRegisters from "./FetchRegisters";
+import { fetchRegistersContent } from "./fetchRegistersContent";
 
 export default function App() {
   const [language, setLanguage] = useState<Language>("en");
@@ -32,11 +34,15 @@ export default function App() {
     window.location.pathname.replace(/\/$/, "") === "/learn/buses-and-control";
   const instructionCycleLesson =
     window.location.pathname.replace(/\/$/, "") === "/learn/instruction-cycle";
+  const fetchRegistersLesson =
+    window.location.pathname.replace(/\/$/, "") === "/learn/fetch-registers";
   const home = window.location.pathname === "/";
   useEffect(() => {
     document.documentElement.lang = language === "en" ? "en" : "zh-Hans";
     document.title =
-      (instructionCycleLesson
+      (fetchRegistersLesson
+        ? fetchRegistersContent[language].title
+        : instructionCycleLesson
         ? instructionCycleContent[language].title
         : busesLesson
         ? busesControlContent[language].title
@@ -47,7 +53,7 @@ export default function App() {
           : t.title) +
       " · " +
       t.brand;
-  }, [busesLesson, copyingLesson, instructionCycleLesson, language, processorLesson, t]);
+  }, [busesLesson, copyingLesson, fetchRegistersLesson, instructionCycleLesson, language, processorLesson, t]);
   const move = (to: number) => {
     setStage(to);
     setSelected(null);
@@ -241,6 +247,20 @@ export default function App() {
               <small>↶ {instructionCycleContent[language].loopLabel}</small>
             </div>
           </section>
+          <section className="lesson-invitation sixth-lesson">
+            <div className="invitation-copy">
+              <p className="eyebrow">{fetchRegistersContent[language].homeEyebrow}</p>
+              <h2>{fetchRegistersContent[language].title}</h2>
+              <p>{fetchRegistersContent[language].homeIntro}</p>
+              <a className="primary-link" href="/learn/fetch-registers">
+                {fetchRegistersContent[language].explore}<span aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <div className="fetch-home-illustration" aria-hidden="true">
+              <span>PC 20 → MAR 20</span>
+              <span>Memory ⇄ MDR ⇄ CIR</span>
+            </div>
+          </section>
           <p className="home-note">{t.homeNote}</p>
         </main>
       ) : copyingLesson ? (
@@ -249,6 +269,8 @@ export default function App() {
         <BusesControl language={language} />
       ) : instructionCycleLesson ? (
         <InstructionCycle language={language} />
+      ) : fetchRegistersLesson ? (
+        <FetchRegisters language={language} />
       ) : processorLesson ? (
         <ProcessorRegisters language={language} />
       ) : !memoryLesson ? (
