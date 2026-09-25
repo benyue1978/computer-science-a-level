@@ -195,3 +195,14 @@ git status --short --branch
 ```
 
 Expected: fast-forward merge, tests/build pass again on `main`, push succeeds, equality check exits 0, feature branch is deleted, and final status is clean on `main` tracking `origin/main`.
+
+## Verification record
+
+- Spec compliance: approved after separating Section 4 prediction from copy reveal and locking Section 3 corrective feedback.
+- Code quality: approved after fixing language-independent source/destination styling, visible heading focus, live correction feedback and nested heading levels.
+- Unit/interface suite: 29 tests passed across 5 files.
+- Production build: TypeScript and Vite build completed successfully.
+- Browser suite: 18 checks passed across desktop and mobile projects; Bite 3 accounts for 6 checks.
+- Dependency audit: 0 vulnerabilities at moderate level or above.
+- Whitespace validation: `git diff --check` passed.
+- Visual review: English/Mandarin content, desktop/mobile stacking, source/destination labels and before/after diagrams inspected. A guided learner trial remains pending.
