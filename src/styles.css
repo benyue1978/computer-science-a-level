@@ -215,6 +215,104 @@ h2:focus-visible {
 .third-lesson {
   margin-top: 24px;
 }
+.fourth-lesson { margin-top: 24px; }
+.bus-home-illustration {
+  align-self: center;
+  justify-self: center;
+  display: grid;
+  gap: 8px;
+  width: min(100%, 320px);
+}
+.bus-home-illustration span {
+  border: 1px solid #7b8877;
+  background: #eef0e6;
+  padding: 9px 14px;
+  text-align: center;
+  color: #3c5142;
+  font-size: 13px;
+}
+.buses-lesson { padding-bottom: 60px; }
+.buses-heading { padding: 58px 0 34px; max-width: 790px; }
+.buses-heading h1 { font-size: clamp(42px, 6vw, 68px); margin: 12px 0 16px; }
+.buses-heading > p:last-child { color: var(--muted); font-size: 18px; }
+.bus-topology,
+.bus-explorer,
+.bus-check { border-top: 1px solid var(--line); padding: 28px 0; }
+.bus-components {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.bus-node {
+  border: 2px solid #ad754c;
+  background: #fff0d9;
+  text-align: center;
+  padding: 15px 10px;
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 24px;
+}
+.bus-group { position: relative; border: 1px dashed #8c6595; padding: 32px 12px 12px; }
+.bus-group-label {
+  position: absolute;
+  top: 3px;
+  left: 12px;
+  color: #684775;
+  font-size: 12px;
+  font-weight: 700;
+}
+.bus-lane {
+  display: grid;
+  grid-template-columns: minmax(145px, .8fr) minmax(160px, 1fr) minmax(90px, .5fr);
+  align-items: center;
+  gap: 12px;
+  margin: 7px 0;
+  padding: 12px 15px;
+  border-left: 5px solid #387698;
+  background: #e9f0f2;
+}
+.bus-lane strong { font-size: 14px; }
+.bus-lane > span { text-align: center; color: #365666; font-size: 13px; }
+.bus-lane small { text-align: right; color: var(--muted); }
+.bus-lane.active { outline: 3px solid #a3482c; outline-offset: 2px; font-weight: 600; }
+.data-lane { border-color: #50834b; background: #edf2e7; }
+.data-lane > span { color: #41643d; }
+.control-lane { border-color: #8a568e; background: #f1eaf2; }
+.control-lane > span { color: #684775; }
+.bus-roles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+.bus-roles p { color: var(--muted); font-size: 14px; }
+.bus-roles strong { display: block; color: #292d28; margin-bottom: 5px; }
+.cu-note { border-left: 3px solid #8a568e; padding: 9px 14px; margin-top: 18px; background: #f1eaf2; }
+.bus-explorer-heading { display:flex; justify-content:space-between; align-items:center; gap:20px; }
+.bus-explorer h2 { font-size: 32px; margin-top: 8px; }
+.bus-mode { display:flex; gap:8px; }
+.bus-mode button,
+.bus-predictions button {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  padding: 9px 16px;
+}
+.bus-mode button[aria-pressed="true"],
+.bus-predictions button[aria-pressed="true"] { background:#e8e9dc; border-color:#66725b; }
+.bus-example-state { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:22px 0; }
+.bus-example-state > div { background:#fffdf7; border:1px solid var(--line); padding:13px 16px; display:grid; gap:4px; }
+.bus-example-state span { color:var(--muted); font-size:12px; }
+.bus-example-state strong { font-size:20px; }
+.bus-try { border-left:3px solid #78836d; padding:12px 17px; background:#f0f1e8; }
+.bus-try h3 { font-size:12px; text-transform:uppercase; letter-spacing:.12em; margin-bottom:5px; }
+.bus-predictions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.computer-event { display:flex; align-items:center; gap:18px; margin-top:22px; flex-wrap:wrap; }
+.computer-event .eyebrow { min-width:120px; }
+.event-output { flex:1; min-width:240px; padding:12px 16px; background:#eef0e6; border:1px solid #c4cbb9; }
+.bus-check-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px; }
+.bus-check-grid p { display:grid; gap:4px; padding:12px; background:#fffdf7; border:1px solid var(--line); }
+.bus-check-grid strong { font-size:13px; }
+.bus-check-grid span { color:#365666; }
 .copy-home-illustration {
   align-self: center;
   justify-self: center;
@@ -982,6 +1080,15 @@ footer {
     width: 180px;
     margin: 20px 0;
   }
+  .bus-components { grid-template-columns:1fr; }
+  .bus-lane { grid-template-columns:1fr; gap:3px; }
+  .bus-lane > span,
+  .bus-lane small { text-align:left; }
+  .bus-roles,
+  .bus-check-grid { grid-template-columns:1fr; }
+  .bus-explorer-heading { align-items:flex-start; flex-direction:column; }
+  .bus-example-state { grid-template-columns:1fr; }
+  .computer-event { align-items:stretch; flex-direction:column; gap:10px; }
   .home-illustration > div {
     font-size: 75px;
   }

@@ -5,6 +5,8 @@ import ProcessorRegisters from "./ProcessorRegisters";
 import { processorContent } from "./processorContent";
 import CopyingValues from "./CopyingValues";
 import { copyingContent } from "./copyingContent";
+import BusesControl from "./BusesControl";
+import { busesControlContent } from "./busesControlContent";
 
 export default function App() {
   const [language, setLanguage] = useState<Language>("en");
@@ -24,18 +26,22 @@ export default function App() {
     "/learn/processor-registers";
   const copyingLesson =
     window.location.pathname.replace(/\/$/, "") === "/learn/copying-values";
+  const busesLesson =
+    window.location.pathname.replace(/\/$/, "") === "/learn/buses-and-control";
   const home = window.location.pathname === "/";
   useEffect(() => {
     document.documentElement.lang = language === "en" ? "en" : "zh-Hans";
     document.title =
-      (copyingLesson
+      (busesLesson
+        ? busesControlContent[language].title
+        : copyingLesson
         ? copyingContent[language].title
         : processorLesson
           ? processorContent[language].title
           : t.title) +
       " · " +
       t.brand;
-  }, [copyingLesson, language, processorLesson, t]);
+  }, [busesLesson, copyingLesson, language, processorLesson, t]);
   const move = (to: number) => {
     setStage(to);
     setSelected(null);
@@ -200,10 +206,27 @@ export default function App() {
               <div><small>B</small><strong>7</strong></div>
             </div>
           </section>
+          <section className="lesson-invitation fourth-lesson">
+            <div className="invitation-copy">
+              <p className="eyebrow">{busesControlContent[language].homeEyebrow}</p>
+              <h2>{busesControlContent[language].homeTitle}</h2>
+              <p>{busesControlContent[language].homeIntro}</p>
+              <a className="primary-link" href="/learn/buses-and-control">
+                {busesControlContent[language].explore}<span aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <div className="bus-home-illustration" aria-hidden="true">
+              <span>{busesControlContent[language].addressBus}</span>
+              <span>{busesControlContent[language].dataBus}</span>
+              <span>{busesControlContent[language].controlBus}</span>
+            </div>
+          </section>
           <p className="home-note">{t.homeNote}</p>
         </main>
       ) : copyingLesson ? (
         <CopyingValues language={language} />
+      ) : busesLesson ? (
+        <BusesControl language={language} />
       ) : processorLesson ? (
         <ProcessorRegisters language={language} />
       ) : !memoryLesson ? (
