@@ -39,21 +39,23 @@ export default function BusesControl({ language }: Props) {
       </header>
 
       <section className="bus-topology" aria-label={t.systemBus}>
-        <div className="bus-components">
-          <div className="bus-node">{t.cpu}</div>
-          <div className="bus-node">{t.memory}</div>
-          <div className="bus-node">{t.ports}</div>
-        </div>
-        <div className="bus-group">
-          <span className="bus-group-label">{t.systemBus}</span>
-          <div className={`bus-lane address-lane${activeBus === "address" ? " active" : ""}`} aria-label={language === "en" ? "Address bus lane" : "地址总线通道"} aria-current={activeBus === "address" ? "step" : undefined}>
-            <strong>{t.addressBus}</strong><span>{t.addressDirection}</span><small>{t.where}</small>
+        <div className="bus-flow-diagram">
+          <div className="bus-node bus-cpu">{t.cpu}</div>
+          <div className="bus-group">
+            <span className="bus-group-label">{t.systemBus}</span>
+            <div className={`bus-lane address-lane${activeBus === "address" ? " active" : ""}`} aria-label={language === "en" ? "Address bus lane" : "地址总线通道"} aria-current={activeBus === "address" ? "step" : undefined}>
+              <strong>{t.addressBus}</strong><span>{t.addressDirection}</span><small>{t.where}</small>
+            </div>
+            <div className={`bus-lane data-lane${activeBus === "data" ? " active" : ""}`} aria-label={language === "en" ? "Data bus lane" : "数据总线通道"} aria-current={activeBus === "data" ? "step" : undefined}>
+              <strong>{t.dataBus}</strong><span>{t.dataDirection}</span><small>{t.value}</small>
+            </div>
+            <div className={`bus-lane control-lane${activeBus === "control" ? " active" : ""}`} aria-label={language === "en" ? "Control bus lane" : "控制总线通道"} aria-current={activeBus === "control" ? "step" : undefined}>
+              <strong>{t.controlBus}</strong><span>{t.controlSignals}<br />{t.controlDirection}</span><small>{t.request}</small>
+            </div>
           </div>
-          <div className={`bus-lane data-lane${activeBus === "data" ? " active" : ""}`} aria-label={language === "en" ? "Data bus lane" : "数据总线通道"} aria-current={activeBus === "data" ? "step" : undefined}>
-            <strong>{t.dataBus}</strong><span>{t.dataDirection}</span><small>{t.value}</small>
-          </div>
-          <div className={`bus-lane control-lane${activeBus === "control" ? " active" : ""}`} aria-label={language === "en" ? "Control bus lane" : "控制总线通道"} aria-current={activeBus === "control" ? "step" : undefined}>
-            <strong>{t.controlBus}</strong><span>{t.controlSignals}</span><small>{t.request}</small>
+          <div className="bus-endpoints">
+            <div className="bus-node">{t.memory}</div>
+            <div className="bus-node">{t.ports}</div>
           </div>
         </div>
         <div className="bus-roles">
@@ -61,6 +63,7 @@ export default function BusesControl({ language }: Props) {
           <p><strong>{t.dataBus} · {t.value}</strong>{t.dataMeaning}</p>
           <p><strong>{t.controlBus} · {t.request}</strong>{t.controlMeaning}</p>
         </div>
+        <p className="port-note">{t.portMeaning}</p>
         <p className="cu-note">{t.cu}</p>
       </section>
 

@@ -27,6 +27,7 @@ By the end, the learner can:
 ## Teaching boundaries and precision
 
 - Address identifies where; it does not carry the contents.
+- Introduce a bus in plain language as shared communication pathways linking components before relying on the new term. A port is the point where an I/O device connects to the computer.
 - Data carries the instruction or value; it does not identify the destination by itself.
 - Control carries requests and coordination/status signals; it is not payload data. Name READ and WRITE as concrete examples. The control bus is described as bidirectional in aggregate: individual signals have their own directions.
 - The address bus is shown CPU→memory/I/O for this taught access model. The data bus can carry information in either direction, depending on read versus write.

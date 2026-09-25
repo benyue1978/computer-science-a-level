@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("home exposes three lessons and the copying route survives reload", async ({ page }) => {
+test("home exposes the lesson sequence and the copying route survives reload", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");

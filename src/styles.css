@@ -238,12 +238,7 @@ h2:focus-visible {
 .bus-topology,
 .bus-explorer,
 .bus-check { border-top: 1px solid var(--line); padding: 28px 0; }
-.bus-components {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 14px;
-}
+.bus-flow-diagram { display:grid; grid-template-columns:minmax(110px,.65fr) minmax(0,2.4fr) minmax(130px,.9fr); gap:10px; align-items:stretch; }
 .bus-node {
   border: 2px solid #ad754c;
   background: #fff0d9;
@@ -252,6 +247,8 @@ h2:focus-visible {
   font-family: "Newsreader", Georgia, serif;
   font-size: 24px;
 }
+.bus-cpu { align-self:center; }
+.bus-endpoints { display:grid; grid-template-rows:1fr 1fr; gap:10px; }
 .bus-group { position: relative; border: 1px dashed #8c6595; padding: 32px 12px 12px; }
 .bus-group-label {
   position: absolute;
@@ -288,6 +285,7 @@ h2:focus-visible {
 .bus-roles p { color: var(--muted); font-size: 14px; }
 .bus-roles strong { display: block; color: #292d28; margin-bottom: 5px; }
 .cu-note { border-left: 3px solid #8a568e; padding: 9px 14px; margin-top: 18px; background: #f1eaf2; }
+.port-note { margin-top:16px; color:var(--muted); font-size:14px; }
 .bus-explorer-heading { display:flex; justify-content:space-between; align-items:center; gap:20px; }
 .bus-explorer h2 { font-size: 32px; margin-top: 8px; }
 .bus-mode { display:flex; gap:8px; }
@@ -1080,7 +1078,9 @@ footer {
     width: 180px;
     margin: 20px 0;
   }
-  .bus-components { grid-template-columns:1fr; }
+  .bus-flow-diagram { grid-template-columns:1fr; }
+  .bus-cpu { min-height:55px; }
+  .bus-endpoints { grid-template-columns:1fr 1fr; grid-template-rows:1fr; }
   .bus-lane { grid-template-columns:1fr; gap:3px; }
   .bus-lane > span,
   .bus-lane small { text-align:left; }

@@ -91,13 +91,16 @@ test("new example checks content, address, and duplicate values without gating n
     screen.getByRole("button", { name: "Address 11, contents 42" }),
   ).toBeVisible();
 });
-test("has a single available lesson and recovers unknown paths", () => {
+test("home lists the available lessons and unknown paths recover", () => {
   window.history.replaceState({}, "", "/");
   const view = render(<App />);
   expect(screen.getByRole("link", { name: /Explore memory/ })).toHaveAttribute(
     "href",
     "/learn/memory",
   );
+  expect(
+    screen.getByRole("link", { name: /Explore buses and control/ }),
+  ).toHaveAttribute("href", "/learn/buses-and-control");
   view.unmount();
   window.history.replaceState({}, "", "/missing");
   render(<App />);

@@ -4,10 +4,11 @@ export const busesControlContent = {
   en: {
     title: "Buses and control",
     intro:
-      "The processor, memory and input/output ports exchange information along a system bus. Its three bus groups have different jobs.",
+      "A bus is a shared set of communication pathways linking components. The system bus connects the processor, memory and input/output ports through three groups, each with a different job.",
     cpu: "CPU",
     memory: "Memory",
     ports: "I/O ports",
+    portMeaning: "A port is the point where a device connects to the computer.",
     systemBus: "System bus",
     addressBus: "Address bus",
     dataBus: "Data bus",
@@ -18,10 +19,11 @@ export const busesControlContent = {
     addressDirection: "CPU → memory / ports",
     dataDirection: "CPU ↔ memory / ports",
     controlSignals: "READ · WRITE",
+    controlDirection: "CPU ↔ memory / ports · each signal has its own direction",
     addressMeaning: "Carries the location being accessed, from the CPU toward memory or a port.",
     dataMeaning: "Carries the value being transferred. Its direction depends on the transfer.",
     controlMeaning:
-      "Carries control signals such as READ and WRITE. The control bus is bidirectional overall; each signal has its own direction.",
+      "Carries control signals such as READ and WRITE. Overall, signals can travel both ways; each individual signal has its own direction.",
     cu:
       "The control unit (CU) coordinates a transfer by issuing the appropriate control signal.",
     modePrompt: "Choose a transfer to explore.",
@@ -35,7 +37,6 @@ export const busesControlContent = {
       "Memory contents at address 12 change",
       "Address 12 changes to 6",
     ],
-    prediction: "Check prediction",
     correctPrediction: "That prediction is right. Now follow the computer's transfers.",
     incorrectPrediction: "Not quite. Follow the transfers and compare the final state with your prediction.",
     predictFirst: "Make a prediction before showing the transfers.",
@@ -76,10 +77,11 @@ export const busesControlContent = {
   zh: {
     title: "总线与控制",
     intro:
-      "处理器、内存和输入／输出端口通过系统总线交换信息。系统总线中的三类总线各有不同作用。",
+      "总线是一组供部件之间传递信息的通路。系统总线连接处理器、内存和输入／输出端口，其中三类总线各有不同作用。",
     cpu: "CPU（处理器）",
     memory: "内存",
     ports: "输入／输出端口",
+    portMeaning: "端口是设备连接到计算机的接口位置。",
     systemBus: "系统总线",
     addressBus: "地址总线",
     dataBus: "数据总线",
@@ -90,10 +92,11 @@ export const busesControlContent = {
     addressDirection: "CPU → 内存／端口",
     dataDirection: "CPU ↔ 内存／端口",
     controlSignals: "READ（读）· WRITE（写）",
+    controlDirection: "CPU ↔ 内存／端口 · 每个信号都有自己的方向",
     addressMeaning: "把正在访问的位置传向内存或端口。",
     dataMeaning: "传送正在交换的数值；传输方向取决于操作。",
     controlMeaning:
-      "传送 READ（读）和 WRITE（写）等控制信号。总体来看，控制总线是双向的；每个信号都有自己的方向。",
+      "传送 READ（读）和 WRITE（写）等控制信号。总体来看，信号可以双向传递；每个信号都有自己的方向。",
     cu: "控制单元（CU）通过发出相应的控制信号来协调传输。",
     modePrompt: "选择一种传输过程来观察。",
     read: "读取",
@@ -103,7 +106,6 @@ export const busesControlContent = {
     writeQuestion: "这次写入之后，什么会改变？",
     readChoices: ["处理器收到 42；内存保持不变", "地址 11 的内容变成 7"],
     writeChoices: ["地址 12 的内存内容会改变", "地址 12 会变成 6"],
-    prediction: "查看预测",
     correctPrediction: "预测正确。现在按顺序观察计算机的传输。",
     incorrectPrediction: "还不完全正确。观察传输过程，再把最终状态和你的预测比较。",
     predictFirst: "先做出预测，再显示传输过程。",

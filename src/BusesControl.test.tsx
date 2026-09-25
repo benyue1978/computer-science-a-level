@@ -15,8 +15,12 @@ test("shows the bus system and explains the three roles in both languages", asyn
   expect(screen.getByText("System bus")).toBeVisible();
   expect(screen.getByText("I/O ports")).toBeVisible();
   expect(screen.getAllByText(/where/i).length).toBeGreaterThan(0);
+  expect(screen.getByText(/bus is a shared set of communication pathways/i)).toBeVisible();
+  expect(screen.getByText(/point where a device connects to the computer/i)).toBeVisible();
+  expect(screen.getByLabelText("Control bus lane")).toHaveTextContent("CPU ↔ memory / ports");
   await user.click(screen.getByRole("button", { name: "中文" }));
   expect(screen.getByRole("heading", { name: "总线与控制" })).toBeVisible();
+  expect(screen.getByText("端口是设备连接到计算机的接口位置。")).toBeVisible();
   expect(screen.getAllByText("地址总线").length).toBeGreaterThan(0);
   expect(screen.getAllByText("数据总线").length).toBeGreaterThan(0);
   expect(screen.getAllByText("控制总线").length).toBeGreaterThan(0);
@@ -51,6 +55,21 @@ test("bus matching answers stay hidden until the learner chooses to reveal them"
   await user.click(screen.getByRole("button", { name: "Show matches" }));
   expect(within(check).getByText("Address bus", { exact: true })).toBeVisible();
   expect(screen.getByRole("button", { name: "Hide matches" })).toBeVisible();
+});
+
+test("reset returns the explorer to a fresh read example", async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(screen.getByRole("button", { name: "Write" }));
+  await user.click(screen.getByRole("button", { name: /Memory contents at address 12 change/i }));
+  for (let index = 0; index < 4; index += 1) {
+    await user.click(screen.getByRole("button", { name: "Show next transfer" }));
+  }
+  await user.click(screen.getByRole("button", { name: "Start again" }));
+  expect(screen.getByRole("button", { name: "Read" })).toHaveAttribute("aria-pressed", "true");
+  expect(screen.getByText("Memory[11] = 42")).toBeVisible();
+  expect(screen.getByRole("button", { name: "Show next transfer" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Show matches" })).toBeVisible();
 });
 
 test("predictions do not run the computer and write changes only the selected contents", async () => {
