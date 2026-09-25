@@ -75,6 +75,8 @@ test("all fresh predictions precede feedback and language and reset preserve the
   await page.getByRole("button", { name: "中文", exact: true }).click();
   await expect(page.getByRole("button", { name: "4. 应用同一规则" })).toHaveAttribute("aria-current", "step");
   await expect(page.getByRole("status")).toHaveCount(2);
+  await expect(page.locator(".source-location").first()).toBeVisible();
+  await expect(page.locator(".destination-location").first()).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath("copying-fresh-zh.png"), fullPage: true });
   await page.getByRole("button", { name: "重新开始", exact: true }).click();

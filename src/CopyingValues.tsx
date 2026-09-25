@@ -8,13 +8,15 @@ function Register({
   name,
   value,
   roleLabel,
+  roleKind,
 }: {
   name: string;
   value: number;
   roleLabel?: string;
+  roleKind?: "source" | "destination";
 }) {
   return (
-    <div className={`copy-location ${roleLabel ? roleLabel.toLowerCase() + "-location" : ""}`} role="group" aria-label={name}>
+    <div className={`copy-location ${roleKind ? roleKind + "-location" : ""}`} role="group" aria-label={name}>
       {roleLabel && <small className="location-role">{roleLabel}</small>}
       <span>{name}</span>
       <strong>{value}</strong>
@@ -26,15 +28,18 @@ function Memory({
   language,
   values,
   sourceAddress,
+  headingLevel = 3,
 }: {
   language: CopyingLanguage;
   values: readonly { address: number; value: number }[];
   sourceAddress?: number;
+  headingLevel?: 3 | 4;
 }) {
   const t = copyingContent[language];
+  const Heading = headingLevel === 4 ? "h4" : "h3";
   return (
     <section className="copy-memory" role="group" aria-label={t.mainMemory}>
-      <h3>{t.mainMemory}</h3>
+      <Heading>{t.mainMemory}</Heading>
       <div className="copy-memory-cells">
         {values.map((cell) => (
           <div
@@ -182,8 +187,8 @@ export default function CopyingValues({ language }: Props) {
               <section className="copy-processor" role="group" aria-label={t.processor}>
                 <h3>{t.processor}</h3>
                 <div className="copy-registers">
-                  <Register name={t.registerA} value={7} roleLabel={section <= 1 ? t.source : section === 2 ? t.destination : undefined} />
-                  {section !== 2 && <Register name={t.registerB} value={42} roleLabel={section <= 1 ? t.destination : undefined} />}
+                  <Register name={t.registerA} value={7} roleLabel={section <= 1 ? t.source : section === 2 ? t.destination : undefined} roleKind={section <= 1 ? "source" : section === 2 ? "destination" : undefined} />
+                  {section !== 2 && <Register name={t.registerB} value={42} roleLabel={section <= 1 ? t.destination : undefined} roleKind={section <= 1 ? "destination" : undefined} />}
                 </div>
               </section>
             </div>
@@ -240,14 +245,14 @@ export default function CopyingValues({ language }: Props) {
                 <div className="copy-cue result-cue">{t.copyValue}: {t.registerA} {language === "en" ? "to" : "到"} {t.registerB}</div>
                 <div className="copy-comparison">
                   <div className="copy-computer" role="group" aria-label={t.before}>
-                    <section className="copy-processor" role="group" aria-label={t.processor}><h3>{t.processor}</h3><div className="copy-registers"><Register name={t.registerA} value={7} roleLabel={t.source} /><Register name={t.registerB} value={42} roleLabel={t.destination} /></div></section>
+                    <section className="copy-processor" role="group" aria-label={t.processor}><h3>{t.processor}</h3><div className="copy-registers"><Register name={t.registerA} value={7} roleLabel={t.source} roleKind="source" /><Register name={t.registerB} value={42} roleLabel={t.destination} roleKind="destination" /></div></section>
                   </div>
                   <div className="copy-computer result-computer" role="group" aria-label={t.after}>
                     <section className="copy-processor" role="group" aria-label={t.processor}>
                       <h3>{t.processor}</h3>
                       <div className="copy-registers">
-                        <Register name={t.registerA} value={registerAfter[0].value} roleLabel={t.source} />
-                        <Register name={t.registerB} value={registerAfter[1].value} roleLabel={t.destination} />
+                        <Register name={t.registerA} value={registerAfter[0].value} roleLabel={t.source} roleKind="source" />
+                        <Register name={t.registerB} value={registerAfter[1].value} roleLabel={t.destination} roleKind="destination" />
                       </div>
                     </section>
                   </div>
@@ -264,7 +269,7 @@ export default function CopyingValues({ language }: Props) {
                 <legend>{t.memoryRecallTitle}</legend><p>{t.memoryRecallQuestion}</p>
                 {choices("memoryRecall", ["11", "42", "7"], revealed || memoryRecallLocked, [11, 42, 7])}
                 {answers.memoryRecall !== undefined && answers.memoryRecall !== 42 && (
-                  <p className="quiet">
+                  <p className="quiet" role="status">
                     {answers.memoryRecall === 11
                       ? t.memoryRecallCorrection
                       : t.memoryRecallRetry}{" "}
@@ -283,11 +288,11 @@ export default function CopyingValues({ language }: Props) {
               <button className="primary" disabled={!memoryPredictionReady} aria-controls="memory-copy-result" aria-expanded={revealed} onClick={() => setRevealed(true)}>{t.showCopy}</button>
               <div id="memory-copy-result" data-testid="memory-copy-result" hidden={!revealed}>
                 <div className="copy-comparison memory-comparison">
-                  <div className="copy-computer memory-copy-layout" role="group" aria-label={t.before}><Memory language={language} values={[{ address: 10, value: 7 }, { address: 11, value: 42 }, { address: 12, value: 9 }]} sourceAddress={11} /><section className="copy-processor" role="group" aria-label={t.processor}><h3>{t.processor}</h3><div className="copy-registers"><Register name={t.registerA} value={7} roleLabel={t.destination} /></div></section></div>
+                  <div className="copy-computer memory-copy-layout" role="group" aria-label={t.before}><Memory language={language} values={[{ address: 10, value: 7 }, { address: 11, value: 42 }, { address: 12, value: 9 }]} sourceAddress={11} /><section className="copy-processor" role="group" aria-label={t.processor}><h3>{t.processor}</h3><div className="copy-registers"><Register name={t.registerA} value={7} roleLabel={t.destination} roleKind="destination" /></div></section></div>
                   <div className="copy-computer memory-copy-layout result-computer" role="group" aria-label={t.after}>
                     <Memory language={language} values={memoryAfter.slice(0, 3).map((item, index) => ({ address: 10 + index, value: item.value }))} sourceAddress={11} />
                     <section className="copy-processor" role="group" aria-label={t.processor}>
-                      <h3>{t.processor}</h3><div className="copy-registers"><Register name={t.registerA} value={memoryAfter[3].value} roleLabel={t.destination} /></div>
+                      <h3>{t.processor}</h3><div className="copy-registers"><Register name={t.registerA} value={memoryAfter[3].value} roleLabel={t.destination} roleKind="destination" /></div>
                     </section>
                   </div>
                 </div>
@@ -304,7 +309,7 @@ export default function CopyingValues({ language }: Props) {
                   <h3 id="fresh-example-1">{t.example1}</h3>
                   <div className="copy-computer" role="group" aria-label={`${t.example1} ${t.before}`}>
                     <section className="copy-processor" role="group" aria-label={t.processor}>
-                      <h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={3} roleLabel={t.source} /><Register name={t.registerA} value={9} roleLabel={t.destination} /></div>
+                      <h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={3} roleLabel={t.source} roleKind="source" /><Register name={t.registerA} value={9} roleLabel={t.destination} roleKind="destination" /></div>
                     </section>
                   </div>
                   {[
@@ -322,8 +327,8 @@ export default function CopyingValues({ language }: Props) {
                 <section className="fresh-copy-example" aria-labelledby="fresh-example-2">
                   <h3 id="fresh-example-2">{t.example2}</h3>
                   <div className="copy-computer memory-copy-layout" role="group" aria-label={`${t.example2} ${t.before}`}>
-                    <Memory language={language} values={[{ address: 21, value: 4 }]} sourceAddress={21} />
-                    <section className="copy-processor" role="group" aria-label={t.processor}><h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={8} roleLabel={t.destination} /></div></section>
+                    <Memory language={language} values={[{ address: 21, value: 4 }]} sourceAddress={21} headingLevel={4} />
+                    <section className="copy-processor" role="group" aria-label={t.processor}><h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={8} roleLabel={t.destination} roleKind="destination" /></div></section>
                   </div>
                   {[
                     ["fresh2Source", [`${t.address} 21`, t.registerB], [0, 1]],
@@ -351,12 +356,12 @@ export default function CopyingValues({ language }: Props) {
                 <div className="fresh-copy-grid fresh-results-grid">
                   <section className="fresh-copy-example" aria-label={`${t.example1} ${t.after}`}>
                     <h3>{t.example1}: {t.after}</h3>
-                    <div className="copy-computer result-computer" role="group" aria-label={`${t.example1} ${t.after}`}><section className="copy-processor" role="group" aria-label={t.processor}><h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={freshRegisterAfter[0].value} roleLabel={t.source} /><Register name={t.registerA} value={freshRegisterAfter[1].value} roleLabel={t.destination} /></div></section></div>
+                    <div className="copy-computer result-computer" role="group" aria-label={`${t.example1} ${t.after}`}><section className="copy-processor" role="group" aria-label={t.processor}><h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={freshRegisterAfter[0].value} roleLabel={t.source} roleKind="source" /><Register name={t.registerA} value={freshRegisterAfter[1].value} roleLabel={t.destination} roleKind="destination" /></div></section></div>
                     <p role="status" className="feedback">{t.freshResult1}</p>
                   </section>
                   <section className="fresh-copy-example" aria-label={`${t.example2} ${t.after}`}>
                     <h3>{t.example2}: {t.after}</h3>
-                    <div className="copy-computer memory-copy-layout result-computer" role="group" aria-label={`${t.example2} ${t.after}`}><Memory language={language} values={[{ address: 21, value: freshMemoryAfter[0].value }]} sourceAddress={21} /><section className="copy-processor" role="group" aria-label={t.processor}><h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={freshMemoryAfter[1].value} roleLabel={t.destination} /></div></section></div>
+                    <div className="copy-computer memory-copy-layout result-computer" role="group" aria-label={`${t.example2} ${t.after}`}><Memory language={language} values={[{ address: 21, value: freshMemoryAfter[0].value }]} sourceAddress={21} headingLevel={4} /><section className="copy-processor" role="group" aria-label={t.processor}><h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={freshMemoryAfter[1].value} roleLabel={t.destination} roleKind="destination" /></div></section></div>
                     <p role="status" className="feedback">{t.freshResult2}</p>
                   </section>
                 </div>

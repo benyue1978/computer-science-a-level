@@ -41,7 +41,7 @@ npm run build
 npm run test:e2e
 ```
 
-Current automated verification: 28 unit/interface tests and 18 desktop/mobile browser checks pass.
+Current automated verification: 29 unit/interface tests and 18 desktop/mobile browser checks pass.
 
 For the first browser-test run, install Chromium with `npx playwright install chromium`. Browser tests exercise the production preview. To try that build yourself:
 

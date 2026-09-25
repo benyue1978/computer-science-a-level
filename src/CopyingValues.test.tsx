@@ -31,6 +31,16 @@ test("introduces source and destination, revealing explanations only together", 
   expect(screen.getAllByRole("status")).toHaveLength(2);
 });
 
+test("Mandarin source and destination keep language-independent visual roles", () => {
+  render(<CopyingValues language="zh" />);
+  expect(screen.getByRole("group", { name: "寄存器 A" })).toHaveClass(
+    "source-location",
+  );
+  expect(screen.getByRole("group", { name: "寄存器 B" })).toHaveClass(
+    "destination-location",
+  );
+});
+
 test("optional register recall offers recovery without gating the lesson", async () => {
   const user = userEvent.setup();
   render(<CopyingValues language="en" />);
@@ -157,6 +167,11 @@ test("memory copy keeps address 11 and its contents while replacing Register A",
     "/learn/memory",
   );
   expect(screen.getByText(/11 is the address label; 42 is its contents/)).toBeVisible();
+  expect(
+    within(
+      screen.getByRole("group", { name: "Optional address and contents check" }),
+    ).getByRole("status"),
+  ).toHaveTextContent("11 is the address label");
   expect(mistakenAddress).toHaveAttribute("aria-disabled", "true");
   await user.click(correctContents);
   expect(mistakenAddress).toHaveAttribute("aria-pressed", "true");
@@ -237,6 +252,16 @@ test("fresh examples use a separate reveal after all eight predictions", async (
   expect(within(first).getByRole("group", { name: "Register B" })).toHaveTextContent("3");
   expect(within(first).getByRole("group", { name: "Register A" })).toHaveTextContent("3");
   const second = screen.getByRole("group", { name: "Example 2 After" });
+  const secondExample = screen
+    .getByRole("heading", { name: "Example 2" })
+    .closest("section");
+  expect(secondExample).not.toBeNull();
+  expect(
+    within(secondExample as HTMLElement).getByRole("heading", {
+      level: 4,
+      name: "Main memory",
+    }),
+  ).toBeVisible();
   expect(within(second).getByRole("group", { name: "Address 21" })).toHaveTextContent("4");
   expect(within(second).getByRole("group", { name: "Register B" })).toHaveTextContent("4");
   expect(
