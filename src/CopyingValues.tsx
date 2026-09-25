@@ -116,6 +116,8 @@ export default function CopyingValues({ language }: Props) {
   const memoryPredictionReady =
     answers.memorySource !== undefined &&
     answers.memoryDestination !== undefined;
+  const memoryRecallLocked =
+    answers.memoryRecall !== undefined && answers.memoryRecall !== 42;
   const freshKeys = [
     "fresh1Source",
     "fresh1Destination",
@@ -260,10 +262,13 @@ export default function CopyingValues({ language }: Props) {
               <p className="eyebrow">{t.tryIt}</p>
               <fieldset className="question-group" aria-label={t.memoryRecallTitle}>
                 <legend>{t.memoryRecallTitle}</legend><p>{t.memoryRecallQuestion}</p>
-                {choices("memoryRecall", ["11", "42", "7"], revealed, [11, 42, 7])}
+                {choices("memoryRecall", ["11", "42", "7"], revealed || memoryRecallLocked, [11, 42, 7])}
                 {answers.memoryRecall !== undefined && answers.memoryRecall !== 42 && (
                   <p className="quiet">
-                    {t.memoryRecallCorrection} <a href="/learn/memory">{t.revisitMemory}</a>
+                    {answers.memoryRecall === 11
+                      ? t.memoryRecallCorrection
+                      : t.memoryRecallRetry}{" "}
+                    <a href="/learn/memory">{t.revisitMemory}</a>
                   </p>
                 )}
               </fieldset>
@@ -310,11 +315,9 @@ export default function CopyingValues({ language }: Props) {
                   ].map(([key, labels, values], index) => (
                     <fieldset key={key as string} className="question-group" aria-label={`${t.example1}: ${t.freshQuestions[index]}`}>
                       <legend>{t.freshQuestions[index]}</legend>
-                      {choices(key as string, labels as readonly string[], freshReady, values as readonly number[])}
+                      {choices(key as string, labels as readonly string[], revealed, values as readonly number[])}
                     </fieldset>
                   ))}
-                  {freshReady && <div className="copy-computer result-computer" role="group" aria-label={`${t.example1} ${t.after}`}><section className="copy-processor" role="group" aria-label={t.processor}><h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={freshRegisterAfter[0].value} roleLabel={t.source} /><Register name={t.registerA} value={freshRegisterAfter[1].value} roleLabel={t.destination} /></div></section></div>}
-                  {freshReady && <p role="status" className="feedback">{t.freshResult1}</p>}
                 </section>
                 <section className="fresh-copy-example" aria-labelledby="fresh-example-2">
                   <h3 id="fresh-example-2">{t.example2}</h3>
@@ -330,12 +333,33 @@ export default function CopyingValues({ language }: Props) {
                   ].map(([key, labels, values], index) => (
                     <fieldset key={key as string} className="question-group" aria-label={`${t.example2}: ${t.freshQuestions[index]}`}>
                       <legend>{t.freshQuestions[index]}</legend>
-                      {choices(key as string, labels as readonly string[], freshReady, values as readonly number[])}
+                      {choices(key as string, labels as readonly string[], revealed, values as readonly number[])}
                     </fieldset>
                   ))}
-                  {freshReady && <div className="copy-computer memory-copy-layout result-computer" role="group" aria-label={`${t.example2} ${t.after}`}><Memory language={language} values={[{ address: 21, value: freshMemoryAfter[0].value }]} sourceAddress={21} /><section className="copy-processor" role="group" aria-label={t.processor}><h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={freshMemoryAfter[1].value} roleLabel={t.destination} /></div></section></div>}
-                  {freshReady && <p role="status" className="feedback">{t.freshResult2}</p>}
                 </section>
+              </div>
+              <button
+                className="primary"
+                disabled={!freshReady}
+                aria-controls="fresh-copy-results"
+                aria-expanded={revealed}
+                onClick={() => setRevealed(true)}
+              >
+                {t.showBothCopies}
+              </button>
+              <div id="fresh-copy-results" data-testid="fresh-copy-results" hidden={!revealed}>
+                <div className="fresh-copy-grid fresh-results-grid">
+                  <section className="fresh-copy-example" aria-label={`${t.example1} ${t.after}`}>
+                    <h3>{t.example1}: {t.after}</h3>
+                    <div className="copy-computer result-computer" role="group" aria-label={`${t.example1} ${t.after}`}><section className="copy-processor" role="group" aria-label={t.processor}><h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={freshRegisterAfter[0].value} roleLabel={t.source} /><Register name={t.registerA} value={freshRegisterAfter[1].value} roleLabel={t.destination} /></div></section></div>
+                    <p role="status" className="feedback">{t.freshResult1}</p>
+                  </section>
+                  <section className="fresh-copy-example" aria-label={`${t.example2} ${t.after}`}>
+                    <h3>{t.example2}: {t.after}</h3>
+                    <div className="copy-computer memory-copy-layout result-computer" role="group" aria-label={`${t.example2} ${t.after}`}><Memory language={language} values={[{ address: 21, value: freshMemoryAfter[0].value }]} sourceAddress={21} /><section className="copy-processor" role="group" aria-label={t.processor}><h4>{t.processor}</h4><div className="copy-registers"><Register name={t.registerB} value={freshMemoryAfter[1].value} roleLabel={t.destination} /></div></section></div>
+                    <p role="status" className="feedback">{t.freshResult2}</p>
+                  </section>
+                </div>
               </div>
             </div>
           )}

@@ -146,11 +146,21 @@ test("memory copy keeps address 11 and its contents while replacing Register A",
       screen.getByRole("group", { name: "Optional address and contents check" }),
     ).getByRole("button", { name: "11" }),
   );
+  const mistakenAddress = within(
+    screen.getByRole("group", { name: "Optional address and contents check" }),
+  ).getByRole("button", { name: "11" });
+  const correctContents = within(
+    screen.getByRole("group", { name: "Optional address and contents check" }),
+  ).getByRole("button", { name: "42" });
   expect(screen.getByRole("link", { name: "Revisit memory" })).toHaveAttribute(
     "href",
     "/learn/memory",
   );
   expect(screen.getByText(/11 is the address label; 42 is its contents/)).toBeVisible();
+  expect(mistakenAddress).toHaveAttribute("aria-disabled", "true");
+  await user.click(correctContents);
+  expect(mistakenAddress).toHaveAttribute("aria-pressed", "true");
+  expect(correctContents).toHaveAttribute("aria-pressed", "false");
 
   const show = screen.getByRole("button", { name: "Show copy" });
   expect(show).toBeDisabled();
@@ -188,7 +198,7 @@ test("memory copy keeps address 11 and its contents while replacing Register A",
   );
 });
 
-test("fresh examples reveal together only after all eight predictions", async () => {
+test("fresh examples use a separate reveal after all eight predictions", async () => {
   const user = userEvent.setup();
   render(<CopyingValues language="en" />);
   await next(user, 3);
@@ -203,16 +213,25 @@ test("fresh examples reveal together only after all eight predictions", async ()
     ["Example 2: what is the source’s final value?", "4"],
     ["Example 2: what is the destination’s final value?", "4"],
   ];
-  for (const [index, [question, choice]] of predictions.entries()) {
+  for (const [question, choice] of predictions) {
     await user.click(
       within(screen.getByRole("group", { name: question })).getByRole(
         "button",
         { name: choice },
       ),
     );
-    if (index < 7) expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   }
 
+  const show = screen.getByRole("button", { name: "Show both copies" });
+  const result = screen.getByTestId("fresh-copy-results");
+  expect(show).toBeEnabled();
+  expect(result).toHaveAttribute("hidden");
+  show.focus();
+  await user.click(show);
+  expect(document.activeElement).toBe(show);
+  expect(show).toHaveAttribute("aria-expanded", "true");
+  expect(result).not.toHaveAttribute("hidden");
   expect(screen.getAllByRole("status")).toHaveLength(2);
   const first = screen.getByRole("group", { name: "Example 1 After" });
   expect(within(first).getByRole("group", { name: "Register B" })).toHaveTextContent("3");
@@ -226,6 +245,9 @@ test("fresh examples reveal together only after all eight predictions", async ()
       { name: predictions[0][1] },
     ),
   ).toHaveAttribute("aria-disabled", "true");
+  await user.click(show);
+  expect(document.activeElement).toBe(show);
+  expect(show).toHaveAttribute("aria-expanded", "true");
 });
 
 test("language changes preserve an attempt while section re-entry and reset clear it", async () => {

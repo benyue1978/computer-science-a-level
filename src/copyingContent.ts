@@ -59,6 +59,7 @@ export const copyingContent = {
     prediction: "Make a prediction",
     spoken: "I have made my prediction",
     showCopy: "Show copy",
+    showBothCopies: "Show both copies",
     copyValue: "Copy value",
     address: "Address",
     contents: "Contents",
@@ -68,6 +69,7 @@ export const copyingContent = {
     memoryRecallQuestion: "What are the contents at address 11?",
     memoryRecallCorrection:
       "11 is the address label; 42 is its contents. The copy reads the contents, not the address label.",
+    memoryRecallRetry: "Look again: the contents are the number stored inside the memory cell.",
     revisitMemory: "Revisit memory",
     registerSourcePrediction: "What will Register A contain after the copy?",
     registerDestinationPrediction: "What will Register B contain after the copy?",
@@ -148,6 +150,7 @@ export const copyingContent = {
     prediction: "先作预测",
     spoken: "我已经作出预测",
     showCopy: "显示复制结果",
+    showBothCopies: "显示两个复制结果",
     copyValue: "复制数值",
     address: "地址",
     contents: "内容",
@@ -156,6 +159,7 @@ export const copyingContent = {
     memoryRecallQuestion: "地址 11 的内容是什么？",
     memoryRecallCorrection:
       "11 是地址标签；42 才是其中的内容。复制时读取的是内容，而不是地址标签。",
+    memoryRecallRetry: "再看一看：内容是存储在内存单元里面的数值。",
     revisitMemory: "回顾内存",
     registerSourcePrediction: "复制后，寄存器 A 的内容是什么？",
     registerDestinationPrediction: "复制后，寄存器 B 的内容是什么？",

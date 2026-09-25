@@ -61,10 +61,16 @@ test("all fresh predictions precede feedback and language and reset preserve the
     ["Example 2: what is the source’s final value?", "4"],
     ["Example 2: what is the destination’s final value?", "4"],
   ];
-  for (const [index, [question, answer]] of predictions.entries()) {
+  for (const [question, answer] of predictions) {
     await page.getByRole("group", { name: question }).getByRole("button", { name: answer, exact: true }).click();
-    if (index < 7) await expect(page.getByRole("status")).toHaveCount(0);
+    await expect(page.getByRole("status")).toHaveCount(0);
   }
+  const showBoth = page.getByRole("button", { name: "Show both copies" });
+  await expect(showBoth).toBeEnabled();
+  await showBoth.focus();
+  await page.keyboard.press("Enter");
+  await expect(showBoth).toBeFocused();
+  await expect(showBoth).toHaveAttribute("aria-expanded", "true");
   await expect(page.getByRole("status")).toHaveCount(2);
   await page.getByRole("button", { name: "中文", exact: true }).click();
   await expect(page.getByRole("button", { name: "4. 应用同一规则" })).toHaveAttribute("aria-current", "step");
