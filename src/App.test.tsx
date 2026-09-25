@@ -106,6 +106,20 @@ test("has a single available lesson and recovers unknown paths", () => {
     "/",
   );
 });
+
+test("home links to the third lesson and its direct route renders", () => {
+  window.history.replaceState({}, "", "/");
+  const home = render(<App />);
+  expect(
+    screen.getByRole("link", { name: /Explore copying/ }),
+  ).toHaveAttribute("href", "/learn/copying-values");
+  home.unmount();
+
+  window.history.replaceState({}, "", "/learn/copying-values");
+  render(<App />);
+  expect(screen.getByRole("heading", { name: "Copying values" })).toBeVisible();
+  expect(document.title).toContain("Copying values");
+});
 test("revisiting the first example restores 42 and clears prior read and write attempts", async () => {
   const user = userEvent.setup();
   render(<App />);

@@ -3,6 +3,8 @@ import { content, type Language } from "./content";
 import { readMemory, resetMemory, writeMemory } from "./memory";
 import ProcessorRegisters from "./ProcessorRegisters";
 import { processorContent } from "./processorContent";
+import CopyingValues from "./CopyingValues";
+import { copyingContent } from "./copyingContent";
 
 export default function App() {
   const [language, setLanguage] = useState<Language>("en");
@@ -20,14 +22,20 @@ export default function App() {
   const processorLesson =
     window.location.pathname.replace(/\/$/, "") ===
     "/learn/processor-registers";
+  const copyingLesson =
+    window.location.pathname.replace(/\/$/, "") === "/learn/copying-values";
   const home = window.location.pathname === "/";
   useEffect(() => {
     document.documentElement.lang = language === "en" ? "en" : "zh-Hans";
     document.title =
-      (processorLesson ? processorContent[language].title : t.title) +
+      (copyingLesson
+        ? copyingContent[language].title
+        : processorLesson
+          ? processorContent[language].title
+          : t.title) +
       " · " +
       t.brand;
-  }, [language, processorLesson, t]);
+  }, [copyingLesson, language, processorLesson, t]);
   const move = (to: number) => {
     setStage(to);
     setSelected(null);
@@ -168,8 +176,34 @@ export default function App() {
               </div>
             </div>
           </section>
+          <section className="lesson-invitation third-lesson">
+            <div className="invitation-copy">
+              <p className="eyebrow">
+                {language === "en"
+                  ? "YOUR THIRD EXPLORATION"
+                  : "你的第三次探索"}
+              </p>
+              <h2>{copyingContent[language].title}</h2>
+              <p>
+                {language === "en"
+                  ? "What stays the same when a value is copied? Predict what changes as a copy moves between registers and from memory into the processor."
+                  : "复制数值时，什么保持不变？先预测结果，再观察寄存器之间以及从内存到处理器的复制。"}
+              </p>
+              <a className="primary-link" href="/learn/copying-values">
+                {language === "en" ? "Explore copying" : "探索复制"}
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <div className="copy-home-illustration" aria-hidden="true">
+              <div><small>A</small><strong>7</strong></div>
+              <span>{language === "en" ? "COPY" : "复制"}</span>
+              <div><small>B</small><strong>7</strong></div>
+            </div>
+          </section>
           <p className="home-note">{t.homeNote}</p>
         </main>
+      ) : copyingLesson ? (
+        <CopyingValues language={language} />
       ) : processorLesson ? (
         <ProcessorRegisters language={language} />
       ) : !memoryLesson ? (
