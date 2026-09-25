@@ -287,25 +287,7 @@ h2:focus {
   font-size: 15px;
   max-width: 350px;
 }
-.state-notes {
-  margin-top: 35px;
-  border-left: 2px solid #d3d6c2;
-  padding-left: 20px;
-}
-.state-notes p {
-  font-size: 13px;
-  max-width: 320px;
-  margin-bottom: 20px;
-}
-.state-notes span {
-  display: block;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 700;
-  margin-bottom: 4px;
-}
+
 .activity {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -474,18 +456,7 @@ h2:focus {
   font-size: 10px;
   color: var(--muted);
 }
-.reflection {
-  border-top: 1px solid var(--line);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 55px;
-  padding: 25px 0;
-}
-.reflection p {
-  font-size: 14px;
-  margin-top: 7px;
-  max-width: 460px;
-}
+
 .lesson-controls {
   border-top: 1px solid var(--line);
   display: flex;
@@ -504,37 +475,7 @@ h2:focus {
   min-height: 48px;
   font-size: 14px;
 }
-.parent-guide {
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  margin: 22px 0 38px;
-  padding: 18px 0;
-}
-.parent-guide summary {
-  font-size: 15px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-}
-.parent-guide > p {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 15px;
-}
-.parent-guide dl {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px 40px;
-}
-.parent-guide dt {
-  font-size: 12px;
-  font-weight: 700;
-}
-.parent-guide dd {
-  font-size: 13px;
-  color: var(--muted);
-  margin: 5px 0 0;
-}
+
 .fresh-questions fieldset {
   padding: 15px 0;
   border: 0;
@@ -628,9 +569,6 @@ footer {
   .value {
     font-size: 49px;
   }
-  .reflection {
-    gap: 28px;
-  }
 }
 @media (max-width: 650px) {
   .site-shell {
@@ -687,17 +625,7 @@ footer {
   .intro {
     max-width: none;
   }
-  .state-notes {
-    margin-top: 22px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    padding-left: 14px;
-  }
-  .state-notes p {
-    margin: 0;
-    font-size: 12px;
-  }
+
   .activity {
     padding: 20px 16px;
   }
@@ -716,13 +644,7 @@ footer {
   .memory-cells {
     gap: 9px;
   }
-  .reflection {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  .parent-guide dl {
-    grid-template-columns: 1fr;
-  }
+
   .home {
     padding-top: 45px;
   }

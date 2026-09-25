@@ -14,7 +14,7 @@ The programme combines short English/Mandarin Remotion videos, a browser-based p
 
 ## Status
 
-The first browser activity introduces memory, addresses and contents through six small, parent-guided stages, with English and Mandarin support. The home page is at `/`; the activity is at `/learn/memory`. The complete simulator and hybrid RTN lesson remain later goals. The parent/child learning trial is still pending; automated checks cannot establish whether the teaching is understood. Processor-engine coverage requirements in the wider plans apply to future work.
+The first browser activity introduces memory, addresses and contents through six small stages, with English and Mandarin support. Learner prompts are separate from memory demonstrations; facilitator notes remain in the trial document. The home page is at `/`; the activity is at `/learn/memory`. The complete simulator and hybrid RTN lesson remain later goals. The parent/child learning trial is still pending; automated checks cannot establish whether the teaching is understood. Processor-engine coverage requirements in the wider plans apply to future work.
 
 The proposed processor is a project-specific implementation of Cambridge's example instruction meanings. Its encoding, widths and controller layout remain engineering details behind a stable teaching interface. Architecture changes must revalidate affected examples.
 

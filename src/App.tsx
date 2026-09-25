@@ -176,22 +176,12 @@ export default function App() {
           <div className="workspace">
             <section className="instruction">
               <p className="eyebrow">
-                {t.stage} {stage + 1} {t.of} 6
+                {t.stage} {stage + 1} / 6
               </p>
               <h2 ref={heading} tabIndex={-1}>
                 {s.title}
               </h2>
               <p className="intro">{s.intro}</p>
-              <div className="state-notes">
-                <p>
-                  <span>{t.four[0]}</span>
-                  {s.state}
-                </p>
-                <p>
-                  <span>{t.four[1]}</span>
-                  {s.action}
-                </p>
-              </div>
             </section>
             <section className="activity" aria-label={t.memory}>
               <div className="activity-top">
@@ -263,6 +253,7 @@ export default function App() {
               </div>
               <p className="model-caption">{t.model}</p>
               <div className="interaction">
+                <p className="eyebrow">{t.tryIt}</p>
                 <h3>{s.prompt}</h3>
                 {stage === 0 && (
                   <>
@@ -273,7 +264,9 @@ export default function App() {
                     >
                       {reveal === 0 ? t.revealAddress : t.revealContents}
                     </button>
-                    {reveal === 2 && <p className="feedback">{s.why}</p>}
+                    {reveal === 2 && (
+                      <p className="feedback">{t.locationExplanation}</p>
+                    )}
                   </>
                 )}
                 {(stage === 1 || stage === 3) && (
@@ -379,16 +372,6 @@ export default function App() {
               </div>
             </section>
           </div>
-          <section className="reflection">
-            <div>
-              <span className="mini-label">{t.four[2]}</span>
-              <p>{s.change}</p>
-            </div>
-            <div>
-              <span className="mini-label">{t.four[3]}</span>
-              <p>{s.why}</p>
-            </div>
-          </section>
           <div className="lesson-controls">
             <button
               className="secondary"
@@ -414,21 +397,6 @@ export default function App() {
               <p>{t.endText}</p>
             </div>
           )}
-          <details className="parent-guide">
-            <summary>
-              {t.parent}
-              <span aria-hidden="true">＋</span>
-            </summary>
-            <p>{t.parentIntro}</p>
-            <dl>
-              {t.guide.map(([label, text]) => (
-                <div key={label}>
-                  <dt>{label}</dt>
-                  <dd>{text}</dd>
-                </div>
-              ))}
-            </dl>
-          </details>
         </main>
       )}
       <footer>

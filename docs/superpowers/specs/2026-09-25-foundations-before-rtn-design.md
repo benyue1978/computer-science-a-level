@@ -8,13 +8,13 @@
 
 ## 1. Teaching principle
 
-Start with an observable action, ask the learner to explain or predict it, then introduce its technical name or notation. A prerequisite deserves its own explanation and practice, rather than a quick mention in a warm-up. No assembly, binary arithmetic, processor terminology or RTN is assumed at entry.
+Start with a concrete concept and diagram. Where an example includes a computation, invite a prediction before showing its result. Keep learner tasks separate from what the example represents. A prerequisite deserves its own explanation and practice, rather than a quick mention in a warm-up. No assembly, binary arithmetic, processor terminology or RTN is assumed at entry.
 
 Each bite contains one short explanation, a visual example, one guided action and one changed example the learner explains to the parent. A failed check returns to a simpler example; the parent may stop and resume without losing the thread. Avoid timers, scores and forced progression in this introductory experience.
 
-Use the programme's [four-question teaching principle](2026-09-24-processor-fundamentals-learning-programme-design.md#11-shared-teaching-principle-state-action-change-and-reason) in every bite: **current state → action → what changes and stays unchanged → why**. Invite the learner to predict before revealing the result. These small activities teach how to understand the state changes later exposed by the simulator's Next step and Next instruction controls; they are the beginning of that same learning experience.
+Use the programme's [four-question teaching principle](2026-09-24-processor-fundamentals-learning-programme-design.md#11-shared-teaching-principle-state-action-change-and-reason) as an internal authoring check for represented computation, not fixed learner-facing headings: **current state → action → what changes and stays unchanged → why**. Invite the learner to predict before revealing the result. These small activities teach how to understand the state changes later exposed by the simulator's Next step and Next instruction controls; they are the beginning of that same learning experience.
 
-For Bite 1, make the pattern concrete:
+For Bite 1, focus the learner page on address versus contents. Remove the fixed Current state / Action / Changed and unchanged / Reason panels. Keep explanatory read/write feedback where relevant. The following table is an authoring reference, not the page layout:
 
 | Current state | Action | Changed and unchanged | Reason |
 |---|---|---|---|
@@ -70,14 +70,14 @@ A cabinet/drawer comparison can explain why the label stays fixed while the cont
 
 1. **Introduce a location.** Reveal one cell, its address label and its content separately. Say: “The address tells us which place. The contents tell us what is stored there.” / “地址告诉我们是哪一个位置；内容告诉我们那里存着什么。”
 2. **Choose by address.** Reveal all three cells. Ask: “Which cell has address 11?” / “哪一个存储位置的地址是 11？” Wait for a choice before highlighting the requested location.
-3. **Read its contents.** Ask what is stored there. The expected response is 42, not 11. Reveal a readout only after a submitted choice or parent-led spoken prediction.
+3. **Read its contents.** Ask what is stored there. The expected response is 42, not 11. Reveal a readout only after a submitted choice or an explicit “I have made my prediction” acknowledgement.
 4. **Keep address and value distinct.** Ask where 7 is stored. The answer is address 10. Use this reverse question to check understanding rather than memorisation of one selection.
 5. **Change the contents.** Offer one simple controlled action: replace the value at address 11 with 6. Ask what will change before applying it. Animate only the inside value; the address stays 11. Explain that reading earlier did not empty the cell.
 6. **Try a new example.** Reset to addresses 20, 21 and 22 with contents 8, 3 and 8. Ask for the contents at 21, the address of the cell containing 3, and whether two locations can contain the same value. A correct explanation identifies 3, 21 and both 20/22 containing 8.
 
 The two scenarios are authored data, not snapshots of the PL24 processor. Do not pretend a processor or bus transaction has run. Later bites can connect these same concepts to real machine state through the teaching adapter.
 
-### Parent card
+### Separate facilitator guide (not displayed on the learner page)
 
 - **Prepare:** Point to an address and a value; confirm the learner recognises the numbers.
 - **Ask:** “Are we being asked where it is, or what is there?” / “我们要找的是位置，还是那个位置里的内容？”
@@ -90,6 +90,8 @@ English and Mandarin explanations receive equal authored support. A language swi
 
 ## 4. Small implementation boundary
 
+Learner-facing copy addresses the learner directly, with no parent references or parent card. The explanation describes the concept; a “Try it” / “试一试” area states the learner task. Buttons that launch conceptual examples say “Show reading” / “演示读取” and “Show writing” / “演示写入”; navigation says “Next section” / “下一小节”. Choosing a cell answers a question; it is not described as a memory operation. The diagram represents memory only and does not claim a processor has executed.
+
 Build a small self-paced browser activity: three cells, guided prompts, reveal, replace-value, reset and language controls. Its state is limited to scenario ID, stage, selected address, current cell values, submitted answer/reveal state and language. Keep authored content separate from the visual component and the small state transitions.
 
 Do not make the full processor engine, assembler, generic teaching-frame framework, Remotion pipeline, narration production, progress database or exam grading a prerequisite for this first activity. The parent can read the short bilingual text while the diagram illustrates it. Polished video production follows once the teaching granularity has been tried. The wider hybrid-video plan remains unchanged.
@@ -98,7 +100,7 @@ Keyboard selection must have the same effect as pointer selection. Do not rely o
 
 ## 5. Acceptance and next decision
 
-- A fresh visitor can understand the three terms with the parent reading the supplied guide and without a developer explaining the interface.
+- A fresh visitor can understand the three terms from the learner-facing explanation and diagram, with optional spoken support and without a developer explaining the interface.
 - Reading a cell changes neither its address nor its stored value.
 - Replacing contents changes only the selected cell's value; other cells and all address labels remain unchanged.
 - Reset and language switching behave as specified; all actions work with keyboard input.

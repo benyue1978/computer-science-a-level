@@ -41,7 +41,7 @@ test("guided memory sequence, language preservation, reset and new example", asy
     .getByRole("button", { name: "Reveal contents", exact: true })
     .click();
   await expect(page.getByText("7", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await page.getByRole("button", { name: "Next section", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Which place is 11?", exact: true }),
   ).toBeFocused();
@@ -57,32 +57,28 @@ test("guided memory sequence, language preservation, reset and new example", asy
     page.getByRole("button", { name: "地址 11，内容 42", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "English", exact: true }).click();
-  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await page.getByRole("button", { name: "Next section", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Read address 11", exact: true }),
+    page.getByRole("button", { name: "Show reading", exact: true }),
   ).toBeDisabled();
   await page.getByRole("button", { name: "11", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Read address 11", exact: true })
-    .click();
-  await expect(
-    page.getByLabel("Activity readout", { exact: true }),
-  ).toContainText("42");
+  await page.getByRole("button", { name: "Show reading", exact: true }).click();
+  await expect(page.getByLabel("Value read", { exact: true })).toContainText(
+    "42",
+  );
   await expect(target).toBeVisible();
-  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await page.getByRole("button", { name: "Next section", exact: true }).click();
   await page
     .getByRole("button", { name: "Address 10, contents 7", exact: true })
     .click();
-  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await page.getByRole("button", { name: "Next section", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Replace with 6", exact: true }),
+    page.getByRole("button", { name: "Show writing", exact: true }),
   ).toBeDisabled();
   await page
-    .getByRole("button", { name: "We said our prediction aloud", exact: true })
+    .getByRole("button", { name: "I have made my prediction", exact: true })
     .click();
-  await page
-    .getByRole("button", { name: "Replace with 6", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Show writing", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Address 11, contents 6", exact: true }),
   ).toBeVisible();
@@ -96,7 +92,7 @@ test("guided memory sequence, language preservation, reset and new example", asy
     path: testInfo.outputPath("write-result.png"),
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await page.getByRole("button", { name: "Next section", exact: true }).click();
   await page
     .getByRole("group")
     .nth(0)
@@ -125,7 +121,7 @@ test("guided memory sequence, language preservation, reset and new example", asy
   await expect(
     page.getByRole("heading", { name: "一个位置，两个概念。", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "下一步", exact: true }).click();
+  await page.getByRole("button", { name: "下一小节", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "地址 11，内容 42", exact: true }),
   ).toHaveAttribute("aria-pressed", "false");

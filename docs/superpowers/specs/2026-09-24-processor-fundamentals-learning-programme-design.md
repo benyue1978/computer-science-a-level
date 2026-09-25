@@ -24,15 +24,27 @@ The design uses one coherent processor model wherever topics genuinely share mac
 The programme uses the parent's four questions as its organising principle for explaining computation:
 
 1. **What is the current state?** / 当前的状态是什么？
-2. **What action happens?** / 发生了什么操作？
+2. **What does the represented computer or program do?** / 图中所表示的计算机或程序做了什么？
 3. **What changes, and what stays unchanged?** / 什么改变了，什么保持不变？
 4. **Why does that happen?** / 为什么会发生这样的变化？
 
-Apply this pattern to introductory activities, processor steps, program traces, videos and parent prompts. Show only the state relevant to the current idea, establish it before acting, invite a prediction, and then compare before and after. Explicitly identify relevant unchanged values: reading does not remove the stored value; copying does not clear its source. The explanation must name the rule causing the result, not merely describe an animation.
+Use this pattern as an authoring and review method when explaining computation in processor steps, program traces, videos and relevant introductory examples. It is not a mandatory four-panel learner interface. A static concept such as the difference between an address and its contents needs a clear explanation and diagram, not artificial state/action labels. When a represented computation occurs, show only the relevant machine or program state, invite a prediction, and compare before and after. Explicitly identify relevant unchanged values: reading does not remove the stored value; copying does not clear its source. The explanation must name the rule causing the result, not merely describe an animation.
 
-The same pattern works at increasing levels of detail: a memory read, a register transfer, a complete instruction, or a program statement. Use **Next step** for a detailed teaching action and **Next instruction** for a complete instruction where supported. An instruction groups smaller steps that the learner can inspect; both levels must agree on the resulting state. Avoid the ambiguous label “Next cycle”; teach the distinction between clock cycles and instruction cycles explicitly.
+The same pattern works at increasing levels of detail: a memory read, a register transfer, a complete instruction, or a program statement. Within a clearly identified simulator, use **Next step** for a machine microstep and **Next instruction** for a complete instruction where supported. Course navigation uses **Next section**, never the same control as advancing machine execution. An instruction groups smaller steps that the learner can inspect; both levels must agree on the resulting state. Avoid the ambiguous label “Next cycle”; teach the distinction between clock cycles and instruction cycles explicitly.
 
 The introductory activities establish this visual and reasoning language before they connect to the processor engine. They need not implement a CPU to teach a truthful state change. This principle supports later programming topics without expanding the current scope or replacing explanations of abstraction, correctness and efficiency.
+
+### 1.2 Separate lesson interaction from represented computation
+
+Learners must be able to distinguish three things without inferring them from the ambiguous word “action”:
+
+- **Explanation and diagram:** what the concept means, with an explicit subject such as a memory location or the processor.
+- **Learner task:** what the learner should do, expressed directly (“Select the cell with address 11”, “Predict the value”), grouped with answer controls under “Try it” / “试一试”. Revealing labels, selecting answers, highlighting and changing lesson sections are interface behaviour, not computer operations.
+- **Represented computation:** what the model demonstrates or the simulator executes. Use specific verbs and actors (“Reading address 11 retrieves 42”, “The processor copies the PC contents into MAR”). Controls say “Show reading” / “演示读取” for a conceptual demonstration. Later simulator controls explicitly advance simulated execution. Pressing a button is the learner's interaction; the resulting memory read/register transfer is the represented event. Never describe the two as one unexplained “operation”.
+
+The state/action/change/reason principle concerns the represented computation. Do not count selecting an answer or moving a highlight as the machine-state change being taught. Relevant unchanged values and causal explanations remain part of read/write feedback; they do not require fixed page headings.
+
+Learner-facing pages address the learner directly and do not require or explicitly mention a parent. Parent-guided use remains supported through separate teaching/trial documents. This presentation rule applies to future lessons and takes precedence over earlier suggestions to display parent cards inside a lesson.
 
 ## 2. Outcomes and success criteria
 
@@ -294,7 +306,7 @@ Every lesson package contains:
 - English and Mandarin title, explanation, terminology and parent prompts;
 - paired technical terms and approved abbreviations;
 - misconception list and corrective explanation;
-- for each demonstrated action: relevant initial state, action, changed and unchanged values, and the rule explaining the result, with a prediction prompt before reveal;
+- for each demonstrated computation: relevant initial machine/program state, the represented operation, changed and unchanged values, and the rule explaining the result, with a learner prediction before reveal; keep these authoring fields separate from lesson-navigation and answer-selection instructions;
 - video scene sequence and language-specific narration timing;
 - pause points and prediction prompts;
 - scenario ID, initial state, allowed controls and expected event invariants;

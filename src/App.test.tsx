@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import App from "./App";
 const next = async (user: ReturnType<typeof userEvent.setup>, count = 1) => {
   for (let i = 0; i < count; i++)
-    await user.click(screen.getByRole("button", { name: "Next" }));
+    await user.click(screen.getByRole("button", { name: "Next section" }));
 };
 beforeEach(() => window.history.replaceState({}, "", "/learn/memory"));
 test("introduces one cell progressively before showing the full example", async () => {
@@ -24,18 +24,16 @@ test("requires a prediction before reading; reading leaves memory unchanged", as
   const user = userEvent.setup();
   render(<App />);
   await next(user, 2);
-  expect(screen.queryByLabelText("Activity readout")).not.toBeInTheDocument();
-  expect(
-    screen.getByRole("button", { name: "Read address 11" }),
-  ).toBeDisabled();
+  expect(screen.queryByLabelText("Value read")).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Show reading" })).toBeDisabled();
   await user.click(screen.getByRole("button", { name: "11" }));
-  await user.click(screen.getByRole("button", { name: "Read address 11" }));
-  expect(screen.getByLabelText("Activity readout")).toHaveTextContent("42");
+  await user.click(screen.getByRole("button", { name: "Show reading" }));
+  expect(screen.getByLabelText("Value read")).toHaveTextContent("42");
   expect(
     screen.getByRole("button", { name: "Address 11, contents 42" }),
   ).toBeVisible();
   expect(screen.getByRole("status")).toHaveTextContent(
-    "Reading leaves every stored value unchanged",
+    "the other stored values are unchanged",
   );
   await next(user);
   expect(
@@ -46,11 +44,11 @@ test("supports spoken predictions, writes only contents, preserves state on lang
   const user = userEvent.setup();
   render(<App />);
   await next(user, 4);
-  expect(screen.getByRole("button", { name: "Replace with 6" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Show writing" })).toBeDisabled();
   await user.click(
-    screen.getByRole("button", { name: "We said our prediction aloud" }),
+    screen.getByRole("button", { name: "I have made my prediction" }),
   );
-  await user.click(screen.getByRole("button", { name: "Replace with 6" }));
+  await user.click(screen.getByRole("button", { name: "Show writing" }));
   expect(
     screen.getByRole("button", { name: "Address 11, contents 6" }),
   ).toHaveAttribute("aria-pressed", "true");
@@ -65,7 +63,7 @@ test("supports spoken predictions, writes only contents, preserves state on lang
   expect(
     screen.getByRole("heading", { name: "一个位置，两个概念。" }),
   ).toBeVisible();
-  await user.click(screen.getByRole("button", { name: "下一步" }));
+  await user.click(screen.getByRole("button", { name: "下一小节" }));
   expect(
     screen.getByRole("button", { name: "地址 11，内容 42" }),
   ).toHaveAttribute("aria-pressed", "false");
@@ -88,7 +86,7 @@ test("new example checks content, address, and duplicate values without gating n
   );
   await user.click(screen.getByRole("button", { name: "Yes — 20 and 22" }));
   expect(screen.getAllByRole("status")).toHaveLength(3);
-  await user.click(screen.getByRole("button", { name: "Back" }));
+  await user.click(screen.getByRole("button", { name: "Previous section" }));
   expect(
     screen.getByRole("button", { name: "Address 11, contents 42" }),
   ).toBeVisible();
@@ -113,20 +111,18 @@ test("revisiting the first example restores 42 and clears prior read and write a
   render(<App />);
   await next(user, 4);
   await user.click(
-    screen.getByRole("button", { name: "We said our prediction aloud" }),
+    screen.getByRole("button", { name: "I have made my prediction" }),
   );
-  await user.click(screen.getByRole("button", { name: "Replace with 6" }));
-  await user.click(screen.getByRole("button", { name: "Back" }));
-  await user.click(screen.getByRole("button", { name: "Back" }));
+  await user.click(screen.getByRole("button", { name: "Show writing" }));
+  await user.click(screen.getByRole("button", { name: "Previous section" }));
+  await user.click(screen.getByRole("button", { name: "Previous section" }));
   expect(
     screen.getByRole("button", { name: "Address 11, contents 42" }),
   ).toBeVisible();
-  expect(
-    screen.getByRole("button", { name: "Read address 11" }),
-  ).toBeDisabled();
-  expect(screen.queryByLabelText("Activity readout")).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Show reading" })).toBeDisabled();
+  expect(screen.queryByLabelText("Value read")).not.toBeInTheDocument();
   await next(user, 2);
-  expect(screen.getByRole("button", { name: "Replace with 6" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Show writing" })).toBeDisabled();
 });
 
 test("fresh-example explanations wait for every prediction", async () => {
