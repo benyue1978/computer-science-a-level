@@ -54,3 +54,35 @@ npm run preview
 After the owner has tried and approved the working app, import this repository into Vercel as a Vite project. Use the repository root, build command `npm run build`, and output directory `dist`. The included `vercel.json` supports opening and refreshing lesson links directly. Vercel publishes the built app; planning documents and local source notes are not automatically website pages.
 
 No Vercel project or automatic deployment has been set up as part of this implementation. No backend, account, environment secret or database is required.
+
+## Daily vocabulary
+
+Open `/vocabulary` (also linked on the home page). Choose five words per day by default, adjustable to ten including reviews. Add optional Chinese/English notes, copy the list, send it yourself, then mark it sent. Sent words return after 3 days; Remembered advances to 7, 14, then 30 days, while Needs practice brings the word back tomorrow. Overdue reviews take priority over frequent new words. Known/trivial words can be restored under All words → Hidden.
+
+The collection, draft, explanations and sent-list history are stored in IndexedDB, in this browser at this site address. Use one tab at a time. Notes do not upload to Vercel. Export a JSON backup in Books & backup before clearing browser data or moving to a new browser/site address. Backup restore replaces the current collection after showing a preview. Localhost, Vercel preview URLs and the production domain each have separate storage.
+
+The shipped collection is `public/vocabulary/coursebook.json`. It contains general vocabulary as well as technical vocabulary, with conservative grouping of selected inflections. Common function words are initially hidden but remain searchable. Extraction excludes publisher material, obvious code lines and footer noise. Frequency counts are approximate; uncommon abbreviations and extraction artifacts may remain. Sentence examples are extracted where readable, and are not invented. Initial data is loaded only when no saved collection exists; subsequent deployment updates do not overwrite personal progress.
+
+To prepare another source, install Poppler (`pdftotext`) and run:
+
+```sh
+python3 scripts/extract_vocabulary.py 'Another book.pdf' public/vocabulary/another-book.json --id another-book --name 'Another book'
+```
+
+Optional `--first-page` and `--last-page` use PDF page numbers to omit publisher pages/indexes. For the supplied Cambridge edition, use `--first-page 14 --last-page 398`. Import the generated JSON through Books & backup. Reimporting the same source ID updates its counts without double-counting; different source IDs contribute separate frequencies. Notes and progress are preserved. Keep a stable source ID for each book.
+
+Source JSON format:
+
+```json
+{
+  "id": "maths-book",
+  "name": "Maths book",
+  "words": [
+    { "word": "available", "frequency": 12, "examples": ["The information is available in several different formats."] }
+  ]
+}
+```
+
+Words must be lowercase English entries (apostrophes and hyphens allowed). Frequencies are positive integers; examples contain up to three short strings. An optional `forms` string array lists related spellings. The PDF is not included in deployment, but vocabulary and source examples in `public/` are publicly accessible. No remote database or authentication is required.
+
+Verification: `npm test`, `npm run build`, and `npx playwright test tests/vocabulary.spec.ts`.

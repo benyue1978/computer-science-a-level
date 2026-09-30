@@ -172,6 +172,9 @@ h2:focus-visible {
   text-decoration: none;
   font-size: 14px;
 }
+.vocabulary-link {
+  margin-top: 24px;
+}
 .invitation-copy .primary-link {
   margin-top: 24px;
 }

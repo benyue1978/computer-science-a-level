@@ -157,6 +157,10 @@ export default function App() {
           <p className="eyebrow">{t.series}</p>
           <h1>{t.homeTitle}</h1>
           <p className="home-intro">{t.homeIntro}</p>
+          <a className="primary-link vocabulary-link" href="/vocabulary">
+            {language === "en" ? "Daily vocabulary" : "每日词汇"}
+            <span aria-hidden="true">↗</span>
+          </a>
           <section className="lesson-invitation">
             <div className="invitation-copy">
               <p className="eyebrow">{t.available}</p>
