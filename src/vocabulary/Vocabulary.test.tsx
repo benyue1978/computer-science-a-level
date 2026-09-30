@@ -93,6 +93,23 @@ describe("administrator explanation controls", () => {
     expect(await screen.findByText(/Published for everyone/)).toBeVisible();
   });
 
+  it("keeps the explanation draft when a shared publish fails", async () => {
+    mocks.isVocabularyAdmin.mockResolvedValue(true);
+    mocks.publishSharedExplanation.mockRejectedValue(new Error("Admin access required"));
+    const user = userEvent.setup();
+    render(<Vocabulary />);
+
+    await user.click(await screen.findByRole("button", { name: "+ Add to today" }));
+    const editor = screen.getByRole("textbox", { name: "Explanation for apple" });
+    await user.type(editor, "A fruit");
+    await user.click(screen.getByRole("button", { name: "Publish for everyone" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Could not publish this explanation. Admin access required",
+    );
+    expect(editor).toHaveValue("A fruit");
+  });
+
   it("shows the publishing action in the All words editor for an administrator", async () => {
     mocks.isVocabularyAdmin.mockResolvedValue(true);
     const user = userEvent.setup();

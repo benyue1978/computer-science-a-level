@@ -40,4 +40,16 @@ describe("shared explanation access", () => {
     ).rejects.toThrow("An explanation is required.");
     expect(upsert).not.toHaveBeenCalled();
   });
+
+  it("propagates a rejected shared write", async () => {
+    const failure = new Error("Admin access required");
+    const upsert = vi.fn().mockResolvedValue({ error: failure });
+    const client = {
+      from: vi.fn().mockReturnValue({ upsert }),
+    } as unknown as SupabaseClient;
+
+    await expect(
+      publishSharedExplanation("available", "Shared definition", "admin-id", client),
+    ).rejects.toBe(failure);
+  });
 });
