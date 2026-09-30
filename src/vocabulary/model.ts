@@ -12,6 +12,7 @@ export type Word = Source["words"][number] & {
   sources: Record<string, number>;
   note: string;
   hidden: boolean;
+  known: boolean;
   stage: number;
   due?: string;
   lastSent?: string;
@@ -59,7 +60,7 @@ export function mergeSource(state: State, source: Source): State {
     const old = Object.hasOwn(next.words, key) ? next.words[key] : undefined;
     const sources = { ...old?.sources, [source.id]: entry.frequency };
     next.words[key] = {
-      ...(old ?? { note: "", hidden: basic.has(key), stage: 0 }),
+      ...(old ?? { note: "", hidden: basic.has(key), known: false, stage: 0 }),
       word: key,
       sources,
       frequency: Object.values(sources).reduce((a, b) => a + b, 0),
@@ -203,13 +204,16 @@ export function parseBackup(raw: string): State {
   );
   assert(Object.keys(s.words).length <= 100000);
   for (const [k, w] of Object.entries(s.words)) {
+    // Migrate browser data and backups saved before Known list was added.
+    if (record(w) && w.known === undefined) w.known = false;
     validEntry(w);
     assert(
       record(w) &&
         keyOK(k) &&
         w.word === k &&
         text(w.note) &&
-        typeof w.hidden === "boolean",
+        typeof w.hidden === "boolean" &&
+        typeof w.known === "boolean",
     );
     assert(
       Number.isInteger(w.stage) &&

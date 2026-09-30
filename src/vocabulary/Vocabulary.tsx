@@ -18,7 +18,7 @@ import {
 import { loadState, saveState } from "./storage";
 import "./vocabulary.css";
 
-type View = "today" | "words" | "history" | "data";
+type View = "today" | "words" | "known" | "history" | "data";
 export default function Vocabulary() {
   const [state, setState] = useState<State>();
   const [view, setView] = useState<View>("today");
@@ -80,7 +80,7 @@ export default function Vocabulary() {
   }, [state]);
   useEffect(() => {
     setPage(0);
-  }, [search, filter, source]);
+  }, [search, filter, source, view]);
   useEffect(() => {
     const protect = (e: BeforeUnloadEvent) => {
       if (state && !saved) {
@@ -112,19 +112,26 @@ export default function Vocabulary() {
           : "Your list is full. Remove a word or increase the daily total.",
       );
   }
-  function hide(w: Word) {
+  function toggleKnown(w: Word) {
+    const nextKnown = !w.known && !w.hidden;
     update((s) => ({
       ...s,
       draft: s.draft.filter((k) => k !== w.word),
       words: {
         ...s.words,
-        [w.word]: { ...s.words[w.word], hidden: !w.hidden },
+        [w.word]: {
+          ...s.words[w.word],
+          hidden: nextKnown,
+          known: nextKnown,
+        },
       },
     }));
     setMessage(
-      w.hidden
-        ? `Restored “${w.word}”.`
-        : `“${w.word}” is hidden. Restore it from All words → Hidden.`,
+      w.known
+        ? `“${w.word}” returned to your active words.`
+        : w.hidden
+          ? `“${w.word}” restored to your active words.`
+          : `“${w.word}” added to your Known list.`,
     );
   }
   async function copy(list: SentList) {
@@ -228,12 +235,14 @@ export default function Vocabulary() {
           [w.word, ...(w.forms ?? [])].some((f) =>
             f.includes(search.toLowerCase().trim()),
           )) &&
-        (filter === "all" ||
+        (view === "known"
+          ? w.known
+          : filter === "all" ||
           (filter === "hidden"
-            ? w.hidden
-            : filter === "due"
-              ? !w.hidden && w.due && w.due <= day
-              : !w.hidden)),
+            ? w.hidden && !w.known
+              : filter === "due"
+                ? !w.hidden && w.due && w.due <= day
+                : !w.hidden)),
     )
     .sort((a, b) => b.frequency - a.frequency || a.word.localeCompare(b.word));
   const pageCount = Math.max(1, Math.ceil(filtered.length / 40));
@@ -268,15 +277,17 @@ export default function Vocabulary() {
       <div className="v-word-top">
         <div>
           <span className={`v-tag ${w.due ? "review" : ""}`}>
-            {w.hidden
-              ? "Hidden"
-              : w.lastSent === day
-                ? "Sent today"
-                : w.due
-                  ? w.due <= day
-                    ? "Due for review"
-                    : `Review ${w.due}`
-                  : "New word"}
+            {w.known
+              ? "Known"
+              : w.hidden
+                ? "Hidden"
+                : w.lastSent === day
+                  ? "Sent today"
+                  : w.due
+                    ? w.due <= day
+                      ? "Due for review"
+                      : `Review ${w.due}`
+                    : "New word"}
           </span>
           <h3>{w.word}</h3>
         </div>
@@ -308,8 +319,12 @@ export default function Vocabulary() {
         >
           {state.draft.includes(w.word) ? "✓ Selected" : "+ Add to today"}
         </button>
-        <button className="v-text-button" onClick={() => hide(w)}>
-          {w.hidden ? "Restore word" : "Already known / trivial"}
+        <button className="v-text-button" onClick={() => toggleKnown(w)}>
+          {w.known
+            ? "Move back to active words"
+            : w.hidden
+              ? "Restore word"
+              : "Already known / trivial"}
         </button>
       </div>
       {reviewButtons(w)}
@@ -343,6 +358,7 @@ export default function Vocabulary() {
             [
               ["today", "Today"],
               ["words", "All words"],
+              ["known", "Known list"],
               ["history", "Sent lists"],
               ["data", "Books & backup"],
             ] as const
@@ -357,6 +373,9 @@ export default function Vocabulary() {
             >
               {title}
               {id === "today" && <span>{state.draft.length}</span>}
+              {id === "known" && (
+                <span>{words.filter((w) => w.known).length}</span>
+              )}
             </button>
           ))}
           <span className="v-save" role="status">
@@ -388,7 +407,7 @@ export default function Vocabulary() {
             <button onClick={() => setCopyFallback("")}>Close</button>
           </div>
         )}
-        {(view === "today" || view === "words") && (
+        {(view === "today" || view === "words" || view === "known") && (
           <div className="v-workspace">
             <section className="v-discover">
               <div className="v-section-heading">
@@ -396,10 +415,16 @@ export default function Vocabulary() {
                   <p className="v-eyebrow">
                     {view === "today"
                       ? "A PLACE TO BEGIN"
-                      : "THE WHOLE COLLECTION"}
+                      : view === "known"
+                        ? "WORDS YOU ALREADY KNOW"
+                        : "THE WHOLE COLLECTION"}
                   </p>
                   <h2>
-                    {view === "today" ? "Suggested for you" : "All your words"}
+                    {view === "today"
+                      ? "Suggested for you"
+                      : view === "known"
+                        ? "Your Known list"
+                        : "All your words"}
                   </h2>
                 </div>
                 <span className="v-muted">
@@ -462,16 +487,22 @@ export default function Vocabulary() {
                 : filtered.length === 0) && (
                 <div className="v-empty">
                   <h3>
-                    {search || source ? "No matching words" : "All caught up"}
+                    {search || source
+                      ? "No matching words"
+                      : view === "known"
+                        ? "Your Known list is empty"
+                        : "All caught up"}
                   </h3>
                   <p>
                     {search || source
                       ? "Try another search or book."
-                      : "Browse All words to choose something else, or come back when a review is due."}
+                      : view === "known"
+                        ? "Mark a word “Already known / trivial” to add it here."
+                        : "Browse All words to choose something else, or come back when a review is due."}
                   </p>
                 </div>
               )}
-              {view === "words" && (
+              {view !== "today" && (
                 <div className="v-pagination">
                   <button
                     disabled={currentPage === 0}
