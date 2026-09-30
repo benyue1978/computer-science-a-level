@@ -11,3 +11,7 @@ Today defaults to five total words, adjustable through ten. Suggestions prioriti
 ## Approved Supabase extension
 
 Approved in conversation on 2026-09-30. Use the existing Supabase project and Google OAuth. Version all schema changes as migrations. Public vocabulary and shared explanations can be read without signing in. Each signed-in account stores its explanations, known/hidden states, review dates, draft, sent history, and additional imported books in its own protected snapshot. Guest use remains available in one browser without login. The local backup supplied for setup stays out of Git; its non-empty explanations were imported as shared explanations.
+
+## Shared and personal explanations
+
+The explanation editor remains available in both the All words cards and the Today list. Every signed-in user can save a personal explanation; it is private to that account and takes precedence over a shared explanation for that user. A vocabulary administrator sees an additional “Publish for everyone” action in those same editors. Publishing replaces the shared explanation for that word, clears the administrator's personal override for that word, and shows the newly published shared explanation in the editor. Other users' personal overrides remain private and continue to take precedence. Non-administrators cannot publish or modify shared explanations; Supabase row-level security remains the enforcement boundary. Existing shared explanations are shown by default when there is no personal override.
