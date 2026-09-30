@@ -58,7 +58,7 @@ for (let i = 0; i < words.length; i += chunkSize) {
   const notes = chunk.filter((word) => word.note?.trim());
   if (notes.length) {
     const values = notes.map((word) => `(${sqlText(word.word)},${sqlText(word.note.trim())})`).join(",\n");
-    statements.push(`insert into public.shared_explanations(word,body) values ${values} on conflict(word) do update set body=excluded.body, updated_at=now();`);
+    statements.push(`insert into public.shared_explanations(word,body) values ${values} on conflict(word) do nothing;`);
   }
   runQuery(statements.join("\n") + "\n", ++batchNumber);
   console.log(`Imported ${Math.min(i + chunk.length, words.length)} of ${words.length} words.`);
