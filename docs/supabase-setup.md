@@ -6,4 +6,6 @@ The coursebook catalogue is public data already checked into `public/vocabulary/
 
 Keep project passwords and local environment files out of Git. Copy `.env.example` to `.env.local` for local frontend configuration. The publishable key is safe for browser use because row-level security protects writes; never use a service-role or secret key in the browser.
 
-The first project is `daily-vocabulary` in Singapore. Its catalogue has been seeded. Google OAuth credentials and the Vercel production URL still need to be configured before sign-in and cloud sync are enabled in the app.
+The first project is `daily-vocabulary` in Singapore. Its catalogue has been seeded. Google OAuth credentials are configured for local sign-in. The Vercel project receives the public Supabase URL and publishable key for its production, preview, and development builds. Production redirects use `https://cs.withus.fun`; add that origin to the Google OAuth web client before testing production sign-in.
+
+Signed-in private data is stored as one compact, row-level-protected account snapshot. Guest data remains in IndexedDB. On first sign-in, the current browser state is copied into the account snapshot; subsequent logins load that account's cloud copy. Account snapshots include notes that differ from the shared explanation, known/hidden status, review dates, daily selections, sent history, and extra imported word sources.

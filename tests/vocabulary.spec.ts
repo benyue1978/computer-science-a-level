@@ -9,7 +9,7 @@ test("daily selection, notes, recall, hide and backup survive browser reload", a
   await expect(
     page.getByRole("heading", { name: "Suggested for you" }),
   ).toBeVisible();
-  await expect(page.getByText("● Saved in this browser")).toBeVisible();
+  await expect(page.getByText("● Saved on this device")).toBeVisible();
   for (let i = 0; i < 5; i++)
     await page
       .getByRole("button", { name: "+ Add to today", exact: true })
@@ -27,7 +27,7 @@ test("daily selection, notes, recall, hide and backup survive browser reload", a
   await expect(page.getByText("6 of 10 chosen")).toBeVisible();
   const note = page.getByRole("textbox", { name: /Explanation for/ }).first();
   await note.fill("我的理解：信息 / useful information");
-  await expect(page.getByText("● Saved in this browser")).toBeVisible();
+  await expect(page.getByText("● Saved on this device")).toBeVisible();
   await page.reload();
   await expect(
     page.getByRole("textbox", { name: /Explanation for/ }).first(),
@@ -50,11 +50,9 @@ test("daily selection, notes, recall, hide and backup survive browser reload", a
     .getByRole("button", { name: "Already known / trivial", exact: true })
     .first()
     .click();
+  await page.getByRole("button", { name: /^Known list/ }).click();
   await page
-    .getByRole("combobox", { name: "Word status" })
-    .selectOption("hidden");
-  await page
-    .getByRole("button", { name: "Restore word", exact: true })
+    .getByRole("button", { name: "Move back to active words", exact: true })
     .first()
     .click();
   await page
@@ -135,7 +133,7 @@ test("daily total is enforced, copied notes match, and due reviews return", asyn
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.clock.setFixedTime(new Date("2026-10-01T12:00:00"));
   await page.goto("/vocabulary");
-  await expect(page.getByText("● Saved in this browser")).toBeVisible();
+  await expect(page.getByText("● Saved on this device")).toBeVisible();
   const first = (await page.locator(".v-word h3").first().textContent())!;
   for (let i = 0; i < 5; i++)
     await page
@@ -149,13 +147,13 @@ test("daily total is enforced, copied notes match, and due reviews return", asyn
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toContain("自己的解释");
   expect(copied).toContain(`1. ${first}`);
-  await expect(page.getByText("● Saved in this browser")).toBeVisible();
+  await expect(page.getByText("● Saved on this device")).toBeVisible();
   await page.getByRole("button", { name: "Mark as sent", exact: true }).click();
   await expect(page.getByText("5 sent today · 0 places left")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "+ Add to today", exact: true }).first(),
   ).toBeDisabled();
-  await expect(page.getByText("● Saved in this browser")).toBeVisible();
+  await expect(page.getByText("● Saved on this device")).toBeVisible();
   await page.clock.setFixedTime(new Date("2026-10-04T12:00:00"));
   await page.reload();
   await expect(page.locator(".v-word").first()).toContainText("Due for review");

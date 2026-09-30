@@ -51,15 +51,13 @@ npm run preview
 
 ## Publish later
 
-After the owner has tried and approved the working app, import this repository into Vercel as a Vite project. Use the repository root, build command `npm run build`, and output directory `dist`. The included `vercel.json` supports opening and refreshing lesson links directly. Vercel publishes the built app; planning documents and local source notes are not automatically website pages.
-
-No Vercel project or automatic deployment has been set up as part of this implementation. No backend, account, environment secret or database is required.
+The site is deployed to Vercel from `main`. The vocabulary page uses Supabase Auth and Postgres for account sync; only the public Supabase URL and publishable key are exposed to the browser. OAuth client secrets remain in Supabase Auth configuration.
 
 ## Daily vocabulary
 
 Open `/vocabulary` (also linked on the home page). Choose five words per day by default, adjustable to ten including reviews. Add or edit Chinese/English explanations from any word card in All words or Known list; the same saved note appears when you pick that word for today’s list. Copy the list, send it yourself, then mark it sent. Sent words return after 3 days; Remembered advances to 7, 14, then 30 days, while Needs practice brings the word back tomorrow. Overdue reviews take priority over frequent new words. Words marked already known appear in the Known list and can be moved back to active words. Initially hidden common words remain separate under All words → Hidden.
 
-The collection, draft, explanations and sent-list history are stored in IndexedDB, in this browser at this site address. Use one tab at a time. Notes do not upload to Vercel. Export a JSON backup in Books & backup before clearing browser data or moving to a new browser/site address. Backup restore replaces the current collection after showing a preview. Localhost, Vercel preview URLs and the production domain each have separate storage.
+Guests keep their notes, selection and history in IndexedDB in the current browser. Signing in with Google syncs private explanations and learning state to the signed-in account; the first sign-in copies the current guest data into that account. Each account is isolated from other accounts. Shared explanations are public and appear when no personal explanation is saved. Export a JSON backup in Books & backup before clearing browser data; restoring a backup replaces the current collection after showing a preview. Localhost, Vercel preview URLs and the production domain keep separate guest data.
 
 The shipped collection is `public/vocabulary/coursebook.json`. It contains general vocabulary as well as technical vocabulary, with conservative grouping of selected inflections. Common function words are initially hidden but remain searchable. Extraction excludes publisher material, obvious code lines and footer noise. Frequency counts are approximate; uncommon abbreviations and extraction artifacts may remain. Sentence examples are extracted where readable, and are not invented. Initial data is loaded only when no saved collection exists; subsequent deployment updates do not overwrite personal progress.
 
@@ -87,6 +85,6 @@ Source JSON format:
 }
 ```
 
-Words must be lowercase English entries (apostrophes and hyphens allowed). Frequencies are positive integers; examples contain up to three short strings. An optional `forms` string array lists related spellings. The PDF is not included in deployment, but vocabulary and source examples in `public/` are publicly accessible. No remote database or authentication is required.
+Words must be lowercase English entries (apostrophes and hyphens allowed). Frequencies are positive integers; examples contain up to three short strings. An optional `forms` string array lists related spellings. The PDF is not included in deployment, but vocabulary and source examples in `public/` are publicly accessible. Supabase schema changes are versioned under `supabase/migrations/`; setup notes are in `docs/supabase-setup.md`.
 
 Verification: `npm test`, `npm run build`, and `npx playwright test tests/vocabulary.spec.ts`.

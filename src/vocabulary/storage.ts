@@ -8,13 +8,15 @@ const database = new Promise<IDBDatabase>((resolve, reject) => {
   request.onblocked = () =>
     reject(new Error("Close other vocabulary tabs and reload."));
 });
-export async function loadState(): Promise<State | undefined> {
+const storageKey = (owner: string) =>
+  owner === "guest" ? "state" : `state:${owner}`;
+export async function loadState(owner = "guest"): Promise<State | undefined> {
   const db = await database;
   return new Promise((resolve, reject) => {
     const request = db
       .transaction("collection")
       .objectStore("collection")
-      .get("state");
+      .get(storageKey(owner));
     request.onsuccess = () => {
       try {
         resolve(
@@ -29,11 +31,11 @@ export async function loadState(): Promise<State | undefined> {
     request.onerror = () => reject(request.error);
   });
 }
-export async function saveState(state: State): Promise<void> {
+export async function saveState(state: State, owner = "guest"): Promise<void> {
   const db = await database;
   return new Promise((resolve, reject) => {
     const tx = db.transaction("collection", "readwrite");
-    tx.objectStore("collection").put(state, "state");
+    tx.objectStore("collection").put(state, storageKey(owner));
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
     tx.onabort = () => reject(tx.error);

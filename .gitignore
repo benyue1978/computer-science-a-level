@@ -17,3 +17,5 @@ test-results/
 .playwright-mcp/
 
 vocabulary-backup-*.json
+.vercel
+.env*

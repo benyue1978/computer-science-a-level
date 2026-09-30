@@ -1,7 +1,7 @@
 # Vocabulary Implementation Plan
 
 **Goal:** Deliver the approved daily vocabulary picker on main.
-**Architecture:** Existing React/Vite route, pure scheduling/import model, IndexedDB single snapshot, offline PDF extraction producing shipped JSON.
+**Architecture:** Existing React/Vite route, pure scheduling/import model, IndexedDB guest snapshot, Supabase account snapshots protected by row-level security, offline PDF extraction producing shipped JSON.
 **Tech Stack:** React, TypeScript, Python standard library + pdftotext, Vitest, Playwright.
 
 - [x] Add model tests for due priority, sent-only scheduling, recall intervals, hidden restoration, duplicate-safe imports, validated backup round-trip.
@@ -16,3 +16,5 @@ Independent code review identified untrusted source fields and aggregate import 
 Follow-up: added a dedicated Known list while keeping initially hidden common words distinct; older browser records migrate with an empty known status.
 
 Follow-up: each All words and Known list card can open an explanation editor; updates persist on the shared word record and are reused in Today.
+
+Follow-up: Supabase project/schema and public seed are provisioned. Google OAuth redirects, user-scoped cloud state and local-to-account migration are configured; Vercel has the public Supabase variables. Production Google-origin configuration and an end-user sign-in still need verification.

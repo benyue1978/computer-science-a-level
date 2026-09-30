@@ -34,6 +34,7 @@ const basic = new Set(
     " ",
   ),
 );
+export const isInitiallyHidden = (word: string) => basic.has(word);
 const intervals = [3, 7, 14, 30];
 export const emptyState = (): State => ({
   version: 1,

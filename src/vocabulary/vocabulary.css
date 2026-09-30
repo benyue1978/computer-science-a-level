@@ -93,6 +93,26 @@
   font-style: italic;
   color: var(--v-muted);
 }
+.v-auth {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  color: var(--v-muted);
+  font-size: 11px;
+  min-width: 0;
+}
+.v-auth > span {
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.v-auth button {
+  padding: 8px 11px;
+  white-space: nowrap;
+  font-size: 11px;
+}
 .v-main {
   max-width: 1344px;
   padding: 0 48px;
@@ -765,6 +785,15 @@
   }
   .v-header {
     padding: 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .v-private {
+    margin-left: auto;
+  }
+  .v-auth {
+    flex-basis: 100%;
+    justify-content: flex-end;
   }
   .v-brand {
     font-size: 9px;

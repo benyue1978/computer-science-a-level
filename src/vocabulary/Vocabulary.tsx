@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import type { User } from "@supabase/supabase-js";
 import {
   emptyState,
   feedback,
@@ -16,6 +17,14 @@ import {
   type SentList,
 } from "./model";
 import { loadState, saveState } from "./storage";
+import {
+  addSharedDefaults,
+  getSharedExplanations,
+  loadAccountSnapshot,
+  restoreAccountState,
+  saveAccountSnapshot,
+} from "./cloud";
+import { supabase } from "./supabaseClient";
 import "./vocabulary.css";
 
 type View = "today" | "words" | "known" | "history" | "data";
@@ -33,28 +42,104 @@ export default function Vocabulary() {
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [pending, setPending] = useState<{ backup?: State; source?: Source }>();
   const [copyFallback, setCopyFallback] = useState("");
+  const [user, setUser] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState(!supabase);
+  const [loadedOwner, setLoadedOwner] = useState<string | null>(null);
+  const [cloudOwner, setCloudOwner] = useState<string | null>(null);
+  const [authBusy, setAuthBusy] = useState(false);
   const queue = useRef(Promise.resolve());
   const revision = useRef(0);
+  const cloudTimer = useRef<number | undefined>(undefined);
+  const sharedNotesRef = useRef<Record<string, string>>({});
+  const owner = user?.id ?? "guest";
   useEffect(() => {
     document.title = "Word by word · Daily vocabulary";
+    if (!supabase) {
+      setAuthReady(true);
+      return;
+    }
+    let cancelled = false;
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!cancelled) setUser(session?.user ?? null);
+    });
+    supabase.auth.getSession().then(({ data: result, error: sessionError }) => {
+      if (cancelled) return;
+      if (sessionError) setError("Could not read your sign-in session.");
+      setUser(result.session?.user ?? null);
+      setAuthReady(true);
+    });
+    return () => {
+      cancelled = true;
+      data.subscription.unsubscribe();
+    };
+  }, []);
+  useEffect(() => {
+    document.title = "Word by word · Daily vocabulary";
+    if (!authReady) return;
     let cancelled = false;
     (async () => {
       try {
-        let value = await loadState();
-        if (!value) {
+        const activeOwner = user?.id ?? "guest";
+        setState(undefined);
+        setLoadedOwner(null);
+        setCloudOwner(null);
+        setError("");
+        const [guestState, accountCache, sharedNotes] = await Promise.all([
+          loadState("guest"),
+          user ? loadState(user.id) : Promise.resolve(undefined),
+          getSharedExplanations().catch(() => ({})),
+        ]);
+        sharedNotesRef.current = sharedNotes;
+        const catalogue = async () => {
           const response = await fetch("/vocabulary/coursebook.json");
           if (!response.ok)
             throw new Error(
               "Could not load the initial word collection. Please reload to try again.",
             );
-          value = mergeSource(emptyState(), parseSource(await response.text()));
+          return mergeSource(emptyState(), parseSource(await response.text()));
+        };
+        let value: State;
+        if (user && supabase) {
+          const payload = await loadAccountSnapshot(user.id);
+          if (payload === undefined) {
+            value = addSharedDefaults(
+              accountCache ?? guestState ?? (await catalogue()),
+              sharedNotes,
+            );
+            await saveAccountSnapshot(user.id, value, sharedNotesRef.current);
+          } else {
+            value = restoreAccountState(await catalogue(), payload, sharedNotes);
+          }
+          await saveState(value, user.id);
+          if (!cancelled) setCloudOwner(user.id);
+        } else {
+          value = addSharedDefaults(guestState ?? (await catalogue()), sharedNotes);
+          await saveState(value, "guest");
         }
-        if (!cancelled) setState(value);
+        if (!cancelled) {
+          setState(value);
+          setLoadedOwner(activeOwner);
+          setSaved(true);
+        }
       } catch (e) {
-        if (!cancelled)
+        const activeOwner = user?.id ?? "guest";
+        const local = await loadState(activeOwner).catch(() => undefined);
+        const fallback = local ?? (activeOwner !== "guest" ? await loadState("guest") : undefined);
+        if (!cancelled && fallback) {
+          setState(fallback);
+          setLoadedOwner(activeOwner);
+          setCloudOwner(null);
+          setSaved(true);
+          setError(
+            activeOwner === "guest"
+              ? `Unable to open your collection. ${e instanceof Error ? e.message : "Browser storage is unavailable."}`
+              : "Could not load your cloud data. Your local copy is open; cloud changes are paused until you reload and retry.",
+          );
+        } else if (!cancelled) {
           setError(
             `Unable to open your collection. ${e instanceof Error ? e.message : "Browser storage is unavailable."}`,
           );
+        }
       }
     })();
     const timer = window.setInterval(() => setDay(today()), 30000);
@@ -62,23 +147,41 @@ export default function Vocabulary() {
       cancelled = true;
       clearInterval(timer);
     };
-  }, []);
+  }, [authReady, user?.id]);
   useEffect(() => {
-    if (!state) return;
+    if (!state || loadedOwner !== owner) return;
     setSaved(false);
     const id = ++revision.current;
+    const storageOwner = owner;
     queue.current = queue.current
       .catch(() => {})
-      .then(() => saveState(state))
+      .then(() => saveState(state, storageOwner))
       .then(() => {
-        if (id === revision.current) setSaved(true);
+        if (id !== revision.current) return;
+        if (storageOwner === "guest" || cloudOwner !== storageOwner) {
+          setSaved(true);
+          return;
+        }
+        window.clearTimeout(cloudTimer.current);
+        cloudTimer.current = window.setTimeout(() => {
+          saveAccountSnapshot(storageOwner, state, sharedNotesRef.current)
+            .then(() => {
+              if (id === revision.current) setSaved(true);
+            })
+            .catch(() => {
+              if (id !== revision.current) return;
+              setSaved(true);
+              setError("Saved on this device, but cloud sync failed. Check your connection and reload to retry.");
+            });
+        }, 650);
       })
       .catch(() => {
         setError(
           "Your latest changes could not be saved. Export a backup now before closing this page.",
         );
       });
-  }, [state]);
+    return () => window.clearTimeout(cloudTimer.current);
+  }, [state, owner, loadedOwner, cloudOwner]);
   useEffect(() => {
     setPage(0);
   }, [search, filter, source, view]);
@@ -97,6 +200,26 @@ export default function Vocabulary() {
     setSaved(false);
     setState((s) => (s ? fn(s) : s));
   };
+  async function signInWithGoogle() {
+    if (!supabase) return;
+    setAuthBusy(true);
+    setError("");
+    const { error: signInError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/vocabulary` },
+    });
+    if (signInError) {
+      setAuthBusy(false);
+      setError(`Google sign-in could not start. ${signInError.message}`);
+    }
+  }
+  async function signOut() {
+    if (!supabase) return;
+    setAuthBusy(true);
+    const { error: signOutError } = await supabase.auth.signOut();
+    setAuthBusy(false);
+    if (signOutError) setError(`Could not sign out. ${signOutError.message}`);
+  }
   function toggle(w: Word) {
     if (!state) return;
     if (state.draft.includes(w.word))
@@ -191,6 +314,24 @@ export default function Vocabulary() {
           <span aria-hidden="true">w.</span> WORD BY WORD
         </a>
         <span className="v-private">A little, every day.</span>
+        <div className="v-auth">
+          {user ? (
+            <>
+              <span title={user.email ?? "Signed in"}>
+                {user.email ?? "Signed in"}
+              </span>
+              <button disabled={authBusy} onClick={signOut}>
+                {authBusy ? "Signing out…" : "Sign out"}
+              </button>
+            </>
+          ) : supabase ? (
+            <button disabled={authBusy || !authReady} onClick={signInWithGoogle}>
+              {authBusy ? "Opening Google…" : "Sign in with Google · Sync"}
+            </button>
+          ) : (
+            <span>Guest · Saved on this device</span>
+          )}
+        </div>
       </header>
       {content}
     </div>
@@ -428,7 +569,11 @@ export default function Vocabulary() {
             </button>
           ))}
           <span className="v-save" role="status">
-            {saved ? "● Saved in this browser" : "Saving…"}
+            {saved
+              ? user && cloudOwner === user.id
+                ? "● Saved to your account"
+                : "● Saved on this device"
+              : "Saving…"}
           </span>
         </nav>
         {error && (
@@ -761,9 +906,9 @@ export default function Vocabulary() {
               <p className="v-eyebrow">ROOM TO GROW</p>
               <h2>Your books & your words</h2>
               <p>
-                Notes and progress live only in this browser, at this website
-                address. Export a backup regularly, especially before clearing
-                browser data or changing devices. Use one tab at a time.
+                {user && cloudOwner === user.id
+                  ? "Your account keeps your explanations, selection and review history across devices. Export a backup as an extra copy whenever you like."
+                  : "Without signing in, notes and progress live only in this browser at this website address. Export a backup before clearing browser data or changing devices."}
               </p>
             </div>
             <div className="v-data-grid">
@@ -884,7 +1029,9 @@ export default function Vocabulary() {
       <footer className="v-footer">
         <span>Word by word. Day by day.</span>
         <span>
-          Private notes · No account needed ·{" "}
+          {user && cloudOwner === user.id
+            ? "Private account sync · "
+            : "Private notes · Guest mode · "}
           <button onClick={() => setView("data")}>Back up your words</button>
         </span>
       </footer>
