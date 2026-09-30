@@ -14,3 +14,5 @@
 Independent code review identified untrusted source fields and aggregate import limits; both are covered by regression tests and validated before committing imported data to browser storage.
 
 Follow-up: added a dedicated Known list while keeping initially hidden common words distinct; older browser records migrate with an empty known status.
+
+Follow-up: each All words and Known list card can open an explanation editor; updates persist on the shared word record and are reused in Today.

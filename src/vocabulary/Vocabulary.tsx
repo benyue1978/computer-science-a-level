@@ -30,6 +30,7 @@ export default function Vocabulary() {
   const [source, setSource] = useState("");
   const [page, setPage] = useState(0);
   const [day, setDay] = useState(today());
+  const [editingNote, setEditingNote] = useState<string | null>(null);
   const [pending, setPending] = useState<{ backup?: State; source?: Source }>();
   const [copyFallback, setCopyFallback] = useState("");
   const queue = useRef(Promise.resolve());
@@ -238,8 +239,8 @@ export default function Vocabulary() {
         (view === "known"
           ? w.known
           : filter === "all" ||
-          (filter === "hidden"
-            ? w.hidden && !w.known
+            (filter === "hidden"
+              ? w.hidden && !w.known
               : filter === "due"
                 ? !w.hidden && w.due && w.due <= day
                 : !w.hidden)),
@@ -327,6 +328,53 @@ export default function Vocabulary() {
               : "Already known / trivial"}
         </button>
       </div>
+      {(view === "words" || view === "known") && (
+        <div className="v-library-note">
+          {w.note && editingNote !== w.word && (
+            <p className="v-note-preview">{w.note}</p>
+          )}
+          <button
+            className="v-note-toggle"
+            aria-expanded={editingNote === w.word}
+            aria-controls={`word-note-${w.word}`}
+            onClick={() =>
+              setEditingNote(editingNote === w.word ? null : w.word)
+            }
+          >
+            {editingNote === w.word
+              ? "Close explanation"
+              : w.note
+                ? "Edit explanation"
+                : "Add explanation"}
+          </button>
+          {editingNote === w.word && (
+            <div className="v-library-note-editor" id={`word-note-${w.word}`}>
+              <label>
+                <span>
+                  Your explanation <small>optional · 中文 / English</small>
+                </span>
+                <textarea
+                  aria-label={`Explanation for ${w.word}`}
+                  maxLength={10000}
+                  placeholder="What does this word mean to you?"
+                  value={w.note}
+                  onChange={(e) => {
+                    const note = e.target.value;
+                    update((s) => ({
+                      ...s,
+                      words: {
+                        ...s.words,
+                        [w.word]: { ...s.words[w.word], note },
+                      },
+                    }));
+                  }}
+                />
+              </label>
+              <small>Saved with this word · shown in your daily list</small>
+            </div>
+          )}
+        </div>
+      )}
       {reviewButtons(w)}
     </article>
   );
@@ -368,6 +416,7 @@ export default function Vocabulary() {
               aria-current={view === id ? "page" : undefined}
               onClick={() => {
                 setView(id);
+                setEditingNote(null);
                 setSearch("");
               }}
             >
