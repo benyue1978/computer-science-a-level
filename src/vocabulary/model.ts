@@ -132,7 +132,7 @@ export function listText(list: SentList): string {
     list.entries
       .map(
         (e, i) =>
-          `${i + 1}. ${e.word}${e.example ? "\nExample: " + e.example : ""}${e.note.trim() ? "\n" + e.note.trim() : ""}`,
+          `${i + 1}. ${e.word}${e.note.trim() ? "\n" + e.note.trim() : ""}`,
       )
       .join("\n\n")
   );
