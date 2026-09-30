@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { emptyState, mergeSource, type Source } from "./model";
-import { applyCloudSnapshot, createCloudSnapshot } from "./cloudState";
+import {
+  applyCloudSnapshot,
+  createCloudSnapshot,
+  usePublishedExplanation,
+} from "./cloudState";
 
 const source: Source = {
   id: "cambridge-computer-science-2",
@@ -78,6 +82,17 @@ describe("cloud account state", () => {
     expect(
       createCloudSnapshot(state, { available: "Shared definition" }).notes,
     ).toEqual({ the: "My own explanation" });
+  });
+
+  it("uses the published explanation and stops storing it as a personal override", () => {
+    const state = mergeSource(emptyState(), source);
+    state.words.available.note = "My draft";
+
+    const published = usePublishedExplanation(state, "available", "Shared definition");
+
+    expect(published.words.available.note).toBe("Shared definition");
+    expect(createCloudSnapshot(published, { available: "Shared definition" }).notes)
+      .not.toHaveProperty("available");
   });
 
   it("does not mistake inherited object properties for saved word progress", () => {

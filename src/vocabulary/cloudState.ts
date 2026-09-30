@@ -17,6 +17,21 @@ export type CloudSnapshot = {
   history: State["history"];
 };
 
+export function usePublishedExplanation(
+  state: State,
+  word: string,
+  body: string,
+): State {
+  if (!Object.hasOwn(state.words, word)) return state;
+  return {
+    ...state,
+    words: {
+      ...state.words,
+      [word]: { ...state.words[word], note: body },
+    },
+  };
+}
+
 export function createCloudSnapshot(
   state: State,
   sharedNotes: Record<string, string> = {},

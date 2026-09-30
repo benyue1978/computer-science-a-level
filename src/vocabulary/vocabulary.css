@@ -113,6 +113,27 @@
   white-space: nowrap;
   font-size: 11px;
 }
+.v-admin-label {
+  border: 1px solid var(--v-line);
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: var(--v-ink);
+  font-size: 10px;
+  white-space: nowrap;
+}
+.v-publish-button {
+  margin-top: 8px;
+  padding: 8px 11px;
+  color: var(--v-ink);
+  background: transparent;
+  border: 1px solid var(--v-line);
+  border-radius: 999px;
+  font-size: 11px;
+}
+.v-publish-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
 .v-main {
   max-width: 1344px;
   padding: 0 48px;

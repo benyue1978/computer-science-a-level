@@ -3,8 +3,36 @@ import {
   createCloudSnapshot,
   type CloudSnapshot,
 } from "./cloudState";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { mergeSource, parseBackup, parseSource, type State } from "./model";
 import { supabase } from "./supabaseClient";
+
+export async function isVocabularyAdmin(
+  client: SupabaseClient | null = supabase,
+): Promise<boolean> {
+  if (!client) return false;
+  const { data, error } = await client.rpc("is_vocabulary_admin");
+  if (error) throw error;
+  return data === true;
+}
+
+export async function publishSharedExplanation(
+  word: string,
+  body: string,
+  userId: string,
+  client: SupabaseClient | null = supabase,
+): Promise<void> {
+  if (!client) throw new Error("Cloud storage is not configured.");
+  const explanation = body.trim();
+  if (!explanation) throw new Error("An explanation is required.");
+  const { error } = await client.from("shared_explanations").upsert({
+    word,
+    body: explanation,
+    updated_by: userId,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) throw error;
+}
 
 export async function getSharedExplanations(): Promise<Record<string, string>> {
   if (!supabase) return {};

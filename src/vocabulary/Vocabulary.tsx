@@ -20,10 +20,13 @@ import { loadState, saveState } from "./storage";
 import {
   addSharedDefaults,
   getSharedExplanations,
+  isVocabularyAdmin,
   loadAccountSnapshot,
+  publishSharedExplanation,
   restoreAccountState,
   saveAccountSnapshot,
 } from "./cloud";
+import { usePublishedExplanation } from "./cloudState";
 import { supabase } from "./supabaseClient";
 import "./vocabulary.css";
 
@@ -44,6 +47,8 @@ export default function Vocabulary() {
   const [copyFallback, setCopyFallback] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(!supabase);
+  const [vocabularyAdmin, setVocabularyAdmin] = useState(false);
+  const [publishingWord, setPublishingWord] = useState<string | null>(null);
   const [loadedOwner, setLoadedOwner] = useState<string | null>(null);
   const [cloudOwner, setCloudOwner] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
@@ -73,6 +78,22 @@ export default function Vocabulary() {
       data.subscription.unsubscribe();
     };
   }, []);
+  useEffect(() => {
+    let cancelled = false;
+    setVocabularyAdmin(false);
+    if (!user || !supabase) return;
+    isVocabularyAdmin()
+      .then((isAdmin) => {
+        if (!cancelled) setVocabularyAdmin(isAdmin);
+      })
+      .catch(() => {
+        if (!cancelled)
+          setError("Could not check administrator access. Personal explanations are still available.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
   useEffect(() => {
     document.title = "Word by word · Daily vocabulary";
     if (!authReady) return;
@@ -200,6 +221,26 @@ export default function Vocabulary() {
     setSaved(false);
     setState((s) => (s ? fn(s) : s));
   };
+  async function publishExplanation(word: string, body: string) {
+    if (!user || !vocabularyAdmin || !body.trim()) return;
+    setPublishingWord(word);
+    setError("");
+    try {
+      const sharedBody = body.trim();
+      await publishSharedExplanation(word, sharedBody, user.id);
+      sharedNotesRef.current = { ...sharedNotesRef.current, [word]: sharedBody };
+      update((current) => usePublishedExplanation(current, word, sharedBody));
+      setMessage("Published for everyone.");
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? `Could not publish this explanation. ${e.message}`
+          : "Could not publish this explanation. Check your connection and try again.",
+      );
+    } finally {
+      setPublishingWord(null);
+    }
+  }
   async function signInWithGoogle() {
     if (!supabase) return;
     setAuthBusy(true);
@@ -320,6 +361,7 @@ export default function Vocabulary() {
               <span title={user.email ?? "Signed in"}>
                 {user.email ?? "Signed in"}
               </span>
+              {vocabularyAdmin && <span className="v-admin-label">Vocabulary admin</span>}
               <button disabled={authBusy} onClick={signOut}>
                 {authBusy ? "Signing out…" : "Sign out"}
               </button>
@@ -512,6 +554,15 @@ export default function Vocabulary() {
                 />
               </label>
               <small>Saved with this word · shown in your daily list</small>
+              {user && vocabularyAdmin && (
+                <button
+                  className="v-publish-button"
+                  disabled={!w.note.trim() || publishingWord === w.word}
+                  onClick={() => void publishExplanation(w.word, w.note)}
+                >
+                  {publishingWord === w.word ? "Publishing…" : "Publish for everyone"}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -819,6 +870,15 @@ export default function Vocabulary() {
                       }}
                     />
                   </label>
+                  {user && vocabularyAdmin && (
+                    <button
+                      className="v-publish-button"
+                      disabled={!w.note.trim() || publishingWord === w.word}
+                      onClick={() => void publishExplanation(w.word, w.note)}
+                    >
+                      {publishingWord === w.word ? "Publishing…" : "Publish for everyone"}
+                    </button>
+                  )}
                   {w.due && (
                     <p className="v-helper">
                       Review word ·{" "}
