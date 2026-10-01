@@ -36,6 +36,15 @@ export default function Vocabulary() {
   const [view, setView] = useState<View>("today");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [sendFeedback, setSendFeedback] = useState<{
+    tone: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [publishFeedback, setPublishFeedback] = useState<{
+    word: string;
+    tone: "success" | "error";
+    text: string;
+  } | null>(null);
   const [saved, setSaved] = useState(false);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("active");
@@ -224,19 +233,21 @@ export default function Vocabulary() {
   async function publishExplanation(word: string, body: string) {
     if (!user || !vocabularyAdmin || !body.trim()) return;
     setPublishingWord(word);
-    setError("");
+    setPublishFeedback(null);
     try {
       const sharedBody = body.trim();
       await publishSharedExplanation(word, sharedBody, user.id);
       sharedNotesRef.current = { ...sharedNotesRef.current, [word]: sharedBody };
       update((current) => usePublishedExplanation(current, word, sharedBody));
-      setMessage("Published for everyone.");
+      setPublishFeedback({ word, tone: "success", text: "Published for everyone." });
     } catch (e) {
-      setError(
-        e instanceof Error
+      setPublishFeedback({
+        word,
+        tone: "error",
+        text: e instanceof Error
           ? `Could not publish this explanation. ${e.message}`
           : "Could not publish this explanation. Check your connection and try again.",
-      );
+      });
     } finally {
       setPublishingWord(null);
     }
@@ -301,12 +312,17 @@ export default function Vocabulary() {
   }
   async function copy(list: SentList) {
     const text = listText(list);
+    setSendFeedback(null);
+    setCopyFallback("");
     try {
       await navigator.clipboard.writeText(text);
-      setMessage("List copied. Paste it into your notebook or message.");
+      setSendFeedback({
+        tone: "success",
+        text: "List copied. Paste it into your notebook or message.",
+      });
     } catch {
       setCopyFallback(text);
-      setMessage("Select and copy the text below.");
+      setSendFeedback({ tone: "error", text: "Select and copy the text below." });
     }
   }
   function download() {
@@ -563,6 +579,14 @@ export default function Vocabulary() {
                   {publishingWord === w.word ? "Publishing…" : "Publish for everyone"}
                 </button>
               )}
+              {publishFeedback?.word === w.word && (
+                <p
+                  className={`v-action-feedback ${publishFeedback.tone}`}
+                  role={publishFeedback.tone === "error" ? "alert" : "status"}
+                >
+                  {publishFeedback.text}
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -637,20 +661,6 @@ export default function Vocabulary() {
           <p className="v-notice" role="status">
             {message}
           </p>
-        )}
-        {copyFallback && (
-          <div className="v-copy-fallback">
-            <label>
-              Copy this list
-              <textarea
-                readOnly
-                value={copyFallback}
-                onFocus={(e) => e.target.select()}
-                rows={12}
-              />
-            </label>
-            <button onClick={() => setCopyFallback("")}>Close</button>
-          </div>
         )}
         {(view === "today" || view === "words" || view === "known") && (
           <div className="v-workspace">
@@ -879,6 +889,14 @@ export default function Vocabulary() {
                       {publishingWord === w.word ? "Publishing…" : "Publish for everyone"}
                     </button>
                   )}
+                  {publishFeedback?.word === w.word && (
+                    <p
+                      className={`v-action-feedback ${publishFeedback.tone}`}
+                      role={publishFeedback.tone === "error" ? "alert" : "status"}
+                    >
+                      {publishFeedback.text}
+                    </p>
+                  )}
                   {w.due && (
                     <p className="v-helper">
                       Review word ·{" "}
@@ -901,19 +919,43 @@ export default function Vocabulary() {
                   className="v-send-button"
                   disabled={!selected.length || !saved}
                   onClick={() => {
+                    setSendFeedback(null);
                     try {
                       const next = sendDraft(state, day);
                       update(() => next);
-                      setMessage(
-                        "Marked as sent. Your list is in Sent lists, and review dates are scheduled.",
-                      );
+                      setSendFeedback({
+                        tone: "success",
+                        text: "Marked as sent. Your list is in Sent lists, and review dates are scheduled.",
+                      });
                     } catch (e) {
-                      setError((e as Error).message);
+                      setSendFeedback({ tone: "error", text: (e as Error).message });
                     }
                   }}
                 >
                   Mark as sent
                 </button>
+                {sendFeedback && (
+                  <p
+                    className={`v-action-feedback ${sendFeedback.tone}`}
+                    role={sendFeedback.tone === "error" ? "alert" : "status"}
+                  >
+                    {sendFeedback.text}
+                  </p>
+                )}
+                {copyFallback && (
+                  <div className="v-copy-fallback">
+                    <label>
+                      Copy this list
+                      <textarea
+                        readOnly
+                        value={copyFallback}
+                        onFocus={(e) => e.target.select()}
+                        rows={12}
+                      />
+                    </label>
+                    <button onClick={() => setCopyFallback("")}>Close</button>
+                  </div>
+                )}
                 <p>
                   Copy, send it to the student, then mark it sent.
                   <br />

@@ -588,6 +588,27 @@
   color: var(--v-muted);
   margin-top: 14px;
 }
+.v-action-feedback {
+  padding: 9px 11px;
+  border: 1px solid #bbcbb1;
+  border-radius: 5px;
+  background: #eaf0e0;
+  color: var(--v-ink);
+  font-size: 11px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.v-action-feedback.success {
+  margin: 8px 0 0;
+}
+.v-action-feedback.error {
+  margin: 8px 0 0;
+  background: #fff0dc;
+  border-color: #c79861;
+}
+.v-send .v-action-feedback {
+  margin: 10px 0 0;
+}
 .v-footer {
   max-width: 1248px;
   margin: 64px auto 0;

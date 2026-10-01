@@ -90,7 +90,9 @@ describe("administrator explanation controls", () => {
     await waitFor(() => expect(mocks.publishSharedExplanation)
       .toHaveBeenCalledWith("apple", "A fruit", "account-1"));
     expect(editor).toHaveValue("A fruit");
-    expect(await screen.findByText(/Published for everyone/)).toBeVisible();
+    const feedback = await screen.findByText("Published for everyone.");
+    expect(feedback).toHaveClass("v-action-feedback");
+    expect(screen.queryByText("Published for everyone.", { selector: ".v-notice" })).toBeNull();
   });
 
   it("keeps the explanation draft when a shared publish fails", async () => {
@@ -104,7 +106,9 @@ describe("administrator explanation controls", () => {
     await user.type(editor, "A fruit");
     await user.click(screen.getByRole("button", { name: "Publish for everyone" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
+    const feedback = await screen.findByRole("alert");
+    expect(feedback).toHaveClass("v-action-feedback");
+    expect(feedback).toHaveTextContent(
       "Could not publish this explanation. Admin access required",
     );
     expect(editor).toHaveValue("A fruit");

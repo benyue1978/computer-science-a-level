@@ -147,8 +147,12 @@ test("daily total is enforced, copied notes match, and due reviews return", asyn
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toContain("自己的解释");
   expect(copied).toContain(`1. ${first}`);
+  await expect(page.locator(".v-send .v-action-feedback")).toContainText("List copied");
+  await expect(page.locator(".v-notice")).toHaveCount(0);
   await expect(page.getByText("● Saved on this device")).toBeVisible();
   await page.getByRole("button", { name: "Mark as sent", exact: true }).click();
+  await expect(page.locator(".v-send .v-action-feedback")).toContainText("Marked as sent");
+  await expect(page.locator(".v-notice")).toHaveCount(0);
   await expect(page.getByText("5 sent today · 0 places left")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "+ Add to today", exact: true }).first(),
