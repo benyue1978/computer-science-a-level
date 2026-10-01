@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Home from "./Home";
 import { content, type Language } from "./content";
 import { readMemory, resetMemory, writeMemory } from "./memory";
 import ProcessorRegisters from "./ProcessorRegisters";
@@ -48,7 +49,9 @@ export default function App() {
   useEffect(() => {
     document.documentElement.lang = language === "en" ? "en" : "zh-Hans";
     document.title =
-      (fetchCycleLesson
+      (home
+        ? (language === "en" ? "Computer Science · Learning catalogue" : "计算机科学 · 学习目录")
+        : fetchCycleLesson
         ? fetchCycleContent[language].title
         : rtnNotationLesson
         ? rtnNotationContent[language].title
@@ -65,7 +68,7 @@ export default function App() {
           : t.title) +
       " · " +
       t.brand;
-  }, [busesLesson, copyingLesson, fetchCycleLesson, fetchRegistersLesson, instructionCycleLesson, language, processorLesson, rtnNotationLesson, t]);
+  }, [home, busesLesson, copyingLesson, fetchCycleLesson, fetchRegistersLesson, instructionCycleLesson, language, processorLesson, rtnNotationLesson, t]);
   const move = (to: number) => {
     setStage(to);
     setSelected(null);
@@ -153,159 +156,7 @@ export default function App() {
         </div>
       </header>
       {home ? (
-        <main id="main" className="home">
-          <p className="eyebrow">{t.series}</p>
-          <h1>{t.homeTitle}</h1>
-          <p className="home-intro">{t.homeIntro}</p>
-          <a className="primary-link vocabulary-link" href="/vocabulary">
-            {language === "en" ? "Daily vocabulary" : "每日词汇"}
-            <span aria-hidden="true">↗</span>
-          </a>
-          <section className="lesson-invitation">
-            <div className="invitation-copy">
-              <p className="eyebrow">{t.available}</p>
-              <h2>{t.lessonTitle}</h2>
-              <p>{t.lessonIntro}</p>
-              <a className="primary-link" href="/learn/memory">
-                {t.enter}
-                <span aria-hidden="true">↗</span>
-              </a>
-            </div>
-            <div className="home-illustration" aria-hidden="true">
-              <span className="outside">11</span>
-              <div>42</div>
-              <span className="small-note">
-                {t.address} ↗<br />
-                {t.contents} →
-              </span>
-            </div>
-          </section>
-          <section className="lesson-invitation second-lesson">
-            <div className="invitation-copy">
-              <p className="eyebrow">
-                {language === "en"
-                  ? "YOUR SECOND EXPLORATION"
-                  : "你的第二次探索"}
-              </p>
-              <h2>{processorContent[language].title}</h2>
-              <p>
-                {language === "en"
-                  ? "What carries out instructions? Where does it hold information while working? Explore the processor and the storage locations inside it."
-                  : "什么负责执行指令？处理器工作时把信息暂时存在哪里？一起认识处理器和它内部的存储位置。"}
-              </p>
-              <a className="primary-link" href="/learn/processor-registers">
-                {language === "en" ? "Explore processors" : "探索处理器"}
-                <span aria-hidden="true">↗</span>
-              </a>
-            </div>
-            <div className="processor-home-illustration" aria-hidden="true">
-              <span>{processorContent[language].processor}</span>
-              <div>
-                <small>{processorContent[language].registerA}</small>
-                <strong>7</strong>
-              </div>
-              <div>
-                <small>{processorContent[language].registerB}</small>
-                <strong>42</strong>
-              </div>
-            </div>
-          </section>
-          <section className="lesson-invitation third-lesson">
-            <div className="invitation-copy">
-              <p className="eyebrow">
-                {language === "en"
-                  ? "YOUR THIRD EXPLORATION"
-                  : "你的第三次探索"}
-              </p>
-              <h2>{copyingContent[language].title}</h2>
-              <p>
-                {language === "en"
-                  ? "What stays the same when a value is copied? Predict what changes when copying between registers and from memory into the processor."
-                  : "复制数值时，什么保持不变？先预测结果，再观察寄存器之间以及从内存到处理器的复制。"}
-              </p>
-              <a className="primary-link" href="/learn/copying-values">
-                {language === "en" ? "Explore copying" : "探索复制"}
-                <span aria-hidden="true">↗</span>
-              </a>
-            </div>
-            <div className="copy-home-illustration" aria-hidden="true">
-              <div><small>A</small><strong>7</strong></div>
-              <span>{language === "en" ? "COPY" : "复制"}</span>
-              <div><small>B</small><strong>7</strong></div>
-            </div>
-          </section>
-          <section className="lesson-invitation fourth-lesson">
-            <div className="invitation-copy">
-              <p className="eyebrow">{busesControlContent[language].homeEyebrow}</p>
-              <h2>{busesControlContent[language].homeTitle}</h2>
-              <p>{busesControlContent[language].homeIntro}</p>
-              <a className="primary-link" href="/learn/buses-and-control">
-                {busesControlContent[language].explore}<span aria-hidden="true">↗</span>
-              </a>
-            </div>
-            <div className="bus-home-illustration" aria-hidden="true">
-              <span>{busesControlContent[language].addressBus}</span>
-              <span>{busesControlContent[language].dataBus}</span>
-              <span>{busesControlContent[language].controlBus}</span>
-            </div>
-          </section>
-          <section className="lesson-invitation fifth-lesson">
-            <div className="invitation-copy">
-              <p className="eyebrow">{instructionCycleContent[language].homeEyebrow}</p>
-              <h2>{instructionCycleContent[language].title}</h2>
-              <p>{instructionCycleContent[language].homeIntro}</p>
-              <a className="primary-link" href="/learn/instruction-cycle">
-                {instructionCycleContent[language].explore}<span aria-hidden="true">↗</span>
-              </a>
-            </div>
-            <div className="cycle-home-illustration" aria-hidden="true">
-              {instructionCycleContent[language].phases.map((phase, index) => <span key={phase}>{phase}{index < 2 && <b> → </b>}</span>)}
-              <small>↶ {instructionCycleContent[language].loopLabel}</small>
-            </div>
-          </section>
-          <section className="lesson-invitation sixth-lesson">
-            <div className="invitation-copy">
-              <p className="eyebrow">{fetchRegistersContent[language].homeEyebrow}</p>
-              <h2>{fetchRegistersContent[language].title}</h2>
-              <p>{fetchRegistersContent[language].homeIntro}</p>
-              <a className="primary-link" href="/learn/fetch-registers">
-                {fetchRegistersContent[language].explore}<span aria-hidden="true">↗</span>
-              </a>
-            </div>
-            <div className="fetch-home-illustration" aria-hidden="true">
-              <span>PC 20 → MAR 20</span>
-              <span>Memory ⇄ MDR ⇄ CIR</span>
-            </div>
-          </section>
-          <section className="lesson-invitation seventh-lesson">
-            <div className="invitation-copy">
-              <p className="eyebrow">{rtnNotationContent[language].homeEyebrow}</p>
-              <h2>{rtnNotationContent[language].title}</h2>
-              <p>{rtnNotationContent[language].homeIntro}</p>
-              <a className="primary-link" href="/learn/rtn-notation">
-                {rtnNotationContent[language].explore}<span aria-hidden="true">↗</span>
-              </a>
-            </div>
-            <div className="rtn-home-illustration" aria-hidden="true">
-              <span>MAR ← [PC]</span>
-              <span>MDR ← [[MAR]]</span>
-            </div>
-          </section>
-          <section className="lesson-invitation eighth-lesson">
-            <div className="invitation-copy">
-              <p className="eyebrow">{fetchCycleContent[language].eyebrow}</p>
-              <h2>{fetchCycleContent[language].title}</h2>
-              <p>{fetchCycleContent[language].homeIntro}</p>
-              <a className="primary-link" href="/learn/fetch-cycle">
-                {fetchCycleContent[language].explore}<span aria-hidden="true">↗</span>
-              </a>
-            </div>
-            <div className="fetch-cycle-home-illustration" aria-hidden="true">
-              <span>Fetch</span><b>→</b><span>Decode</span><b>→</b><span>Execute</span><b>↶</b>
-            </div>
-          </section>
-          <p className="home-note">{t.homeNote}</p>
-        </main>
+        <Home language={language} />
       ) : copyingLesson ? (
         <CopyingValues language={language} />
       ) : busesLesson ? (
