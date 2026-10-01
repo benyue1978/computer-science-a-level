@@ -960,3 +960,44 @@
     transition: none !important;
   }
 }
+.v-lemma-page { min-height: 100vh; background: #f7f5ef; }
+.v-lemma-main { width: min(100% - 40px, 920px); margin: 48px auto 90px; }
+.v-lemma-back { color: #65736b; text-decoration: none; font-size: 13px; }
+.v-lemma-eyebrow, .v-lemma-label { color: #6b796f; font-size: 10px; letter-spacing: .12em; font-weight: 700; }
+.v-lemma-eyebrow { margin: 42px 0 8px; }
+.v-lemma-main h1 { font: 500 clamp(36px, 6vw, 56px)/1.05 Georgia, serif; margin: 0; color: #1d3129; }
+.v-lemma-intro { color: #647168; max-width: 620px; line-height: 1.6; margin: 14px 0 28px; }
+.v-lemma-controls { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 12px; padding: 16px; background: #eeece4; border-radius: 14px; }
+.v-lemma-controls label, .v-lemma-actions label { display: grid; gap: 6px; color: #65736b; font-size: 11px; font-weight: 650; }
+.v-lemma-controls input, .v-lemma-controls select, .v-lemma-actions input { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid #d4d9d1; border-radius: 8px; background: white; color: #24372e; font: inherit; }
+.v-lemma-meta { font-size: 12px; color: #7b847e; margin: 16px 2px; }
+.v-lemma-list { display: grid; gap: 12px; }
+.v-lemma-card { border: 1px solid #e5e6df; border-radius: 14px; background: #fffefa; padding: 20px 22px; }
+.v-lemma-card-top { display: flex; align-items: center; gap: 26px; }
+.v-lemma-card h2 { margin: 4px 0 0; font: 500 28px/1.1 Georgia, serif; color: #1d3129; }
+.v-lemma-proposal { border-left: 1px solid #e4e6df; padding-left: 22px; display: grid; gap: 4px; }
+.v-lemma-proposal strong { color: #246a4d; font-size: 19px; }
+.v-lemma-frequency { margin-left: auto; color: #66766b; font-size: 14px; }
+.v-lemma-evidence { color: #7c857e; font-size: 12px; margin: 12px 0 0; }
+.v-lemma-examples { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 5px; color: #394b42; font-size: 13px; line-height: 1.5; }
+.v-lemma-examples li::before { content: "“"; color: #b4bdb4; margin-right: 3px; }
+.v-lemma-examples li::after { content: "”"; color: #b4bdb4; margin-left: 2px; }
+.v-lemma-actions { display: flex; align-items: end; gap: 8px; margin-top: 16px; }
+.v-lemma-actions label { width: min(240px, 45%); }
+.v-lemma-actions button { min-height: 40px; border: 0; border-radius: 8px; padding: 0 16px; color: white; background: #246a4d; font: inherit; cursor: pointer; }
+.v-lemma-actions button.v-lemma-keep { color: #536257; background: #eef0e9; }
+.v-lemma-actions button:disabled { opacity: .55; cursor: wait; }
+.v-lemma-feedback, .v-lemma-error { margin: 12px 0 0; font-size: 13px; }
+.v-lemma-feedback { color: #246a4d; }
+.v-lemma-error { color: #a13b2c; }
+.v-admin-label { color: #246a4d; text-decoration: none; font-size: 12px; }
+@media (max-width: 680px) {
+  .v-lemma-controls { grid-template-columns: 1fr 1fr; }
+  .v-lemma-search { grid-column: 1 / -1; }
+  .v-lemma-main { width: min(100% - 28px, 920px); margin-top: 28px; }
+  .v-lemma-card { padding: 16px; }
+  .v-lemma-card-top { gap: 14px; flex-wrap: wrap; }
+  .v-lemma-proposal { padding-left: 14px; }
+  .v-lemma-actions { flex-wrap: wrap; }
+  .v-lemma-actions label { width: 100%; }
+}

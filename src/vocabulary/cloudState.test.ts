@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { emptyState, mergeSource, type Source } from "./model";
 import {
   applyCloudSnapshot,
+  applyAliasesToCloudSnapshot,
   createCloudSnapshot,
   usePublishedExplanation,
 } from "./cloudState";
@@ -16,6 +17,53 @@ const source: Source = {
 };
 
 describe("cloud account state", () => {
+  it("normalizes old account keys and custom-source words through approved aliases", () => {
+    const merged = applyAliasesToCloudSnapshot({
+      limit: 5,
+      notes: { started: "older note", start: "target note" },
+      customSources: [{ id: "maths", name: "Maths", words: [
+        { word: "started", frequency: 2, examples: ["Started."], forms: ["started"] },
+        { word: "start", frequency: 3, examples: ["Start."], forms: ["start"] },
+      ] }],
+      progress: {
+        started: { known: true, hidden: true, stage: 1, due: "2026-10-10", lastSent: "2026-09-20" },
+        start: { known: false, hidden: false, stage: 3, due: "2026-10-05", lastSent: "2026-09-25" },
+      },
+      draft: ["started", "start"],
+      history: [{ date: "2026-09-30", entries: [{ word: "started", example: "", note: "snapshot" }] }],
+    }, { started: "start" });
+    expect(merged.notes).toEqual({ start: "target note" });
+    expect(merged.customSources[0].words).toEqual([{
+      word: "start", frequency: 5, examples: ["Started.", "Start."], forms: ["start", "started"],
+    }]);
+    expect(merged.progress.start).toEqual({
+      known: true, hidden: true, hiddenOverride: true, stage: 3, due: "2026-10-05", lastSent: "2026-09-25",
+    });
+    expect(merged.draft).toEqual(["start"]);
+    expect(merged.history[0].entries[0].word).toBe("started");
+  });
+
+  it("retains an explicit hidden override that matches the default value", () => {
+    const state = mergeSource(emptyState(), source);
+    state.words.available.hidden = false;
+    state.words.available.hiddenOverride = false;
+    const snapshot = createCloudSnapshot(state);
+    expect(snapshot.progress.available.hiddenOverride).toBe(false);
+    const restored = applyCloudSnapshot(state, snapshot, {});
+    expect(restored.words.available.hiddenOverride).toBe(false);
+  });
+
+  it("prefers the canonical explicit hidden override even when it equals the default", () => {
+    const merged = applyAliasesToCloudSnapshot({
+      limit: 5, notes: {}, customSources: [], draft: [], history: [],
+      progress: {
+        start: { known: false, hidden: false, hiddenOverride: false, stage: 0 },
+        started: { known: false, hidden: true, hiddenOverride: true, stage: 0 },
+      },
+    }, { started: "start" });
+    expect(merged.progress.start.hidden).toBe(false);
+    expect(merged.progress.start.hiddenOverride).toBe(false);
+  });
   it("stores only personal differences and restores them over a fresh catalogue", () => {
     const state = mergeSource(
       mergeSource(emptyState(), source),

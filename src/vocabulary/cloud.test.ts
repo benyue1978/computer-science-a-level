@@ -3,9 +3,22 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   isVocabularyAdmin,
   publishSharedExplanation,
+  buildSharedVocabularySources,
 } from "./cloud";
 
 describe("shared explanation access", () => {
+  it("rebuilds book sources from public catalogue words and per-source counts", () => {
+    const sources = buildSharedVocabularySources(
+      [{ id: "maths", name: "Maths" }, { id: "empty", name: "Empty" }],
+      [{ word: "volume", forms: ["volume", "volumes"], examples: ["The volume is high."] }],
+      [{ source_id: "maths", word: "volume", frequency: 12 }],
+    );
+    expect(sources).toEqual([{
+      id: "maths", name: "Maths", words: [{
+        word: "volume", frequency: 12, forms: ["volume", "volumes"], examples: ["The volume is high."],
+      }],
+    }]);
+  });
   it("reads the current account's admin status", async () => {
     const rpc = vi.fn().mockResolvedValue({ data: true, error: null });
     const client = { rpc } as unknown as SupabaseClient;

@@ -12,6 +12,7 @@ export type Word = Source["words"][number] & {
   sources: Record<string, number>;
   note: string;
   hidden: boolean;
+  hiddenOverride?: boolean;
   known: boolean;
   stage: number;
   due?: string;
@@ -72,6 +73,71 @@ export function mergeSource(state: State, source: Source): State {
     };
   }
   return parseBackup(JSON.stringify(next));
+}
+
+export function applyWordAliases(state: State, aliases: Record<string, string>): State {
+  const resolve = (word: string) => {
+    const seen = new Set<string>();
+    let target = word;
+    while (aliases[target]) {
+      if (seen.has(target)) throw new Error("The vocabulary contains a circular word merge.");
+      seen.add(target);
+      target = aliases[target];
+    }
+    return target;
+  };
+  const next = structuredClone(state);
+  const grouped = new Map<string, string[]>();
+  for (const word of Object.keys(state.words)) {
+    const target = resolve(word);
+    grouped.set(target, [...(grouped.get(target) ?? []), word]);
+  }
+  const words: State["words"] = {};
+  for (const [target, forms] of grouped) {
+    const rows = forms.map((form) => state.words[form]);
+    const canonical = state.words[target] ?? rows[0];
+    const sources: Record<string, number> = {};
+    for (const row of rows)
+      for (const [sourceId, count] of Object.entries(row.sources))
+        sources[sourceId] = (sources[sourceId] ?? 0) + count;
+    const earliest = rows.map((row) => row.due).filter((value): value is string => !!value).sort()[0];
+    const latestSent = rows.map((row) => row.lastSent).filter((value): value is string => !!value).sort().at(-1);
+    const targetHiddenOverride = canonical.hiddenOverride ??
+      (canonical.hidden !== isInitiallyHidden(target) ? canonical.hidden : undefined);
+    const aliasHiddenOverride = rows
+      .filter((row) => row.word !== target)
+      .map((row) => row.hiddenOverride ?? (row.hidden !== isInitiallyHidden(row.word) ? row.hidden : undefined))
+      .find((value) => value !== undefined);
+    const hiddenOverride = targetHiddenOverride ?? aliasHiddenOverride;
+    words[target] = {
+      ...canonical,
+      word: target,
+      frequency: Object.values(sources).reduce((sum, value) => sum + value, 0),
+      sources,
+      examples: [...new Set(rows.flatMap((row) => row.examples))].slice(0, 3),
+      forms: [...new Set([target, ...rows.flatMap((row) => row.forms ?? [row.word])])],
+      note: canonical.note.trim() ? canonical.note : rows.find((row) => row.note.trim())?.note ?? "",
+      known: rows.some((row) => row.known),
+      hidden: hiddenOverride ?? canonical.hidden,
+      hiddenOverride,
+      stage: Math.max(...rows.map((row) => row.stage)),
+      due: earliest,
+      lastSent: latestSent,
+    };
+  }
+  next.words = words;
+  next.draft = [...new Set(state.draft.map(resolve))];
+  return parseBackup(JSON.stringify(next));
+}
+
+export function syncSharedVocabularySources(
+  state: State,
+  sources: Source[],
+  aliases: Record<string, string>,
+): State {
+  let next = applyWordAliases(state, aliases);
+  for (const source of sources) next = mergeSource(next, source);
+  return applyWordAliases(next, aliases);
 }
 export function suggestions(s: State, day: string): Word[] {
   return Object.values(s.words)
@@ -214,6 +280,7 @@ export function parseBackup(raw: string): State {
         w.word === k &&
         text(w.note) &&
         typeof w.hidden === "boolean" &&
+        (w.hiddenOverride === undefined || typeof w.hiddenOverride === "boolean") &&
         typeof w.known === "boolean",
     );
     assert(

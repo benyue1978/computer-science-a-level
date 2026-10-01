@@ -51,10 +51,14 @@ for (let i = 0; i < words.length; i += chunkSize) {
       `insert into public.vocabulary_sources(id,name) values (${sqlText(id)},${sqlText(name)}) on conflict(id) do update set name=excluded.name;`));
   }
   const rows = chunk.map((word) => `(${sqlText(word.word)},${word.frequency},${sqlArray(word.forms ?? [word.word])},${sqlText(JSON.stringify(word.examples ?? []) )}::jsonb,${basicWords.has(word.word)})`).join(",\n");
-  statements.push(`insert into public.vocabulary_words(word,frequency,forms,examples,initially_hidden) values ${rows} on conflict(word) do update set frequency=excluded.frequency, forms=excluded.forms, examples=excluded.examples, initially_hidden=excluded.initially_hidden, updated_at=now();`);
+  statements.push(`insert into public.vocabulary_words(word,frequency,forms,examples,initially_hidden) values ${rows} on conflict(word) do update set
+    forms=(select array_agg(form order by lower(form),form) from (select distinct unnest(public.vocabulary_words.forms || excluded.forms) as form) merged_forms),
+    examples=(select coalesce(jsonb_agg(item order by first_position),'[]'::jsonb) from (select value as item,min(ord) as first_position from jsonb_array_elements(public.vocabulary_words.examples || excluded.examples) with ordinality e(value,ord) group by value order by min(ord) limit 3) merged_examples),
+    initially_hidden=public.vocabulary_words.initially_hidden or excluded.initially_hidden, updated_at=now();`);
   const links = chunk.flatMap((word) => Object.entries(word.sources).map(([source, frequency]) =>
     `(${sqlText(source)},${sqlText(word.word)},${frequency})`)).join(",\n");
   statements.push(`insert into public.vocabulary_source_words(source_id,word,frequency) values ${links} on conflict(source_id,word) do update set frequency=excluded.frequency;`);
+  statements.push(`update public.vocabulary_words w set frequency=coalesce((select sum(sw.frequency) from public.vocabulary_source_words sw where sw.word=w.word),0),updated_at=now() where w.word in (${chunk.map((word) => sqlText(word.word)).join(",")});`);
   const notes = chunk.filter((word) => word.note?.trim());
   if (notes.length) {
     const values = notes.map((word) => `(${sqlText(word.word)},${sqlText(word.note.trim())})`).join(",\n");

@@ -1,10 +1,11 @@
 import {
+  applyAliasesToCloudSnapshot,
   applyCloudSnapshot,
   createCloudSnapshot,
   type CloudSnapshot,
 } from "./cloudState";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { mergeSource, parseBackup, parseSource, type State } from "./model";
+import { applyWordAliases, mergeSource, parseBackup, parseSource, type Source, type State } from "./model";
 import { supabase } from "./supabaseClient";
 
 export async function isVocabularyAdmin(
@@ -49,6 +50,126 @@ export async function getSharedExplanations(): Promise<Record<string, string>> {
   }
 }
 
+export async function getVocabularyAliases(): Promise<Record<string, string>> {
+  if (!supabase) return {};
+  const aliases: Record<string, string> = {};
+  for (let start = 0; ; start += 1000) {
+    const { data, error } = await supabase
+      .from("vocabulary_word_aliases")
+      .select("alias, canonical")
+      .order("alias")
+      .range(start, start + 999);
+    if (error) throw error;
+    for (const row of data ?? []) aliases[row.alias] = row.canonical;
+    if (!data || data.length < 1000) return aliases;
+  }
+}
+
+export function buildSharedVocabularySources(
+  sources: { id: string; name: string }[],
+  catalogueWords: { word: string; forms: string[] | null; examples: string[] | null }[],
+  links: { source_id: string; word: string; frequency: number }[],
+): Source[] {
+  const wordMap = new Map(catalogueWords.map((row) => [row.word, row]));
+  const grouped = new Map<string, Source["words"]>();
+  for (const link of links) {
+    const detail = wordMap.get(link.word);
+    if (!detail) continue;
+    const entries = grouped.get(link.source_id) ?? [];
+    entries.push({ word: link.word, frequency: link.frequency, forms: detail.forms ?? [link.word], examples: detail.examples ?? [] });
+    grouped.set(link.source_id, entries);
+  }
+  return sources.filter((source) => (grouped.get(source.id)?.length ?? 0) > 0)
+    .map((source) => ({ ...source, words: grouped.get(source.id)! }));
+}
+
+export async function getSharedVocabularySources(): Promise<Source[]> {
+  if (!supabase) return [];
+  const sources: { id: string; name: string }[] = [];
+  for (let start = 0; ; start += 1000) {
+    const { data, error } = await supabase.from("vocabulary_sources")
+      .select("id,name").order("id").range(start, start + 999);
+    if (error) throw error;
+    sources.push(...(data ?? []));
+    if (!data || data.length < 1000) break;
+  }
+  const catalogueWords: { word: string; forms: string[] | null; examples: string[] | null }[] = [];
+  for (let start = 0; ; start += 1000) {
+    const { data, error } = await supabase.from("vocabulary_words")
+      .select("word,forms,examples").order("word").range(start, start + 999);
+    if (error) throw error;
+    catalogueWords.push(...(data ?? []));
+    if (!data || data.length < 1000) break;
+  }
+  const links: { source_id: string; word: string; frequency: number }[] = [];
+  for (let start = 0; ; start += 1000) {
+    const { data, error } = await supabase.from("vocabulary_source_words")
+      .select("source_id,word,frequency").order("source_id").order("word").range(start, start + 999);
+    if (error) throw error;
+    links.push(...(data ?? []));
+    if (!data || data.length < 1000) break;
+  }
+  return buildSharedVocabularySources(sources, catalogueWords, links);
+}
+
+export type LemmaBatch = {
+  batch_key: string;
+  source_id: string;
+  source_name: string;
+  spacy_version: string;
+  model_name: string;
+  model_version: string;
+  created_at: string;
+};
+export type LemmaCandidate = {
+  id: string;
+  batch_key: string;
+  surface_form: string;
+  proposed_target: string;
+  frequency: number;
+  pos_evidence: Record<string, number>;
+  examples: string[];
+  ambiguous: boolean;
+  status: "pending" | "merged" | "kept";
+};
+
+export async function getLemmaBatches(): Promise<LemmaBatch[]> {
+  if (!supabase) throw new Error("Cloud storage is not configured.");
+  const { data, error } = await supabase.from("vocabulary_lemma_batches")
+    .select("batch_key,source_id,source_name,spacy_version,model_name,model_version,created_at")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getLemmaCandidates(batchKey: string): Promise<LemmaCandidate[]> {
+  if (!supabase) throw new Error("Cloud storage is not configured.");
+  const { data, error } = await supabase.from("vocabulary_lemma_candidates")
+    .select("id,batch_key,surface_form,proposed_target,frequency,pos_evidence,examples,ambiguous,status")
+    .eq("batch_key", batchKey)
+    .order("frequency", { ascending: false })
+    .order("surface_form")
+    .order("proposed_target");
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function decideLemmaCandidate(candidateId: string, decision: "kept" | "pending") {
+  if (!supabase) throw new Error("Cloud storage is not configured.");
+  const { error } = await supabase.rpc("review_vocabulary_lemma_candidate", {
+    p_candidate_id: candidateId, p_decision: decision,
+  });
+  if (error) throw error;
+}
+
+export async function mergeLemmaCandidate(candidateId: string, canonical: string) {
+  if (!supabase) throw new Error("Cloud storage is not configured.");
+  const { error } = await supabase.rpc("merge_vocabulary_lemma_candidate", {
+    p_candidate_id: candidateId, p_canonical: canonical,
+  });
+  if (error) throw error;
+}
+
 export async function loadAccountSnapshot(userId: string) {
   if (!supabase) throw new Error("Cloud storage is not configured.");
   const { data, error } = await supabase
@@ -86,6 +207,7 @@ export function restoreAccountState(
   catalogue: State,
   rawSnapshot: unknown,
   sharedNotes: Record<string, string>,
+  aliases: Record<string, string> = {},
 ): State {
   if (!rawSnapshot || typeof rawSnapshot !== "object" || Array.isArray(rawSnapshot))
     throw new Error("The cloud vocabulary data has an invalid format.");
@@ -100,12 +222,16 @@ export function restoreAccountState(
     !Array.isArray(raw.history) ||
     (raw.customSources !== undefined && !Array.isArray(raw.customSources))
   ) throw new Error("The cloud vocabulary data has an invalid format.");
-  const snapshot: CloudSnapshot = { ...raw, customSources: raw.customSources ?? [] } as CloudSnapshot;
+  const validSources = (raw.customSources ?? []).map((source) => parseSource(JSON.stringify(source)));
+  const snapshot = applyAliasesToCloudSnapshot(
+    { ...raw, customSources: validSources } as CloudSnapshot,
+    aliases,
+  );
   let expanded = catalogue;
   for (const source of snapshot.customSources) {
-    const valid = parseSource(JSON.stringify(source));
-    expanded = mergeSource(expanded, valid);
+    expanded = mergeSource(expanded, source);
   }
+  expanded = applyWordAliases(expanded, aliases);
   const keys = new Set(Object.keys(expanded.words));
   for (const [word, note] of Object.entries(snapshot.notes))
     if (!keys.has(word) || typeof note !== "string" || note.length > 10000)
@@ -114,6 +240,7 @@ export function restoreAccountState(
     if (
       !keys.has(word) || !progress || typeof progress !== "object" ||
       typeof progress.known !== "boolean" || typeof progress.hidden !== "boolean" ||
+      (progress.hiddenOverride !== undefined && typeof progress.hiddenOverride !== "boolean") ||
       !Number.isInteger(progress.stage) || progress.stage < 0 || progress.stage > 3
     ) throw new Error("The cloud vocabulary data has invalid review progress.");
   if (

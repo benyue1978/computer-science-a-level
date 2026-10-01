@@ -72,6 +72,13 @@ class GenerateVocabularyCandidatesTests(unittest.TestCase):
         self.assertTrue(all(next(row for row in result['mappings'] if row['surface'] == surface)['lemma'] == surface
                             for surface in ('high-level', 'blu-ray', 'start-up')))
 
+    def test_abbreviation_punctuation_is_not_suggested_as_a_word(self):
+        text = 'The value is i.e. 16 million.'
+        rows = [{'surface': 'i', 'token': 'i', 'key': 'i', 'context': text.lower(), 'start': text.lower().index('i.e.'), 'end': text.lower().index('i.e.') + 1}]
+        result = analyze_occurrences(rows, self.nlp, {'id': 'fixture', 'name': 'Fixture'})
+        self.assertEqual(result['mappings'][0]['lemma'], 'i')
+        self.assertEqual(result['candidates'], [])
+
 
 if __name__ == '__main__':
     unittest.main()

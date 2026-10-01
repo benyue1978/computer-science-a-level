@@ -11,6 +11,7 @@ import {
   sentToday,
   suggestions,
   today,
+  syncSharedVocabularySources,
   type Source,
   type State,
   type Word,
@@ -20,6 +21,8 @@ import { loadState, saveState } from "./storage";
 import {
   addSharedDefaults,
   getSharedExplanations,
+  getVocabularyAliases,
+  getSharedVocabularySources,
   isVocabularyAdmin,
   loadAccountSnapshot,
   publishSharedExplanation,
@@ -108,17 +111,25 @@ export default function Vocabulary() {
     if (!authReady) return;
     let cancelled = false;
     (async () => {
+      let aliases: Record<string, string> = {};
+      let sharedSources: Source[] = [];
       try {
         const activeOwner = user?.id ?? "guest";
         setState(undefined);
         setLoadedOwner(null);
         setCloudOwner(null);
         setError("");
-        const [guestState, accountCache, sharedNotes] = await Promise.all([
+        const [rawGuestState, rawAccountCache, sharedNotes, loadedAliases, loadedSources] = await Promise.all([
           loadState("guest"),
           user ? loadState(user.id) : Promise.resolve(undefined),
           getSharedExplanations().catch(() => ({})),
+          getVocabularyAliases().catch(() => ({})),
+          getSharedVocabularySources().catch(() => []),
         ]);
+        aliases = loadedAliases;
+        sharedSources = loadedSources;
+        const guestState = rawGuestState ? syncSharedVocabularySources(rawGuestState, sharedSources, aliases) : undefined;
+        const accountCache = rawAccountCache ? syncSharedVocabularySources(rawAccountCache, sharedSources, aliases) : undefined;
         sharedNotesRef.current = sharedNotes;
         const catalogue = async () => {
           const response = await fetch("/vocabulary/coursebook.json");
@@ -126,7 +137,11 @@ export default function Vocabulary() {
             throw new Error(
               "Could not load the initial word collection. Please reload to try again.",
             );
-          return mergeSource(emptyState(), parseSource(await response.text()));
+          return syncSharedVocabularySources(
+            mergeSource(emptyState(), parseSource(await response.text())),
+            sharedSources,
+            aliases,
+          );
         };
         let value: State;
         if (user && supabase) {
@@ -138,7 +153,7 @@ export default function Vocabulary() {
             );
             await saveAccountSnapshot(user.id, value, sharedNotesRef.current);
           } else {
-            value = restoreAccountState(await catalogue(), payload, sharedNotes);
+            value = restoreAccountState(await catalogue(), payload, sharedNotes, aliases);
           }
           await saveState(value, user.id);
           if (!cancelled) setCloudOwner(user.id);
@@ -156,7 +171,12 @@ export default function Vocabulary() {
         const local = await loadState(activeOwner).catch(() => undefined);
         const fallback = local ?? (activeOwner !== "guest" ? await loadState("guest") : undefined);
         if (!cancelled && fallback) {
-          setState(fallback);
+          const normalizedFallback = addSharedDefaults(
+            syncSharedVocabularySources(fallback, sharedSources, aliases),
+            sharedNotesRef.current,
+          );
+          await saveState(normalizedFallback, activeOwner).catch(() => {});
+          setState(normalizedFallback);
           setLoadedOwner(activeOwner);
           setCloudOwner(null);
           setSaved(true);
@@ -298,6 +318,7 @@ export default function Vocabulary() {
         [w.word]: {
           ...s.words[w.word],
           hidden: nextKnown,
+          hiddenOverride: nextKnown,
           known: nextKnown,
         },
       },
@@ -377,7 +398,7 @@ export default function Vocabulary() {
               <span title={user.email ?? "Signed in"}>
                 {user.email ?? "Signed in"}
               </span>
-              {vocabularyAdmin && <span className="v-admin-label">Vocabulary admin</span>}
+              {vocabularyAdmin && <a className="v-admin-label" href="/vocabulary/merge">Review word forms</a>}
               <button disabled={authBusy} onClick={signOut}>
                 {authBusy ? "Signing out…" : "Sign out"}
               </button>

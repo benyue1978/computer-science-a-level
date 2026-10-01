@@ -8,6 +8,8 @@ const mocks = vi.hoisted(() => ({
   saveState: vi.fn(),
   addSharedDefaults: vi.fn(),
   getSharedExplanations: vi.fn(),
+  getVocabularyAliases: vi.fn(),
+  getSharedVocabularySources: vi.fn(),
   loadAccountSnapshot: vi.fn(),
   restoreAccountState: vi.fn(),
   saveAccountSnapshot: vi.fn(),
@@ -24,6 +26,8 @@ vi.mock("./storage", () => ({
 vi.mock("./cloud", () => ({
   addSharedDefaults: mocks.addSharedDefaults,
   getSharedExplanations: mocks.getSharedExplanations,
+  getVocabularyAliases: mocks.getVocabularyAliases,
+  getSharedVocabularySources: mocks.getSharedVocabularySources,
   loadAccountSnapshot: mocks.loadAccountSnapshot,
   restoreAccountState: mocks.restoreAccountState,
   saveAccountSnapshot: mocks.saveAccountSnapshot,
@@ -58,6 +62,8 @@ describe("administrator explanation controls", () => {
     mocks.saveState.mockResolvedValue(undefined);
     mocks.addSharedDefaults.mockImplementation((state) => state);
     mocks.getSharedExplanations.mockResolvedValue({});
+    mocks.getVocabularyAliases.mockResolvedValue({});
+    mocks.getSharedVocabularySources.mockResolvedValue([]);
     mocks.loadAccountSnapshot.mockResolvedValue(undefined);
     mocks.saveAccountSnapshot.mockResolvedValue(undefined);
     mocks.isVocabularyAdmin.mockResolvedValue(false);
@@ -123,5 +129,17 @@ describe("administrator explanation controls", () => {
     await user.click(await screen.findByRole("button", { name: "Add explanation" }));
     expect(screen.getByRole("textbox", { name: "Explanation for apple" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Publish for everyone" })).toBeVisible();
+  });
+
+  it("adds a newly shared book to a returning browser cache", async () => {
+    mocks.getSession.mockResolvedValue({ data: { session: null }, error: null });
+    mocks.getSharedVocabularySources.mockResolvedValue([{
+      id: "maths", name: "Maths", words: [{ word: "volume", frequency: 7, examples: ["The volume is high."] }],
+    }]);
+    const user = userEvent.setup();
+    render(<Vocabulary />);
+    await user.click(await screen.findByRole("button", { name: "All words" }));
+    await user.type(screen.getByRole("textbox", { name: "Search words" }), "volume");
+    expect(await screen.findByText("volume")).toBeVisible();
   });
 });

@@ -14,6 +14,7 @@ import argparse
 import collections
 import hashlib
 import json
+import re
 from pathlib import Path
 
 MODEL_NAME = 'en_core_web_sm'
@@ -38,7 +39,7 @@ def analyze_occurrences(occurrences, nlp, source):
         token = min(span, key=lambda t: (abs(t.idx - start), t.i))
         surface = row['token'].lower()
         lemma = surface if surface in VOCABULARY_IDENTITY_EXCEPTIONS or '-' in surface else token.lemma_.lower().strip("\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f ")
-        if not lemma or lemma == '-pron-':
+        if not lemma or lemma == '-pron-' or not re.fullmatch(r"[a-z][a-z'-]{0,59}", lemma):
             lemma = surface
         parsed.append({'surface': surface, 'lemma': lemma, 'pos': token.pos_, 'context': context})
 
