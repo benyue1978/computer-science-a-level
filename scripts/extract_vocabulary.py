@@ -56,7 +56,8 @@ def accept_tokens(page_text):
             if original in {'indd', 'isbn', 'co', 'sci', 'cam', 'igcse', 'hodder', 'endif', 'endwhile'}: continue
             key = families.get(original, original)
             counts[key] += 1
-            occurrences.append({'surface': surface, 'token': original, 'key': key, 'context': line})
+            occurrences.append({'surface': surface, 'token': original, 'key': key, 'context': line,
+                                'start': match.start(), 'end': match.end()})
     return occurrences, counts
 
 

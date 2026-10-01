@@ -30,6 +30,9 @@ class ExtractVocabularyTests(unittest.TestCase):
         self.assertEqual(selected[0]['token'], 'start')
         self.assertTrue(all(o['context'].startswith('Start:') for o in selected[:5]))
         self.assertTrue(all(o['context'].startswith('A different page') for o in selected[5:]))
+        self.assertEqual(selected[0]['context'][selected[0]['start']:selected[0]['end']], 'Start')
+        self.assertEqual(selected[1]['context'][selected[1]['start']:selected[1]['end']], 'starting')
+        self.assertTrue(all(o['end'] - o['start'] == len(o['surface']) for o in selected))
         self.assertFalse(any(o['token'] == 'endif' for o in occurrences))
         self.assertFalse(any(o['token'] == 'x' for o in occurrences))
         self.assertFalse(any(o['surface'] in {'start' } for o in occurrences))
@@ -59,7 +62,7 @@ class ExtractVocabularyTests(unittest.TestCase):
         self.assertEqual(sum(row['frequency'] for row in payload['words']), 115848)
         self.assertEqual(sum(occurrence_data['counts'].values()), 115848)
         self.assertEqual(len(occurrence_data['occurrences']), 115848)
-        self.assertTrue({'surface', 'token', 'key', 'context'} <= set(occurrence_data['occurrences'][0]))
+        self.assertTrue({'surface', 'token', 'key', 'context', 'start', 'end'} <= set(occurrence_data['occurrences'][0]))
         self.assertNotIn('page', occurrence_data['occurrences'][0])
 
 

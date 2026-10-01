@@ -1,0 +1,4 @@
+# Offline vocabulary analysis only; install into an isolated user Python environment.
+# Example: python3 -m venv /tmp/lemma-audit-venv && /tmp/lemma-audit-venv/bin/pip install -r scripts/requirements-vocabulary-lemma.txt
+# Then install the pinned en_core_web_sm 3.8.0 wheel using the command in generate_vocabulary_candidates.py.
+spacy==3.8.16
