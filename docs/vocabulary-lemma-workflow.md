@@ -6,14 +6,14 @@ The coursebook vocabulary file remains the source catalogue. Lemma suggestions a
 
 1. Sign in to the vocabulary page with the administrator Google account.
 2. Open **Review word forms** in the account header, or visit `/vocabulary/merge`.
-3. Choose **Merge all safe suggestions** to merge the batch in one action. The app processes proposals that the offline generator did not flag for review, in small chunks. Ambiguous word forms and noun uses of `-ing` forms stay separate.
+3. Choose **Merge all safe suggestions** to merge the batch in one action. The app processes proposals in small chunks. Only a surface form with multiple different proposed targets (for example, `uses` → `use` and `us`) stays separate.
 4. The remaining review-required proposals can be checked individually from the same page, or left pending.
 
 Approved mappings are applied to the page's catalogue and each account's saved notes, review progress, and daily draft. Sent-list history stays unchanged. If the target already has a shared explanation, the alias explanation is deleted; otherwise the alias explanation moves to the target. Targets missing from the original book are created when the merge is approved.
 
 ## Generate and import a batch
 
-The extraction and language model run locally; the web page never runs the model. The report records whether a candidate needs review, and the importer preserves that flag for the bulk action. Keep the Python model in its isolated environment rather than adding it to the site bundle.
+The extraction and language model run locally; the web page never runs the model. The report marks a candidate for review only when the same surface form has multiple distinct proposed targets. The importer preserves that flag for the bulk action. Keep the Python model in its isolated environment rather than adding it to the site bundle.
 
 ```sh
 python3 -m venv /tmp/lemma-audit-venv

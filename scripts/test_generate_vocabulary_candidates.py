@@ -24,7 +24,7 @@ class GenerateVocabularyCandidatesTests(unittest.TestCase):
         result = analyze_occurrences(rows, self.nlp, {'id': 'fixture', 'name': 'Fixture'})
         self.assertFalse(any(r['surface'] == 'programming' and r['lemma'] == 'program' for r in result['candidates']))
 
-    def test_ambiguous_left_remains_reviewable_and_data_exception_is_identity(self):
+    def test_identity_occurrences_are_not_competing_targets_and_data_stays_identity(self):
         rows = []
         for text in ('She left the room.', 'The left side is shaded.', 'They left it unchanged.'):
             start = text.lower().index('left')
@@ -33,8 +33,24 @@ class GenerateVocabularyCandidatesTests(unittest.TestCase):
         result = analyze_occurrences(rows, self.nlp, {'id': 'fixture', 'name': 'Fixture'})
         left = [r for r in result['candidates'] if r['surface'] == 'left']
         self.assertGreaterEqual(len(left), 1)
-        self.assertTrue(any(r.get('ambiguous') for r in left))
+        self.assertTrue(left)
+        self.assertFalse(any(r.get('ambiguous') for r in left))
         self.assertFalse(any(r['surface'] == 'data' and r['lemma'] != 'data' for r in result['candidates']))
+
+    def test_multiple_proposed_targets_for_the_same_surface_are_ambiguous(self):
+        rows = []
+        for text in (
+            'reviews four uses of the hexadecimal system:',
+            'Uses of BCD',
+            'Denary uses ten separate digits, 0-9, to represent all values.',
+        ):
+            lowered = text.lower()
+            start = lowered.index('uses')
+            rows.append({'surface': 'uses', 'token': 'uses', 'key': 'uses', 'context': lowered, 'start': start, 'end': start + 4})
+        result = analyze_occurrences(rows, self.nlp, {'id': 'fixture', 'name': 'Fixture'})
+        uses = [row for row in result['candidates'] if row['surface'] == 'uses']
+        self.assertEqual({row['lemma'] for row in uses}, {'us', 'use'})
+        self.assertTrue(all(row['ambiguous'] and row['review'] for row in uses))
 
     def test_sorting_and_exact_occurrence_conservation(self):
         forms = [('starts', 'He starts now.'), ('started', 'He started then.'), ('starting', 'He is starting now.'), ('start', 'Please start now.')]

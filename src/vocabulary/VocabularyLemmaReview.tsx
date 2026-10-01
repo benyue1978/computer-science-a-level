@@ -110,13 +110,13 @@ export default function VocabularyLemmaReview() {
     setBulkFeedback("");
     try {
       let merged = 0;
-      let reviewRequired = 0;
+      let conflictingForms = 0;
       const failedIds = new Set<string>();
       let remaining = 0;
       do {
         const result = await mergeAllSafeLemmaCandidates(batchKey, [...failedIds]);
         merged += result.merged;
-        reviewRequired = result.review_required;
+        conflictingForms = result.conflicting_forms;
         result.failed_ids.forEach((id) => failedIds.add(id));
         remaining = result.remaining;
         if (remaining > 0 && result.merged === 0 && result.failed_ids.length === 0) {
@@ -125,7 +125,7 @@ export default function VocabularyLemmaReview() {
         setBulkFeedback(`Merging… ${merged.toLocaleString()} of ${safePending.toLocaleString()} suggestions processed.`);
       } while (remaining > 0);
       const message = `Merged ${merged.toLocaleString()} ${merged === 1 ? "suggestion" : "suggestions"}.` +
-        (reviewRequired ? ` ${reviewRequired.toLocaleString()} ${reviewRequired === 1 ? "suggestion was" : "suggestions were"} flagged for review and stayed separate.` : "") +
+        (conflictingForms ? ` ${conflictingForms.toLocaleString()} ${conflictingForms === 1 ? "word form has" : "word forms have"} competing targets and stayed separate.` : "") +
         (failedIds.size ? ` ${failedIds.size.toLocaleString()} could not be merged and remain pending.` : "");
       setBulkFeedback(message);
       await loadCandidates();
@@ -136,7 +136,7 @@ export default function VocabularyLemmaReview() {
 
   const selectedBatch = batches.find((row) => row.batch_key === batchKey);
   const safePending = candidates.filter((row) => row.status === "pending" && !row.review_required).length;
-  const reviewRequiredPending = candidates.filter((row) => row.status === "pending" && row.review_required).length;
+  const reviewRequiredPending = new Set(candidates.filter((row) => row.status === "pending" && row.review_required).map((row) => row.surface_form)).size;
   const visible = candidates.filter((row) =>
     (row.status === status || (status === "pending" && recentlyReviewed.has(row.id))) &&
     (!search || `${row.surface_form} ${row.proposed_target}`.includes(search.trim().toLowerCase())),
@@ -167,7 +167,7 @@ export default function VocabularyLemmaReview() {
         </div>
         {selectedBatch && <p className="v-lemma-meta">{selectedBatch.source_name} · {selectedBatch.model_name} {selectedBatch.model_version} · {visible.length} shown</p>}
         {status === "pending" && safePending > 0 && <section className="v-lemma-bulk">
-          <div><strong>{safePending.toLocaleString()} suggestions can be merged together.</strong><p>{reviewRequiredPending.toLocaleString()} {reviewRequiredPending === 1 ? "suggestion is" : "suggestions are"} flagged for review and will stay separate.</p></div>
+          <div><strong>{safePending.toLocaleString()} suggestions can be merged together.</strong><p>{reviewRequiredPending.toLocaleString()} {reviewRequiredPending === 1 ? "word form has" : "word forms have"} competing targets and will stay separate.</p></div>
           <button disabled={bulkBusy} onClick={mergeAllSafe}>{bulkBusy ? "Merging…" : `Merge all safe suggestions (${safePending.toLocaleString()})`}</button>
           {bulkFeedback && <p className="v-lemma-feedback" role="status">{bulkFeedback}</p>}
         </section>}

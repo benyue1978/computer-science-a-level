@@ -1,5 +1,5 @@
 begin;
-select plan(69);
+select plan(70);
 
 -- The private review model has stable, batch-local identities and decisions.
 select has_table('public', 'vocabulary_lemma_batches', 'review batches exist');
@@ -44,9 +44,10 @@ values ('00000000-0000-0000-0000-000000000301', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
        ('00000000-0000-0000-0000-000000000306', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walked', 'walked', 1, '{"NOUN":1}', '["A walked path."]', true, true),
        ('00000000-0000-0000-0000-000000000307', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walk', 'run', 5, '{"VERB":5}', '["Walk to school."]', false, false),
        ('00000000-0000-0000-0000-000000000308', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'unseenform', 'unseenlemma', 2, '{"VERB":2}', '["An unseen form."]', false, false),
-       ('00000000-0000-0000-0000-000000000309', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bulkform', 'run', 1, '{"VERB":1}', '["A bulk form."]', false, false),
+       ('00000000-0000-0000-0000-000000000309', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bulkform', 'walk', 1, '{"VERB":1}', '["A bulk form."]', false, false),
        ('00000000-0000-0000-0000-000000000310', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'multiuse', 'walk', 1, '{"NOUN":1}', '["A multiple-use form."]', true, true),
-       ('00000000-0000-0000-0000-000000000311', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'programming', 'program', 2, '{"NOUN":2}', '["Programming is useful."]', false, true);
+       ('00000000-0000-0000-0000-000000000311', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'programming', 'program', 2, '{"NOUN":2}', '["Programming is useful."]', false, false),
+       ('00000000-0000-0000-0000-000000000312', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'multiuse', 'run', 2, '{"NOUN":2}', '["Multiple uses."]', false, true);
 
 select is((select status from public.vocabulary_lemma_candidates where id='00000000-0000-0000-0000-000000000301'), 'pending', 'candidate decisions default to pending');
 select throws_ok($$insert into public.vocabulary_lemma_candidates(batch_key, surface_form, proposed_target, frequency) values ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walked', 'walk', 99)$$, '23505', null, 'candidate uniqueness is enforced within a batch');
@@ -69,7 +70,7 @@ reset role;
 
 set local role authenticated;
 set local request.jwt.claim.sub = '00000000-0000-0000-0000-000000000101';
-select is((select count(*)::int from public.vocabulary_lemma_candidates), 11, 'admins can read review candidates');
+select is((select count(*)::int from public.vocabulary_lemma_candidates), 12, 'admins can read review candidates');
 select lives_ok($$select public.review_vocabulary_lemma_candidate('00000000-0000-0000-0000-000000000305', 'kept')$$, 'admin can decide a candidate');
 select is((select status from public.vocabulary_lemma_candidates where batch_key='bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' and surface_form='ran'), 'kept', 'admin decision RPC stores keep separately');
 select lives_ok($$select public.review_vocabulary_lemma_candidate('00000000-0000-0000-0000-000000000306', 'kept')$$, 'admin can decide an alternative proposal for the same surface');
@@ -120,11 +121,12 @@ select is((select payload->'progress'->'run'->>'hidden' from public.user_vocabul
 select lives_ok($$select public.merge_vocabulary_lemma_candidate('00000000-0000-0000-0000-000000000308', 'unseenlemma')$$, 'admin can create a missing lemma target');
 select is((select frequency from public.vocabulary_words where word='unseenlemma'), 2::bigint, 'new target receives the alias count');
 select is((select frequency from public.vocabulary_source_words where source_id='lemma-book-a' and word='unseenlemma'), 2::bigint, 'new target receives the source count');
-select is((public.merge_all_safe_vocabulary_lemma_candidates('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')->>'merged'), '1', 'bulk action merges all pending unambiguous proposals');
-select is((public.merge_all_safe_vocabulary_lemma_candidates('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')->>'review_required'), '2', 'bulk action reports but leaves review-required proposals separate');
+select is((public.merge_all_safe_vocabulary_lemma_candidates('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')->>'merged'), '2', 'bulk action merges pending proposals without competing targets');
+select is((public.merge_all_safe_vocabulary_lemma_candidates('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')->>'conflicting_forms'), '1', 'bulk action reports but leaves conflicting word forms separate');
 select is((select status from public.vocabulary_lemma_candidates where id='00000000-0000-0000-0000-000000000310'), 'pending', 'ambiguous candidate remains pending after bulk merge');
 select is((select canonical from public.vocabulary_word_aliases where alias='bulkform'), 'run', 'bulk merge creates the approved alias');
-select is((select status from public.vocabulary_lemma_candidates where id='00000000-0000-0000-0000-000000000311'), 'pending', 'derivational noun proposals remain pending after bulk merge');
+select is((select status from public.vocabulary_lemma_candidates where id='00000000-0000-0000-0000-000000000311'), 'merged', 'single-target derivational forms follow the same bulk rule');
+select is((select canonical from public.vocabulary_word_aliases where alias='bulkform'), 'run', 'bulk merge resolves an approved alias target to its terminal word');
 reset role;
 
 select * from finish();

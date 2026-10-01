@@ -46,16 +46,16 @@ def analyze_occurrences(occurrences, nlp, source):
     targets_by_surface = collections.defaultdict(set)
     grouped = collections.defaultdict(list)
     for mapped in parsed:
-        targets_by_surface[mapped['surface']].add(mapped['lemma'])
+        # Only compare proposed merges. A token that sometimes keeps its own
+        # spelling is not a competing target for the same surface form.
+        if mapped['surface'] != mapped['lemma']:
+            targets_by_surface[mapped['surface']].add(mapped['lemma'])
         grouped[(mapped['surface'], mapped['lemma'])].append(mapped)
 
     candidates, mappings = [], []
     for (surface, lemma), rows in grouped.items():
         pos_counts = collections.Counter(row['pos'] or 'UNKNOWN' for row in rows)
-        # Gerunds used as nouns are derivational forms, not inflections of their verb.
-        derivational_noun = surface.endswith('ing') and pos_counts.get('NOUN', 0) > 0 and lemma != surface
         ambiguous = len(targets_by_surface[surface]) > 1
-        compound = '-' in surface and lemma != surface
         mapping = {
             'surface': surface,
             'lemma': lemma,
@@ -63,8 +63,8 @@ def analyze_occurrences(occurrences, nlp, source):
             'pos_evidence': dict(sorted(pos_counts.items())),
             'examples': list(dict.fromkeys(row['context'] for row in rows))[:2],
             'ambiguous': ambiguous,
-            'review': bool(ambiguous or derivational_noun or compound),
-            'flag': 'derivational_or_pos_mismatch' if derivational_noun else ('ambiguous_mapping' if ambiguous else ('compound_mapping' if compound else None)),
+            'review': ambiguous,
+            'flag': 'ambiguous_mapping' if ambiguous else None,
         }
         mappings.append(mapping)
         if surface != lemma:

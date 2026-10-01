@@ -173,7 +173,7 @@ export async function mergeLemmaCandidate(candidateId: string, canonical: string
 
 export type LemmaBulkMergeResult = {
   merged: number;
-  review_required: number;
+  conflicting_forms: number;
   failed: number;
   failed_ids: string[];
   remaining: number;

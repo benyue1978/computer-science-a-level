@@ -36,7 +36,7 @@ beforeEach(() => {
   mocks.batches.mockResolvedValue([batch]);
   mocks.candidates.mockResolvedValue([candidate]);
   mocks.merge.mockResolvedValue(undefined);
-  mocks.mergeAll.mockResolvedValue({ merged: 1, review_required: 1, failed: 0, failed_ids: [], remaining: 0 });
+  mocks.mergeAll.mockResolvedValue({ merged: 1, conflicting_forms: 1, failed: 0, failed_ids: [], remaining: 0 });
   mocks.decide.mockResolvedValue(undefined);
 });
 afterEach(() => cleanup());
@@ -103,9 +103,9 @@ describe("vocabulary lemma review", () => {
     ]);
     render(<VocabularyLemmaReview />);
     const bulk = await screen.findByRole("button", { name: /Merge all safe suggestions/i });
-    expect(screen.getByText(/1 suggestion is flagged for review and will stay separate/i)).toBeInTheDocument();
+    expect(screen.getByText(/1 word form has competing targets and will stay separate/i)).toBeInTheDocument();
     await userEvent.click(bulk);
     await waitFor(() => expect(mocks.mergeAll).toHaveBeenCalledWith("batch", []));
-    expect(await screen.findByRole("status")).toHaveTextContent("Merged 1 suggestion. 1 suggestion was flagged for review and stayed separate.");
+    expect(await screen.findByRole("status")).toHaveTextContent("Merged 1 suggestion. 1 word form has competing targets and stayed separate.");
   });
 });
