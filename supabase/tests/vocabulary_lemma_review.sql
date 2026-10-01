@@ -1,5 +1,5 @@
 begin;
-select plan(63);
+select plan(64);
 
 -- The private review model has stable, batch-local identities and decisions.
 select has_table('public', 'vocabulary_lemma_batches', 'review batches exist');
@@ -29,7 +29,7 @@ insert into public.shared_explanations(word, body) values ('walk', 'Canonical no
 insert into public.shared_explanations(word, body) values ('walking', 'Movable note');
 insert into public.user_vocabulary_state(user_id, payload) values
   ('00000000-0000-0000-0000-000000000101', '{"limit":5,"notes":{"walked":"old note","walk":"target note"},"progress":{"walked":{"known":true,"hidden":true,"hiddenOverride":true,"stage":1,"due":"2026-10-10","lastSent":"2026-09-20"},"walk":{"known":false,"hidden":false,"hiddenOverride":false,"stage":3,"due":"2026-10-05","lastSent":"2026-09-25"}},"draft":["walked","walk","run","walked"],"history":[{"word":"walked","note":"snapshot"}],"customSources":[{"id":"personal","words":["walked"]}],"future":{"preserved":true}}'),
-  ('00000000-0000-0000-0000-000000000102', '{"limit":5,"notes":{},"progress":{"walked":{"known":true,"hidden":false,"stage":2,"due":"2026-10-03","lastSent":"2026-09-30"}},"draft":["walked"],"history":[{"word":"walked","note":"immutable"}]}');
+  ('00000000-0000-0000-0000-000000000102', '{"limit":5,"notes":{},"progress":{"walked":{"known":true,"hidden":true,"stage":2,"due":"2026-10-03","lastSent":"2026-09-30"}},"draft":["walked"],"history":[{"word":"walked","note":"immutable"}]}');
 insert into public.vocabulary_lemma_batches(batch_key, source_id, source_name, spacy_version, model_name, model_version)
 values ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'lemma-book-a', 'Lemma book A', '3.8.16', 'en_core_web_sm', '3.8.0'),
        ('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'lemma-book-b', 'Lemma book B', '3.8.16', 'en_core_web_sm', '3.8.0');
@@ -111,6 +111,7 @@ select is((select body from public.shared_explanations where word='run'), 'Movab
 select lives_ok($$select public.merge_vocabulary_lemma_candidate('00000000-0000-0000-0000-000000000307', 'run')$$, 'admin can merge a canonical that already has approved aliases');
 select is((select canonical from public.vocabulary_word_aliases where alias='walked'), 'run', 'previously approved aliases are retargeted to the new terminal canonical');
 select is((select payload->'history' from public.user_vocabulary_state where user_id='00000000-0000-0000-0000-000000000102'), '[{"word":"walked","note":"immutable"}]'::jsonb, 'other users history remains untouched');
+select is((select payload->'progress'->'run'->>'hidden' from public.user_vocabulary_state where user_id='00000000-0000-0000-0000-000000000102'), 'true', 'legacy alias hidden choice is inferred when canonical only has its default');
 select lives_ok($$select public.merge_vocabulary_lemma_candidate('00000000-0000-0000-0000-000000000308', 'unseenlemma')$$, 'admin can create a missing lemma target');
 select is((select frequency from public.vocabulary_words where word='unseenlemma'), 2::bigint, 'new target receives the alias count');
 select is((select frequency from public.vocabulary_source_words where source_id='lemma-book-a' and word='unseenlemma'), 2::bigint, 'new target receives the source count');
