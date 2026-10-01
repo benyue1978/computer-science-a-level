@@ -723,6 +723,37 @@
 .v-history {
   max-width: 850px;
 }
+.v-lemma-bulk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 16px 18px;
+  margin: 18px 0 24px;
+  border: 1px solid #94a889;
+  border-radius: 8px;
+  background: #eaf0e0;
+}
+.v-lemma-bulk p {
+  margin: 5px 0 0;
+  font-size: 13px;
+}
+.v-lemma-bulk button {
+  padding: 11px 15px;
+  border: 0;
+  border-radius: 5px;
+  background: #314d32;
+  color: white;
+  cursor: pointer;
+}
+.v-lemma-bulk button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.v-lemma-bulk > [role="status"] {
+  flex-basis: 100%;
+}
 .v-history > p {
   margin-top: 12px;
 }

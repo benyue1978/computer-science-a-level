@@ -130,6 +130,7 @@ export type LemmaCandidate = {
   pos_evidence: Record<string, number>;
   examples: string[];
   ambiguous: boolean;
+  review_required: boolean;
   status: "pending" | "merged" | "kept";
 };
 
@@ -145,7 +146,7 @@ export async function getLemmaBatches(): Promise<LemmaBatch[]> {
 export async function getLemmaCandidates(batchKey: string): Promise<LemmaCandidate[]> {
   if (!supabase) throw new Error("Cloud storage is not configured.");
   const { data, error } = await supabase.from("vocabulary_lemma_candidates")
-    .select("id,batch_key,surface_form,proposed_target,frequency,pos_evidence,examples,ambiguous,status")
+    .select("id,batch_key,surface_form,proposed_target,frequency,pos_evidence,examples,ambiguous,review_required,status")
     .eq("batch_key", batchKey)
     .order("frequency", { ascending: false })
     .order("surface_form")
@@ -168,6 +169,28 @@ export async function mergeLemmaCandidate(candidateId: string, canonical: string
     p_candidate_id: candidateId, p_canonical: canonical,
   });
   if (error) throw error;
+}
+
+export type LemmaBulkMergeResult = {
+  merged: number;
+  review_required: number;
+  failed: number;
+  failed_ids: string[];
+  remaining: number;
+};
+
+export async function mergeAllSafeLemmaCandidates(
+  batchKey: string,
+  excludeIds: string[] = [],
+): Promise<LemmaBulkMergeResult> {
+  if (!supabase) throw new Error("Cloud storage is not configured.");
+  const { data, error } = await supabase.rpc("merge_all_safe_vocabulary_lemma_candidates", {
+    p_batch_key: batchKey,
+    p_limit: 200,
+    p_exclude_ids: excludeIds,
+  });
+  if (error) throw error;
+  return data as LemmaBulkMergeResult;
 }
 
 export async function loadAccountSnapshot(userId: string) {

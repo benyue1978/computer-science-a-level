@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   batches: vi.fn(),
   candidates: vi.fn(),
   merge: vi.fn(),
+  mergeAll: vi.fn(),
   decide: vi.fn(),
 }));
 vi.mock("./supabaseClient", () => ({ supabase: { auth: {
@@ -20,12 +21,13 @@ vi.mock("./cloud", () => ({
   getLemmaBatches: mocks.batches,
   getLemmaCandidates: mocks.candidates,
   mergeLemmaCandidate: mocks.merge,
+  mergeAllSafeLemmaCandidates: mocks.mergeAll,
   decideLemmaCandidate: mocks.decide,
 }));
 import VocabularyLemmaReview from "./VocabularyLemmaReview";
 
 const batch = { batch_key: "batch", source_id: "book", source_name: "Coursebook", spacy_version: "3.8.16", model_name: "en_core_web_sm", model_version: "3.8.0", created_at: "2026-10-01T00:00:00Z" };
-const candidate = { id: "one", batch_key: "batch", surface_form: "started", proposed_target: "start", frequency: 20, pos_evidence: { VERB: 20 }, examples: ["It started."], ambiguous: false, status: "pending" as const };
+const candidate = { id: "one", batch_key: "batch", surface_form: "started", proposed_target: "start", frequency: 20, pos_evidence: { VERB: 20 }, examples: ["It started."], ambiguous: false, review_required: false, status: "pending" as const };
 
 beforeEach(() => {
   mocks.onAuthStateChange.mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } });
@@ -34,6 +36,7 @@ beforeEach(() => {
   mocks.batches.mockResolvedValue([batch]);
   mocks.candidates.mockResolvedValue([candidate]);
   mocks.merge.mockResolvedValue(undefined);
+  mocks.mergeAll.mockResolvedValue({ merged: 1, review_required: 1, failed: 0, failed_ids: [], remaining: 0 });
   mocks.decide.mockResolvedValue(undefined);
 });
 afterEach(() => cleanup());
@@ -91,5 +94,18 @@ describe("vocabulary lemma review", () => {
     await userEvent.type(screen.getByRole("textbox", { name: "Search" }), "run");
     expect(screen.getByRole("heading", { name: "running" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "started" })).toBeNull();
+  });
+
+  it("offers one bulk action for safe suggestions and leaves review-required forms untouched", async () => {
+    mocks.candidates.mockResolvedValue([
+      { ...candidate, id: "safe", frequency: 20 },
+      { ...candidate, id: "ambiguous", surface_form: "uses", proposed_target: "use", frequency: 10, ambiguous: true, review_required: true },
+    ]);
+    render(<VocabularyLemmaReview />);
+    const bulk = await screen.findByRole("button", { name: /Merge all safe suggestions/i });
+    expect(screen.getByText(/1 suggestion is flagged for review and will stay separate/i)).toBeInTheDocument();
+    await userEvent.click(bulk);
+    await waitFor(() => expect(mocks.mergeAll).toHaveBeenCalledWith("batch", []));
+    expect(await screen.findByRole("status")).toHaveTextContent("Merged 1 suggestion. 1 suggestion was flagged for review and stayed separate.");
   });
 });

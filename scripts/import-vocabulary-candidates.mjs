@@ -31,6 +31,7 @@ export function parseCandidateReport(report) {
     if (!Array.isArray(candidate.examples) || candidate.examples.length > 2 || candidate.examples.some((example) => typeof example !== "string" || example.length > 2000))
       throw new Error("Invalid candidate examples.");
     if (typeof candidate.ambiguous !== "boolean") throw new Error("Invalid candidate ambiguity flag.");
+    if (typeof candidate.review !== "boolean") throw new Error("Invalid candidate review flag.");
     const pair = `${candidate.surface}\0${candidate.lemma}`;
     if (seen.has(pair)) throw new Error("Duplicate alias-target candidate.");
     seen.add(pair);
@@ -46,8 +47,8 @@ const sqlJson = (value) => `${sqlText(JSON.stringify(value))}::jsonb`;
 
 export function buildImportSql(report) {
   const batch = `insert into public.vocabulary_lemma_batches(batch_key,source_id,source_name,spacy_version,model_name,model_version) values (${sqlText(report.batch_key)},${sqlText(report.source.id)},${sqlText(report.source.name)},${sqlText(report.packages.spacy)},${sqlText(report.packages.model)},${sqlText(report.packages.model_version)}) on conflict (batch_key) do nothing;`;
-  const candidates = report.candidates.map((row) => `(${sqlText(report.batch_key)},${sqlText(row.surface)},${sqlText(row.lemma)},${row.frequency},${sqlJson(row.pos_evidence)},${sqlJson(row.examples)},${row.ambiguous})`).join(",\n");
-  return batch + (candidates ? `\ninsert into public.vocabulary_lemma_candidates(batch_key,surface_form,proposed_target,frequency,pos_evidence,examples,ambiguous) values ${candidates} on conflict (batch_key, surface_form, proposed_target) do nothing;\n` : "\n");
+  const candidates = report.candidates.map((row) => `(${sqlText(report.batch_key)},${sqlText(row.surface)},${sqlText(row.lemma)},${row.frequency},${sqlJson(row.pos_evidence)},${sqlJson(row.examples)},${row.ambiguous},${row.review})`).join(",\n");
+  return batch + (candidates ? `\ninsert into public.vocabulary_lemma_candidates(batch_key,surface_form,proposed_target,frequency,pos_evidence,examples,ambiguous,review_required) values ${candidates} on conflict (batch_key, surface_form, proposed_target) do nothing;\n` : "\n");
 }
 
 function runQuery(sql, number) {

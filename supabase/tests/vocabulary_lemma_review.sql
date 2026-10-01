@@ -1,5 +1,5 @@
 begin;
-select plan(64);
+select plan(69);
 
 -- The private review model has stable, batch-local identities and decisions.
 select has_table('public', 'vocabulary_lemma_batches', 'review batches exist');
@@ -18,7 +18,8 @@ insert into public.vocabulary_words(word, frequency, forms) values
   ('walk', 2, array['walk']), ('walked', 3, array['walked']), ('walking', 4, array['walking']),
   ('run', 5, array['run']), ('ran', 6, array['ran']), ('old-form', 1, array['old-form']),
   ('overflow-alias', 1, array['overflow-alias']), ('overflow-target', 9223372036854775807, array['overflow-target']),
-  ('unseenform', 2, array['unseenform']);
+  ('unseenform', 2, array['unseenform']), ('bulkform', 1, array['bulkform']), ('multiuse', 1, array['multiuse']),
+  ('programming', 2, array['programming']);
 update public.vocabulary_words set examples = '["Walk target 1.","Walk target 2.","Walk target 3."]'::jsonb where word='walk';
 update public.vocabulary_words set examples = '["Walk alias.","Walk target 1.","Walk alias 2."]'::jsonb where word='walked';
 insert into public.vocabulary_source_words(source_id, word, frequency) values
@@ -34,15 +35,18 @@ insert into public.vocabulary_lemma_batches(batch_key, source_id, source_name, s
 values ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'lemma-book-a', 'Lemma book A', '3.8.16', 'en_core_web_sm', '3.8.0'),
        ('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'lemma-book-b', 'Lemma book B', '3.8.16', 'en_core_web_sm', '3.8.0');
 insert into public.vocabulary_word_aliases(alias, canonical) values ('old-form', 'overflow-alias');
-insert into public.vocabulary_lemma_candidates(id, batch_key, surface_form, proposed_target, frequency, pos_evidence, examples, ambiguous)
-values ('00000000-0000-0000-0000-000000000301', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walked', 'walk', 2, '{"VERB":2}', '["They walked home."]', false),
-       ('00000000-0000-0000-0000-000000000302', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'walked', 'walk', 1, '{"VERB":1}', '["We walked together."]', false),
-       ('00000000-0000-0000-0000-000000000304', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walking', 'walk', 4, '{"VERB":4}', '["Walking helps."]', false),
-       ('00000000-0000-0000-0000-000000000305', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'ran', 'run', 6, '{"VERB":6}', '["She ran fast."]', false),
-       ('00000000-0000-0000-0000-000000000303', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'overflow-alias', 'run', 1, '{}', '[]', false),
-       ('00000000-0000-0000-0000-000000000306', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walked', 'walked', 1, '{"NOUN":1}', '["A walked path."]', true),
-       ('00000000-0000-0000-0000-000000000307', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walk', 'run', 5, '{"VERB":5}', '["Walk to school."]', false),
-       ('00000000-0000-0000-0000-000000000308', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'unseenform', 'unseenlemma', 2, '{"VERB":2}', '["An unseen form."]', false);
+insert into public.vocabulary_lemma_candidates(id, batch_key, surface_form, proposed_target, frequency, pos_evidence, examples, ambiguous, review_required)
+values ('00000000-0000-0000-0000-000000000301', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walked', 'walk', 2, '{"VERB":2}', '["They walked home."]', false, false),
+       ('00000000-0000-0000-0000-000000000302', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'walked', 'walk', 1, '{"VERB":1}', '["We walked together."]', false, false),
+       ('00000000-0000-0000-0000-000000000304', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walking', 'walk', 4, '{"VERB":4}', '["Walking helps."]', false, false),
+       ('00000000-0000-0000-0000-000000000305', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'ran', 'run', 6, '{"VERB":6}', '["She ran fast."]', false, false),
+       ('00000000-0000-0000-0000-000000000303', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'overflow-alias', 'run', 1, '{}', '[]', false, false),
+       ('00000000-0000-0000-0000-000000000306', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walked', 'walked', 1, '{"NOUN":1}', '["A walked path."]', true, true),
+       ('00000000-0000-0000-0000-000000000307', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walk', 'run', 5, '{"VERB":5}', '["Walk to school."]', false, false),
+       ('00000000-0000-0000-0000-000000000308', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'unseenform', 'unseenlemma', 2, '{"VERB":2}', '["An unseen form."]', false, false),
+       ('00000000-0000-0000-0000-000000000309', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bulkform', 'run', 1, '{"VERB":1}', '["A bulk form."]', false, false),
+       ('00000000-0000-0000-0000-000000000310', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'multiuse', 'walk', 1, '{"NOUN":1}', '["A multiple-use form."]', true, true),
+       ('00000000-0000-0000-0000-000000000311', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'programming', 'program', 2, '{"NOUN":2}', '["Programming is useful."]', false, true);
 
 select is((select status from public.vocabulary_lemma_candidates where id='00000000-0000-0000-0000-000000000301'), 'pending', 'candidate decisions default to pending');
 select throws_ok($$insert into public.vocabulary_lemma_candidates(batch_key, surface_form, proposed_target, frequency) values ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'walked', 'walk', 99)$$, '23505', null, 'candidate uniqueness is enforced within a batch');
@@ -60,11 +64,12 @@ set local request.jwt.claim.sub = '00000000-0000-0000-0000-000000000102';
 select is((select count(*)::int from public.vocabulary_lemma_candidates), 0, 'ordinary users cannot read review candidates');
 select throws_ok($$select public.review_vocabulary_lemma_candidate('00000000-0000-0000-0000-000000000301', 'kept')$$, 'P0001', 'Vocabulary administrator access required', 'ordinary users cannot decide candidates');
 select throws_ok($$select public.merge_vocabulary_lemma_candidate('00000000-0000-0000-0000-000000000301', 'walk')$$, 'P0001', 'Vocabulary administrator access required', 'ordinary users cannot merge candidates');
+select throws_ok($$select public.merge_all_safe_vocabulary_lemma_candidates('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')$$, 'P0001', 'Vocabulary administrator access required', 'ordinary users cannot bulk merge candidates');
 reset role;
 
 set local role authenticated;
 set local request.jwt.claim.sub = '00000000-0000-0000-0000-000000000101';
-select is((select count(*)::int from public.vocabulary_lemma_candidates), 8, 'admins can read review candidates');
+select is((select count(*)::int from public.vocabulary_lemma_candidates), 11, 'admins can read review candidates');
 select lives_ok($$select public.review_vocabulary_lemma_candidate('00000000-0000-0000-0000-000000000305', 'kept')$$, 'admin can decide a candidate');
 select is((select status from public.vocabulary_lemma_candidates where batch_key='bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' and surface_form='ran'), 'kept', 'admin decision RPC stores keep separately');
 select lives_ok($$select public.review_vocabulary_lemma_candidate('00000000-0000-0000-0000-000000000306', 'kept')$$, 'admin can decide an alternative proposal for the same surface');
@@ -115,6 +120,11 @@ select is((select payload->'progress'->'run'->>'hidden' from public.user_vocabul
 select lives_ok($$select public.merge_vocabulary_lemma_candidate('00000000-0000-0000-0000-000000000308', 'unseenlemma')$$, 'admin can create a missing lemma target');
 select is((select frequency from public.vocabulary_words where word='unseenlemma'), 2::bigint, 'new target receives the alias count');
 select is((select frequency from public.vocabulary_source_words where source_id='lemma-book-a' and word='unseenlemma'), 2::bigint, 'new target receives the source count');
+select is((public.merge_all_safe_vocabulary_lemma_candidates('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')->>'merged'), '1', 'bulk action merges all pending unambiguous proposals');
+select is((public.merge_all_safe_vocabulary_lemma_candidates('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')->>'review_required'), '2', 'bulk action reports but leaves review-required proposals separate');
+select is((select status from public.vocabulary_lemma_candidates where id='00000000-0000-0000-0000-000000000310'), 'pending', 'ambiguous candidate remains pending after bulk merge');
+select is((select canonical from public.vocabulary_word_aliases where alias='bulkform'), 'run', 'bulk merge creates the approved alias');
+select is((select status from public.vocabulary_lemma_candidates where id='00000000-0000-0000-0000-000000000311'), 'pending', 'derivational noun proposals remain pending after bulk merge');
 reset role;
 
 select * from finish();

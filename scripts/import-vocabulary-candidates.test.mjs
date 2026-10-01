@@ -11,7 +11,7 @@ const sample = {
   mapped_occurrences: 5,
   changed_occurrences: 3,
   identity_occurrences: 2,
-  candidates: [{ surface: "started", lemma: "start", frequency: 3, pos_evidence: { VERB: 3 }, examples: ["It started."], ambiguous: false }],
+  candidates: [{ surface: "started", lemma: "start", frequency: 3, pos_evidence: { VERB: 3 }, examples: ["It started."], ambiguous: false, review: false }],
 };
 
 test("accepts a complete candidate report and builds idempotent SQL", () => {
@@ -19,6 +19,7 @@ test("accepts a complete candidate report and builds idempotent SQL", () => {
   const sql = buildImportSql(report);
   assert.match(sql, /on conflict \(batch_key\) do nothing/i);
   assert.match(sql, /on conflict \(batch_key, surface_form, proposed_target\) do nothing/i);
+  assert.match(sql, /examples,ambiguous,review_required/);
   assert.match(sql, /started/);
 });
 
@@ -28,6 +29,7 @@ test("rejects invalid source ids, model metadata, frequency, examples and duplic
     (r) => { r.packages.model_version = ""; },
     (r) => { r.candidates[0].frequency = 0; },
     (r) => { r.candidates[0].examples = ["x".repeat(2001)]; },
+    (r) => { delete r.candidates[0].review; },
     (r) => { r.candidates.push(structuredClone(r.candidates[0])); },
   ]) {
     const invalid = structuredClone(sample);

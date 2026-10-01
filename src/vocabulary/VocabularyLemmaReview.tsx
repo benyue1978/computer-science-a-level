@@ -5,6 +5,7 @@ import {
   getLemmaBatches,
   getLemmaCandidates,
   isVocabularyAdmin,
+  mergeAllSafeLemmaCandidates,
   mergeLemmaCandidate,
   type LemmaBatch,
   type LemmaCandidate,
@@ -23,6 +24,8 @@ export default function VocabularyLemmaReview() {
   const [search, setSearch] = useState("");
   const [targets, setTargets] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkFeedback, setBulkFeedback] = useState("");
   const [feedback, setFeedback] = useState<Record<string, { error: boolean; text: string }>>({});
   const [recentlyReviewed, setRecentlyReviewed] = useState<Set<string>>(() => new Set());
   const [error, setError] = useState("");
@@ -100,7 +103,40 @@ export default function VocabularyLemmaReview() {
     } finally { setBusy(null); }
   }
 
+  async function mergeAllSafe() {
+    if (!batchKey || bulkBusy) return;
+    setBulkBusy(true);
+    setError("");
+    setBulkFeedback("");
+    try {
+      let merged = 0;
+      let reviewRequired = 0;
+      const failedIds = new Set<string>();
+      let remaining = 0;
+      do {
+        const result = await mergeAllSafeLemmaCandidates(batchKey, [...failedIds]);
+        merged += result.merged;
+        reviewRequired = result.review_required;
+        result.failed_ids.forEach((id) => failedIds.add(id));
+        remaining = result.remaining;
+        if (remaining > 0 && result.merged === 0 && result.failed_ids.length === 0) {
+          throw new Error("Bulk merge stopped before all safe suggestions were processed.");
+        }
+        setBulkFeedback(`Merging… ${merged.toLocaleString()} of ${safePending.toLocaleString()} suggestions processed.`);
+      } while (remaining > 0);
+      const message = `Merged ${merged.toLocaleString()} ${merged === 1 ? "suggestion" : "suggestions"}.` +
+        (reviewRequired ? ` ${reviewRequired.toLocaleString()} ${reviewRequired === 1 ? "suggestion was" : "suggestions were"} flagged for review and stayed separate.` : "") +
+        (failedIds.size ? ` ${failedIds.size.toLocaleString()} could not be merged and remain pending.` : "");
+      setBulkFeedback(message);
+      await loadCandidates();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not merge the safe suggestions.");
+    } finally { setBulkBusy(false); }
+  }
+
   const selectedBatch = batches.find((row) => row.batch_key === batchKey);
+  const safePending = candidates.filter((row) => row.status === "pending" && !row.review_required).length;
+  const reviewRequiredPending = candidates.filter((row) => row.status === "pending" && row.review_required).length;
   const visible = candidates.filter((row) =>
     (row.status === status || (status === "pending" && recentlyReviewed.has(row.id))) &&
     (!search || `${row.surface_form} ${row.proposed_target}`.includes(search.trim().toLowerCase())),
@@ -130,6 +166,11 @@ export default function VocabularyLemmaReview() {
           <label className="v-lemma-search">Search<input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Word or target" /></label>
         </div>
         {selectedBatch && <p className="v-lemma-meta">{selectedBatch.source_name} · {selectedBatch.model_name} {selectedBatch.model_version} · {visible.length} shown</p>}
+        {status === "pending" && safePending > 0 && <section className="v-lemma-bulk">
+          <div><strong>{safePending.toLocaleString()} suggestions can be merged together.</strong><p>{reviewRequiredPending.toLocaleString()} {reviewRequiredPending === 1 ? "suggestion is" : "suggestions are"} flagged for review and will stay separate.</p></div>
+          <button disabled={bulkBusy} onClick={mergeAllSafe}>{bulkBusy ? "Merging…" : `Merge all safe suggestions (${safePending.toLocaleString()})`}</button>
+          {bulkFeedback && <p className="v-lemma-feedback" role="status">{bulkFeedback}</p>}
+        </section>}
         {batches.length === 0 ? <p>No candidate batches have been imported.</p> : visible.length === 0 ? <p>No {status === "pending" ? "unreviewed" : status} candidates match.</p> : <div className="v-lemma-list">
           {visible.map((row) => <article className="v-lemma-card" key={row.id}>
             <div className="v-lemma-card-top"><div><span className="v-lemma-label">WORD FORM</span><h2>{row.surface_form}</h2></div><div className="v-lemma-proposal"><span className="v-lemma-label">SUGGESTED WORD</span><strong>{row.proposed_target}</strong></div>{row.status !== "pending" && <span className="v-lemma-state">{row.status === "merged" ? "Merged" : "Kept separate"}</span>}<span className="v-lemma-frequency">{row.frequency.toLocaleString()}×</span></div>
