@@ -14,6 +14,7 @@ export type CloudSnapshot = {
     { known: boolean; hidden: boolean; hiddenOverride?: boolean; stage: number; due?: string; lastSent?: string }
   >;
   draft: string[];
+  draftDate?: string;
   history: State["history"];
 };
 
@@ -150,6 +151,7 @@ export function createCloudSnapshot(
     customSources,
     progress,
     draft: [...state.draft],
+    ...(state.draftDate ? { draftDate: state.draftDate } : {}),
     history: structuredClone(state.history),
   };
 }
@@ -164,6 +166,7 @@ export function applyCloudSnapshot(
     state = mergeSource(state, source);
   state.limit = snapshot.limit >= 5 && snapshot.limit <= 10 ? snapshot.limit : 5;
   state.draft = snapshot.draft.filter((word) => Object.hasOwn(state.words, word));
+  if (snapshot.draftDate) state.draftDate = snapshot.draftDate;
   state.history = structuredClone(snapshot.history);
   for (const [word, value] of Object.entries(state.words)) {
     if (Object.hasOwn(sharedNotes, word)) value.note = sharedNotes[word];

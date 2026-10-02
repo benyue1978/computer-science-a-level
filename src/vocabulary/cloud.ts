@@ -243,6 +243,7 @@ export function restoreAccountState(
     !raw.progress || typeof raw.progress !== "object" || Array.isArray(raw.progress) ||
     !Array.isArray(raw.draft) ||
     !Array.isArray(raw.history) ||
+    (raw.draftDate !== undefined && (typeof raw.draftDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(raw.draftDate))) ||
     (raw.customSources !== undefined && !Array.isArray(raw.customSources))
   ) throw new Error("The cloud vocabulary data has an invalid format.");
   const validSources = (raw.customSources ?? []).map((source) => parseSource(JSON.stringify(source)));

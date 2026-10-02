@@ -295,12 +295,15 @@ export default function Vocabulary() {
   function toggle(w: Word) {
     if (!state) return;
     if (state.draft.includes(w.word))
-      update((s) => ({ ...s, draft: s.draft.filter((k) => k !== w.word) }));
+      update((s) => {
+        const draft = s.draft.filter((k) => k !== w.word);
+        return { ...s, draft, ...(draft.length ? {} : { draftDate: undefined }) };
+      });
     else if (
       state.draft.length + sentToday(state, day) < state.limit &&
       w.lastSent !== day
     )
-      update((s) => ({ ...s, draft: [...s.draft, w.word] }));
+      update((s) => ({ ...s, draft: [...s.draft, w.word], draftDate: s.draftDate ?? day }));
     else
       setMessage(
         w.lastSent === day
@@ -313,6 +316,7 @@ export default function Vocabulary() {
     update((s) => ({
       ...s,
       draft: s.draft.filter((k) => k !== w.word),
+      ...(s.draft.length === 1 ? { draftDate: undefined } : {}),
       words: {
         ...s.words,
         [w.word]: {
@@ -432,7 +436,7 @@ export default function Vocabulary() {
   ).length;
   const selected = state.draft.map((k) => state.words[k]);
   const dailyList = {
-    date: day,
+    date: state.draftDate ?? day,
     entries: selected.map((w) => ({
       word: w.word,
       example: w.examples[0] ?? "",

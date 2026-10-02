@@ -6,6 +6,7 @@ import {
   mergeSource,
   suggestions,
   sendDraft,
+  sentToday,
   feedback,
   parseBackup,
   parseSource,
@@ -174,6 +175,18 @@ describe("vocabulary learning", () => {
     expect(() => sendDraft(s, "2026-09-30")).toThrow();
     s.limit = 6;
     expect(sendDraft(s, "2026-09-30").words.delta.lastSent).toBe("2026-09-30");
+  });
+  it("records a draft on the day it was selected, even if marked sent later", () => {
+    const s = mergeSource(setup(), {
+      id: "extra", name: "Extra", words: [{ word: "alpha", frequency: 1, examples: [] }],
+    });
+    s.draft = ["available"];
+    s.draftDate = "2026-09-30";
+    const sent = sendDraft(s, "2026-10-01");
+    expect(sent.history[0].date).toBe("2026-09-30");
+    expect(sent.words.available.lastSent).toBe("2026-09-30");
+    expect(sent.words.available.due).toBe("2026-10-03");
+    expect(sentToday(sent, "2026-10-01")).toBe(0);
   });
   it("accepts ordinary words that coincide with object property names", () => {
     const source = parseSource(

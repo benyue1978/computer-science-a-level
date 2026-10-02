@@ -27,6 +27,7 @@ export type State = {
   sources: Record<string, string>;
   words: Record<string, Word>;
   draft: string[];
+  draftDate?: string;
   limit: number;
   history: SentList[];
 };
@@ -155,17 +156,18 @@ export const sentToday = (s: State, day: string) =>
     .filter((h) => h.date === day)
     .reduce((count, h) => count + h.entries.length, 0);
 export function sendDraft(s: State, day: string): State {
+  const listDate = s.draftDate ?? day;
   if (
     !s.draft.length ||
-    s.draft.length + sentToday(s, day) > s.limit ||
-    s.draft.some((k) => !s.words[k] || s.words[k].lastSent === day)
+    s.draft.length + sentToday(s, listDate) > s.limit ||
+    s.draft.some((k) => !s.words[k] || s.words[k].lastSent === listDate)
   )
     throw new Error(
       "Keep within your daily total and choose words that have not been sent today.",
     );
   const next = structuredClone(s);
   next.history.unshift({
-    date: day,
+    date: listDate,
     entries: next.draft.map((k) => ({
       word: k,
       example: next.words[k].examples[0] ?? "",
@@ -174,10 +176,11 @@ export function sendDraft(s: State, day: string): State {
   });
   for (const k of next.draft) {
     const w = next.words[k];
-    w.lastSent = day;
-    w.due = plusDays(day, intervals[w.stage]);
+    w.lastSent = listDate;
+    w.due = plusDays(listDate, intervals[w.stage]);
   }
   next.draft = [];
+  delete next.draftDate;
   return next;
 }
 export function feedback(
@@ -315,6 +318,7 @@ export function parseBackup(raw: string): State {
       new Set(s.draft).size === s.draft.length &&
       s.draft.every((k: unknown) => keyOK(k) && Object.hasOwn(s.words, k)),
   );
+  assert(s.draftDate === undefined || dateOK(s.draftDate));
   assert(Array.isArray(s.history) && s.history.length <= 100000);
   for (const h of s.history)
     assert(
