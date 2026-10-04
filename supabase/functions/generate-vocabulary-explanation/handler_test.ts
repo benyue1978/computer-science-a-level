@@ -1,4 +1,5 @@
 import { createExplanationHandler } from "./handler.ts";
+import { extractCompletedExplanation } from "./openai.ts";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -57,7 +58,7 @@ Deno.test("returns a generated explanation to an admin", async () => {
     isAdmin: async (authorization) => authorization === "Bearer test-user-jwt",
     generate: async (word, example) => {
       received = `${word}|${example}`;
-      return "Meaning: a fruit.\n中文：一种水果。";
+      return "English: a fruit.\n中文: 一种水果。";
     },
   });
   const response = await handler(
@@ -70,9 +71,59 @@ Deno.test("returns a generated explanation to an admin", async () => {
     `unexpected provider input: ${received}`,
   );
   assert(
-    body.explanation === "Meaning: a fruit.\n中文：一种水果。",
+    body.explanation === "English: a fruit.\n中文: 一种水果。",
     "response should contain the explanation",
   );
+});
+
+Deno.test("rejects provider output without the required English and Chinese lines", async () => {
+  const handler = createExplanationHandler({
+    isAdmin: async () => true,
+    generate: async () => "A fruit.",
+  });
+  const response = await handler(request({ word: "apple" }));
+  assert(response.status === 502, `expected 502, received ${response.status}`);
+});
+
+Deno.test("rejects provider output with extra lines", async () => {
+  const handler = createExplanationHandler({
+    isAdmin: async () => true,
+    generate: async () =>
+      "English: a fruit.\n中文: 一种水果。\nExample: red apple.",
+  });
+  const response = await handler(request({ word: "apple" }));
+  assert(response.status === 502, `expected 502, received ${response.status}`);
+});
+
+Deno.test("extracts text across all output messages in a completed response", () => {
+  const explanation = extractCompletedExplanation({
+    status: "completed",
+    output: [
+      { type: "reasoning", content: [] },
+      {
+        type: "message",
+        content: [{ type: "output_text", text: "English: a fruit." }],
+      },
+      {
+        type: "message",
+        content: [{ type: "output_text", text: "中文: 一种水果。" }],
+      },
+    ],
+  });
+  assert(
+    explanation === "English: a fruit.\n中文: 一种水果。",
+    "should collect generated text from messages",
+  );
+});
+
+Deno.test("rejects an incomplete OpenAI response", () => {
+  let rejected = false;
+  try {
+    extractCompletedExplanation({ status: "incomplete", output: [] });
+  } catch {
+    rejected = true;
+  }
+  assert(rejected, "incomplete provider responses must not be used");
 });
 
 Deno.test("returns a retryable error when generation fails", async () => {

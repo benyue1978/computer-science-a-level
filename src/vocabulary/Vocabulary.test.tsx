@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { emptyState, mergeSource } from "./model";
 
@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   generateVocabularyExplanation: vi.fn(),
   publishSharedExplanation: vi.fn(),
   getSession: vi.fn(),
+  authStateChange: vi.fn(),
 }));
 
 vi.mock("./storage", () => ({
@@ -40,9 +41,10 @@ vi.mock("./cloud", () => ({
 vi.mock("./supabaseClient", () => ({
   supabase: {
     auth: {
-      onAuthStateChange: vi.fn(() => ({
-        data: { subscription: { unsubscribe: vi.fn() } },
-      })),
+      onAuthStateChange: vi.fn((callback) => {
+        mocks.authStateChange.mockImplementation(callback);
+        return { data: { subscription: { unsubscribe: vi.fn() } } };
+      }),
       getSession: mocks.getSession,
     },
   },
@@ -69,7 +71,7 @@ describe("administrator explanation controls", () => {
     mocks.loadAccountSnapshot.mockResolvedValue(undefined);
     mocks.saveAccountSnapshot.mockResolvedValue(undefined);
     mocks.isVocabularyAdmin.mockResolvedValue(false);
-    mocks.generateVocabularyExplanation.mockResolvedValue("Meaning: a fruit.\n中文：一种水果。");
+    mocks.generateVocabularyExplanation.mockResolvedValue("English: a fruit.\n中文: 一种水果。");
     mocks.publishSharedExplanation.mockResolvedValue(undefined);
     mocks.getSession.mockResolvedValue({
       data: { session: { user: { id: "account-1", email: "person@example.com" } } },
@@ -114,7 +116,35 @@ describe("administrator explanation controls", () => {
     expect(mocks.generateVocabularyExplanation)
       .toHaveBeenCalledWith("apple", "An apple is red.");
     expect(await screen.findByRole("textbox", { name: "Explanation for apple" }))
-      .toHaveValue("Meaning: a fruit.\n中文：一种水果。");
+      .toHaveValue("English: a fruit.\n中文: 一种水果。");
+  });
+
+  it("does not apply a pending explanation after the signed-in account changes", async () => {
+    mocks.isVocabularyAdmin.mockResolvedValue(true);
+    let resolveGeneration: (note: string) => void = () => {};
+    mocks.generateVocabularyExplanation.mockImplementation(() => new Promise((resolve) => {
+      resolveGeneration = resolve;
+    }));
+    const user = userEvent.setup();
+    render(<Vocabulary />);
+
+    await user.click(await screen.findByRole("button", { name: "+ Add to today" }));
+    await user.click(await screen.findByRole("button", { name: "Generate explanation for apple" }));
+    expect(screen.getByRole("button", { name: "Generating explanation for apple" })).toBeDisabled();
+
+    act(() => {
+      mocks.authStateChange("SIGNED_IN", {
+        user: { id: "account-2", email: "second@example.com" },
+      });
+    });
+    expect(await screen.findByText("second@example.com")).toBeVisible();
+    await screen.findByRole("button", { name: "+ Add to today" });
+    await act(async () => {
+      resolveGeneration("English: a fruit.\n中文: 一种水果。");
+    });
+
+    await user.click(screen.getByRole("button", { name: "+ Add to today" }));
+    expect(await screen.findByRole("textbox", { name: "Explanation for apple" })).toHaveValue("");
   });
 
   it("keeps a blank note and shows a retryable alert when generation fails", async () => {

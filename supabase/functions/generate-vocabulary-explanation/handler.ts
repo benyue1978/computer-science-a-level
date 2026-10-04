@@ -17,6 +17,13 @@ function jsonResponse(status: number, body: unknown) {
   });
 }
 
+function hasRequiredExplanationLines(explanation: string) {
+  const lines = explanation.split(/\r?\n/).map((line) => line.trim());
+  return lines.length === 2 &&
+    /^English:\s+\S/.test(lines[0]) &&
+    /^中文[:：]\s*\S/.test(lines[1]);
+}
+
 export function createExplanationHandler(deps: ExplanationDependencies) {
   return async (request: Request): Promise<Response> => {
     if (request.method === "OPTIONS") {
@@ -72,7 +79,10 @@ export function createExplanationHandler(deps: ExplanationDependencies) {
 
     try {
       const explanation = (await deps.generate(word, example)).trim();
-      if (!explanation || explanation.length > 1000) {
+      if (
+        !explanation || explanation.length > 1000 ||
+        !hasRequiredExplanationLines(explanation)
+      ) {
         return jsonResponse(502, { error: "Could not generate explanation." });
       }
       return jsonResponse(200, { explanation });

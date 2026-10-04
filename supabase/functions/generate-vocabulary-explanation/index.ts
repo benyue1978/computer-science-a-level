@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createExplanationHandler } from "./handler.ts";
+import { extractCompletedExplanation } from "./openai.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
 const publishableKeys = JSON.parse(
@@ -43,19 +44,7 @@ const handler = createExplanationHandler({
     });
     if (!response.ok) throw new Error("OpenAI request failed.");
 
-    const payload = await response.json() as {
-      output?: {
-        type?: string;
-        content?: { type?: string; text?: string }[];
-      }[];
-    };
-    return (payload.output ?? [])
-      .filter((item) => item.type === "message")
-      .flatMap((item) => item.content ?? [])
-      .filter((item) => item.type === "output_text")
-      .map((item) => item.text ?? "")
-      .join("\n")
-      .trim();
+    return extractCompletedExplanation(await response.json());
   },
 });
 

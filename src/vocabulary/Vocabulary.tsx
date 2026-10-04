@@ -297,7 +297,13 @@ export default function Vocabulary() {
       if (ownerRef.current !== requestOwner || generateRequestId.current !== requestId) return;
       setState((current) => {
         const currentWord = current?.words[w.word];
-        if (!current || !currentWord || currentWord.note.trim()) return current;
+        if (
+          ownerRef.current !== requestOwner ||
+          generateRequestId.current !== requestId ||
+          !current ||
+          !currentWord ||
+          currentWord.note.trim()
+        ) return current;
         return {
           ...current,
           words: { ...current.words, [w.word]: { ...currentWord, note } },
