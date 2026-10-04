@@ -71,7 +71,7 @@ describe("administrator explanation controls", () => {
     mocks.loadAccountSnapshot.mockResolvedValue(undefined);
     mocks.saveAccountSnapshot.mockResolvedValue(undefined);
     mocks.isVocabularyAdmin.mockResolvedValue(false);
-    mocks.generateVocabularyExplanation.mockResolvedValue("English: a fruit.\n中文: 一种水果。");
+    mocks.generateVocabularyExplanation.mockResolvedValue("apple：苹果，一种常见的圆形水果。\n果肉可以直接食用，也常被做成果汁或果酱。");
     mocks.publishSharedExplanation.mockResolvedValue(undefined);
     mocks.getSession.mockResolvedValue({
       data: { session: { user: { id: "account-1", email: "person@example.com" } } },
@@ -116,7 +116,7 @@ describe("administrator explanation controls", () => {
     expect(mocks.generateVocabularyExplanation)
       .toHaveBeenCalledWith("apple", "An apple is red.");
     expect(await screen.findByRole("textbox", { name: "Explanation for apple" }))
-      .toHaveValue("English: a fruit.\n中文: 一种水果。");
+      .toHaveValue("apple：苹果，一种常见的圆形水果。\n果肉可以直接食用，也常被做成果汁或果酱。");
   });
 
   it("does not apply a pending explanation after the signed-in account changes", async () => {
@@ -140,7 +140,7 @@ describe("administrator explanation controls", () => {
     expect(await screen.findByText("second@example.com")).toBeVisible();
     await screen.findByRole("button", { name: "+ Add to today" });
     await act(async () => {
-      resolveGeneration("English: a fruit.\n中文: 一种水果。");
+      resolveGeneration("apple：苹果，一种常见的圆形水果。\n果肉可以直接食用，也常被做成果汁或果酱。");
     });
 
     await user.click(screen.getByRole("button", { name: "+ Add to today" }));

@@ -10,13 +10,13 @@ import {
 describe("shared explanation access", () => {
   it("invokes the explanation function with the word and source sentence", async () => {
     const invoke = vi.fn().mockResolvedValue({
-      data: { explanation: "  English: a fruit.\n中文: 一种水果。  " },
+      data: { explanation: "  apple：苹果，一种常见的圆形水果。\n果肉可以直接食用，也常被做成果汁或果酱。  " },
       error: null,
     });
     const client = { functions: { invoke } } as unknown as SupabaseClient;
 
     await expect(generateVocabularyExplanation("apple", "An apple is red.", client))
-      .resolves.toBe("English: a fruit.\n中文: 一种水果。");
+      .resolves.toBe("apple：苹果，一种常见的圆形水果。\n果肉可以直接食用，也常被做成果汁或果酱。");
     expect(invoke).toHaveBeenCalledWith("generate-vocabulary-explanation", {
       body: { word: "apple", example: "An apple is red." },
     });

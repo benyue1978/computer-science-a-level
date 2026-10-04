@@ -17,11 +17,16 @@ function jsonResponse(status: number, body: unknown) {
   });
 }
 
-function hasRequiredExplanationLines(explanation: string) {
-  const lines = explanation.split(/\r?\n/).map((line) => line.trim());
-  return lines.length === 2 &&
-    /^English:\s+\S/.test(lines[0]) &&
-    /^中文[:：]\s*\S/.test(lines[1]);
+function hasRequiredExplanationFormat(explanation: string, word: string) {
+  const heading = `${word}：`;
+  if (!explanation.startsWith(heading)) return false;
+
+  const explanationBody = explanation.slice(heading.length).replace(/\s/g, "");
+  const hasSubstantialFollowUp = explanation
+    .split(/\r?\n/)
+    .slice(1)
+    .some((line) => Array.from(line.replace(/\s/g, "")).length >= 10);
+  return Array.from(explanationBody).length >= 20 && hasSubstantialFollowUp;
 }
 
 export function createExplanationHandler(deps: ExplanationDependencies) {
@@ -81,7 +86,7 @@ export function createExplanationHandler(deps: ExplanationDependencies) {
       const explanation = (await deps.generate(word, example)).trim();
       if (
         !explanation || explanation.length > 1000 ||
-        !hasRequiredExplanationLines(explanation)
+        !hasRequiredExplanationFormat(explanation, word)
       ) {
         return jsonResponse(502, { error: "Could not generate explanation." });
       }
