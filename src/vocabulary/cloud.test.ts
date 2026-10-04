@@ -2,11 +2,50 @@ import { describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   isVocabularyAdmin,
+  generateVocabularyExplanation,
   publishSharedExplanation,
   buildSharedVocabularySources,
 } from "./cloud";
 
 describe("shared explanation access", () => {
+  it("invokes the explanation function with the word and source sentence", async () => {
+    const invoke = vi.fn().mockResolvedValue({
+      data: { explanation: "  Meaning: a fruit.\n中文：一种水果。  " },
+      error: null,
+    });
+    const client = { functions: { invoke } } as unknown as SupabaseClient;
+
+    await expect(generateVocabularyExplanation("apple", "An apple is red.", client))
+      .resolves.toBe("Meaning: a fruit.\n中文：一种水果。");
+    expect(invoke).toHaveBeenCalledWith("generate-vocabulary-explanation", {
+      body: { word: "apple", example: "An apple is red." },
+    });
+  });
+
+  it("rejects an empty function response", async () => {
+    const client = {
+      functions: { invoke: vi.fn().mockResolvedValue({ data: { explanation: " " }, error: null }) },
+    } as unknown as SupabaseClient;
+    await expect(generateVocabularyExplanation("apple", undefined, client))
+      .rejects.toThrow("The generated explanation was invalid.");
+  });
+
+  it("propagates a Supabase function error", async () => {
+    const failure = new Error("Function returned 403");
+    const client = {
+      functions: { invoke: vi.fn().mockResolvedValue({ data: null, error: failure }) },
+    } as unknown as SupabaseClient;
+    await expect(generateVocabularyExplanation("apple", undefined, client)).rejects.toBe(failure);
+  });
+
+  it("rejects a malformed function response", async () => {
+    const client = {
+      functions: { invoke: vi.fn().mockResolvedValue({ data: { explanation: 3 }, error: null }) },
+    } as unknown as SupabaseClient;
+    await expect(generateVocabularyExplanation("apple", undefined, client))
+      .rejects.toThrow("The generated explanation was invalid.");
+  });
+
   it("rebuilds book sources from public catalogue words and per-source counts", () => {
     const sources = buildSharedVocabularySources(
       [{ id: "maths", name: "Maths" }, { id: "empty", name: "Empty" }],

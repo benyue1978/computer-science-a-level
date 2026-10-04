@@ -17,6 +17,24 @@ export async function isVocabularyAdmin(
   return data === true;
 }
 
+export async function generateVocabularyExplanation(
+  word: string,
+  example: string | undefined,
+  client: SupabaseClient | null = supabase,
+): Promise<string> {
+  if (!client) throw new Error("Cloud storage is not configured.");
+  const { data, error } = await client.functions.invoke(
+    "generate-vocabulary-explanation",
+    { body: { word, ...(example ? { example } : {}) } },
+  );
+  if (error) throw error;
+  const raw = (data as { explanation?: unknown } | null)?.explanation;
+  const explanation = typeof raw === "string" ? raw.trim() : "";
+  if (!explanation || explanation.length > 1000)
+    throw new Error("The generated explanation was invalid.");
+  return explanation;
+}
+
 export async function publishSharedExplanation(
   word: string,
   body: string,
