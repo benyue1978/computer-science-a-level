@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
   restoreAccountState: vi.fn(),
   saveAccountSnapshot: vi.fn(),
   isVocabularyAdmin: vi.fn(),
+  generateVocabularyExplanation: vi.fn(),
   publishSharedExplanation: vi.fn(),
   getSession: vi.fn(),
 }));
@@ -32,6 +33,7 @@ vi.mock("./cloud", () => ({
   restoreAccountState: mocks.restoreAccountState,
   saveAccountSnapshot: mocks.saveAccountSnapshot,
   isVocabularyAdmin: mocks.isVocabularyAdmin,
+  generateVocabularyExplanation: mocks.generateVocabularyExplanation,
   publishSharedExplanation: mocks.publishSharedExplanation,
 }));
 
@@ -67,6 +69,7 @@ describe("administrator explanation controls", () => {
     mocks.loadAccountSnapshot.mockResolvedValue(undefined);
     mocks.saveAccountSnapshot.mockResolvedValue(undefined);
     mocks.isVocabularyAdmin.mockResolvedValue(false);
+    mocks.generateVocabularyExplanation.mockResolvedValue("Meaning: a fruit.\n中文：一种水果。");
     mocks.publishSharedExplanation.mockResolvedValue(undefined);
     mocks.getSession.mockResolvedValue({
       data: { session: { user: { id: "account-1", email: "person@example.com" } } },
@@ -81,6 +84,60 @@ describe("administrator explanation controls", () => {
     await user.click(await screen.findByRole("button", { name: "+ Add to today" }));
     expect(screen.getByRole("textbox", { name: "Explanation for apple" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Publish for everyone" })).toBeNull();
+  });
+
+  it("does not offer generation to a non-admin in Today", async () => {
+    const user = userEvent.setup();
+    render(<Vocabulary />);
+
+    await user.click(await screen.findByRole("button", { name: "+ Add to today" }));
+    expect(screen.queryByRole("button", { name: "Generate explanation for apple" })).toBeNull();
+  });
+
+  it("shows generation for a blank explanation in All words", async () => {
+    mocks.isVocabularyAdmin.mockResolvedValue(true);
+    const user = userEvent.setup();
+    render(<Vocabulary />);
+
+    await user.click(await screen.findByRole("button", { name: "All words" }));
+    expect(await screen.findByRole("button", { name: "Generate explanation for apple" }))
+      .toBeVisible();
+  });
+
+  it("generates a private explanation from Today using the source sentence", async () => {
+    mocks.isVocabularyAdmin.mockResolvedValue(true);
+    const user = userEvent.setup();
+    render(<Vocabulary />);
+
+    await user.click(await screen.findByRole("button", { name: "+ Add to today" }));
+    await user.click(await screen.findByRole("button", { name: "Generate explanation for apple" }));
+    expect(mocks.generateVocabularyExplanation)
+      .toHaveBeenCalledWith("apple", "An apple is red.");
+    expect(await screen.findByRole("textbox", { name: "Explanation for apple" }))
+      .toHaveValue("Meaning: a fruit.\n中文：一种水果。");
+  });
+
+  it("keeps a blank note and shows a retryable alert when generation fails", async () => {
+    mocks.isVocabularyAdmin.mockResolvedValue(true);
+    mocks.generateVocabularyExplanation.mockRejectedValue(new Error("Function returned 502"));
+    const user = userEvent.setup();
+    render(<Vocabulary />);
+
+    await user.click(await screen.findByRole("button", { name: "+ Add to today" }));
+    await user.click(await screen.findByRole("button", { name: "Generate explanation for apple" }));
+    expect(await screen.findByRole("alert"))
+      .toHaveTextContent("Could not generate this explanation. Try again.");
+    expect(screen.getByRole("textbox", { name: "Explanation for apple" })).toHaveValue("");
+  });
+
+  it("hides generation when an explanation already exists", async () => {
+    mocks.isVocabularyAdmin.mockResolvedValue(true);
+    const user = userEvent.setup();
+    render(<Vocabulary />);
+
+    await user.click(await screen.findByRole("button", { name: "+ Add to today" }));
+    await user.type(screen.getByRole("textbox", { name: "Explanation for apple" }), "A fruit");
+    expect(screen.queryByRole("button", { name: "Generate explanation for apple" })).toBeNull();
   });
 
   it("lets an administrator publish from Today and shows the shared result", async () => {

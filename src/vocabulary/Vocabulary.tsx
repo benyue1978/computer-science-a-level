@@ -23,6 +23,7 @@ import {
   getSharedExplanations,
   getVocabularyAliases,
   getSharedVocabularySources,
+  generateVocabularyExplanation,
   isVocabularyAdmin,
   loadAccountSnapshot,
   publishSharedExplanation,
@@ -61,14 +62,27 @@ export default function Vocabulary() {
   const [authReady, setAuthReady] = useState(!supabase);
   const [vocabularyAdmin, setVocabularyAdmin] = useState(false);
   const [publishingWord, setPublishingWord] = useState<string | null>(null);
+  const [generatingWord, setGeneratingWord] = useState<string | null>(null);
+  const [generateFeedback, setGenerateFeedback] = useState<{
+    word: string;
+    text: string;
+  } | null>(null);
   const [loadedOwner, setLoadedOwner] = useState<string | null>(null);
   const [cloudOwner, setCloudOwner] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
   const queue = useRef(Promise.resolve());
   const revision = useRef(0);
+  const generateRequestId = useRef(0);
   const cloudTimer = useRef<number | undefined>(undefined);
   const sharedNotesRef = useRef<Record<string, string>>({});
   const owner = user?.id ?? "guest";
+  const ownerRef = useRef(owner);
+  ownerRef.current = owner;
+  useEffect(() => {
+    generateRequestId.current += 1;
+    setGeneratingWord(null);
+    setGenerateFeedback(null);
+  }, [owner]);
   useEffect(() => {
     document.title = "Word by word · Daily vocabulary";
     if (!supabase) {
@@ -270,6 +284,31 @@ export default function Vocabulary() {
       });
     } finally {
       setPublishingWord(null);
+    }
+  }
+  async function generateExplanation(w: Word) {
+    if (!user || !vocabularyAdmin || w.note.trim() || generatingWord) return;
+    const requestOwner = ownerRef.current;
+    const requestId = ++generateRequestId.current;
+    setGeneratingWord(w.word);
+    setGenerateFeedback(null);
+    try {
+      const note = await generateVocabularyExplanation(w.word, w.examples[0]);
+      if (ownerRef.current !== requestOwner || generateRequestId.current !== requestId) return;
+      setState((current) => {
+        const currentWord = current?.words[w.word];
+        if (!current || !currentWord || currentWord.note.trim()) return current;
+        return {
+          ...current,
+          words: { ...current.words, [w.word]: { ...currentWord, note } },
+        };
+      });
+    } catch {
+      if (ownerRef.current === requestOwner && generateRequestId.current === requestId)
+        setGenerateFeedback({ word: w.word, text: "Could not generate this explanation. Try again." });
+    } finally {
+      if (ownerRef.current === requestOwner && generateRequestId.current === requestId)
+        setGeneratingWord(null);
     }
   }
   async function signInWithGoogle() {
@@ -497,6 +536,25 @@ export default function Vocabulary() {
         </button>
       </div>
     );
+  const generateAction = (w: Word) => {
+    if (!user || !vocabularyAdmin || w.note.trim()) return null;
+    const pending = generatingWord === w.word;
+    return (
+      <div>
+        <button
+          className="v-generate-button"
+          aria-label={pending ? `Generating explanation for ${w.word}` : `Generate explanation for ${w.word}`}
+          disabled={generatingWord !== null}
+          onClick={() => void generateExplanation(w)}
+        >
+          {pending ? "Generating…" : "Generate explanation"}
+        </button>
+        {generateFeedback?.word === w.word && (
+          <p className="v-generate-feedback" role="alert">{generateFeedback.text}</p>
+        )}
+      </div>
+    );
+  };
   const card = (w: Word) => (
     <article className="v-word" key={w.word}>
       <div className="v-word-top">
@@ -554,6 +612,7 @@ export default function Vocabulary() {
       </div>
       {(view === "words" || view === "known") && (
         <div className="v-library-note">
+          {view === "words" && generateAction(w)}
           {w.note && editingNote !== w.word && (
             <p className="v-note-preview">{w.note}</p>
           )}
@@ -561,6 +620,7 @@ export default function Vocabulary() {
             className="v-note-toggle"
             aria-expanded={editingNote === w.word}
             aria-controls={`word-note-${w.word}`}
+            disabled={generatingWord === w.word}
             onClick={() =>
               setEditingNote(editingNote === w.word ? null : w.word)
             }
@@ -580,6 +640,7 @@ export default function Vocabulary() {
                 <textarea
                   aria-label={`Explanation for ${w.word}`}
                   maxLength={10000}
+                  disabled={generatingWord === w.word}
                   placeholder="What does this word mean to you?"
                   value={w.note}
                   onChange={(e) => {
@@ -876,6 +937,7 @@ export default function Vocabulary() {
                     <h3>{w.word}</h3>
                     <button
                       aria-label={`Remove ${w.word}`}
+                      disabled={generatingWord === w.word}
                       onClick={() => toggle(w)}
                     >
                       ×
@@ -891,6 +953,7 @@ export default function Vocabulary() {
                     <textarea
                       aria-label={`Explanation for ${w.word}`}
                       maxLength={10000}
+                      disabled={generatingWord === w.word}
                       placeholder="What does this word mean to you?"
                       value={w.note}
                       onChange={(e) => {
@@ -905,6 +968,7 @@ export default function Vocabulary() {
                       }}
                     />
                   </label>
+                  {generateAction(w)}
                   {user && vocabularyAdmin && (
                     <button
                       className="v-publish-button"

@@ -134,6 +134,20 @@
   cursor: not-allowed;
   opacity: 0.45;
 }
+.v-generate-button {
+  margin-top: 8px;
+  padding: 8px 11px;
+  color: var(--v-ink);
+  background: #edf1e7;
+  border: 1px solid var(--v-line);
+  border-radius: 999px;
+  font-size: 11px;
+}
+.v-generate-feedback {
+  margin-top: 6px;
+  color: #8b3d32;
+  font-size: 11px;
+}
 .v-main {
   max-width: 1344px;
   padding: 0 48px;
