@@ -58,6 +58,7 @@ export default function Vocabulary() {
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [pending, setPending] = useState<{ backup?: State; source?: Source }>();
   const [copyFallback, setCopyFallback] = useState("");
+  const [copyingId, setCopyingId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(!supabase);
   const [vocabularyAdmin, setVocabularyAdmin] = useState(false);
@@ -380,10 +381,11 @@ export default function Vocabulary() {
           : `“${w.word}” added to your Known list.`,
     );
   }
-  async function copy(list: SentList) {
+  async function copy(list: SentList, id: string) {
     const text = listText(list);
     setSendFeedback(null);
     setCopyFallback("");
+    setCopyingId(id);
     try {
       await navigator.clipboard.writeText(text);
       setSendFeedback({
@@ -393,6 +395,8 @@ export default function Vocabulary() {
     } catch {
       setCopyFallback(text);
       setSendFeedback({ tone: "error", text: "Select and copy the text below." });
+    } finally {
+      setCopyingId(null);
     }
   }
   function download() {
@@ -1005,10 +1009,16 @@ export default function Vocabulary() {
               <div className="v-send">
                 <button
                   className="v-primary"
-                  disabled={!selected.length}
-                  onClick={() => copy(dailyList)}
+                  disabled={!selected.length || copyingId !== null}
+                  aria-busy={copyingId === "today"}
+                  aria-label={copyingId === "today" ? "Copying…" : undefined}
+                  onClick={() => void copy(dailyList, "today")}
                 >
-                  Copy today’s list <span aria-hidden="true">↗</span>
+                  {copyingId === "today" ? (
+                    <><span className="v-copy-spinner" aria-hidden="true" />Copying…</>
+                  ) : (
+                    <>Copy today’s list <span aria-hidden="true">↗</span></>
+                  )}
                 </button>
                 <button
                   className="v-send-button"
@@ -1078,7 +1088,16 @@ export default function Vocabulary() {
                   <h3>
                     {list.date} <small>· {list.entries.length} words</small>
                   </h3>
-                  <button onClick={() => copy(list)}>Copy list</button>
+                  <button
+                    disabled={copyingId !== null}
+                    aria-busy={copyingId === `history-${i}`}
+                    aria-label={copyingId === `history-${i}` ? "Copying…" : undefined}
+                    onClick={() => void copy(list, `history-${i}`)}
+                  >
+                    {copyingId === `history-${i}` ? (
+                      <><span className="v-copy-spinner" aria-hidden="true" />Copying…</>
+                    ) : "Copy list"}
+                  </button>
                 </div>
                 {list.entries.map((e) => (
                   <section key={e.word}>

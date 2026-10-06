@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { emptyState, mergeSource } from "./model";
 
@@ -94,6 +94,29 @@ describe("administrator explanation controls", () => {
 
     await user.click(await screen.findByRole("button", { name: "+ Add to today" }));
     expect(screen.queryByRole("button", { name: "Generate explanation for apple" })).toBeNull();
+  });
+
+  it("shows the copy button busy state while the clipboard write is pending", async () => {
+    let finishCopy: (() => void) | undefined;
+    const user = userEvent.setup();
+    const writeText = vi.fn(() => new Promise<void>((resolve) => { finishCopy = resolve; }));
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+    render(<Vocabulary />);
+
+    await user.click(await screen.findByRole("button", { name: "+ Add to today" }));
+    fireEvent.click(screen.getByRole("button", { name: "Copy today’s list" }));
+    expect(writeText).toHaveBeenCalledOnce();
+    expect(finishCopy).toBeDefined();
+    const copying = screen.getByRole("button", { name: "Copying…" });
+    expect(copying).toBeDisabled();
+    expect(copying.querySelector(".v-copy-spinner")).not.toBeNull();
+
+    await act(async () => { finishCopy?.(); });
+    expect(await screen.findByText("List copied. Paste it into your notebook or message.")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Copy today’s list" })).toBeEnabled();
   });
 
   it("shows generation for a blank explanation in All words", async () => {

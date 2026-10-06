@@ -589,6 +589,24 @@
   align-items: center;
   padding: 13px 17px;
 }
+.v-copy-spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: v-copy-spin 0.7s linear infinite;
+  vertical-align: -2px;
+  margin-right: 8px;
+}
+@keyframes v-copy-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v-copy-spinner { animation-duration: 1.8s; }
+}
 .vocab .v-send-button {
   width: 100%;
   margin-top: 10px;
