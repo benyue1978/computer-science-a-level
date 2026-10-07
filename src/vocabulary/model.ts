@@ -20,7 +20,7 @@ export type Word = Source["words"][number] & {
 };
 export type SentList = {
   date: string;
-  entries: { word: string; example: string; note: string }[];
+  entries: { word: string; example: string; note: string; isNew?: boolean }[];
 };
 export type State = {
   version: 1;
@@ -155,11 +155,16 @@ export const sentToday = (s: State, day: string) =>
   s.history
     .filter((h) => h.date === day)
     .reduce((count, h) => count + h.entries.length, 0);
+export const newSentToday = (s: State, day: string) =>
+  s.history
+    .filter((h) => h.date === day)
+    .reduce((count, h) => count + h.entries.filter((entry) => entry.isNew === true).length, 0);
 export function sendDraft(s: State, day: string): State {
   const listDate = s.draftDate ?? day;
+  const newWordsInDraft = s.draft.filter((key) => !s.words[key]?.lastSent).length;
   if (
     !s.draft.length ||
-    s.draft.length + sentToday(s, listDate) > s.limit ||
+    newWordsInDraft + newSentToday(s, listDate) > s.limit ||
     s.draft.some((k) => !s.words[k] || s.words[k].lastSent === listDate)
   )
     throw new Error(
@@ -172,6 +177,7 @@ export function sendDraft(s: State, day: string): State {
       word: k,
       example: next.words[k].examples[0] ?? "",
       note: next.words[k].note,
+      isNew: !next.words[k].lastSent,
     })),
   });
   for (const k of next.draft) {
@@ -314,7 +320,7 @@ export function parseBackup(raw: string): State {
       s.limit >= 5 &&
       s.limit <= 10 &&
       Array.isArray(s.draft) &&
-      s.draft.length <= s.limit &&
+      s.draft.length <= Object.keys(s.words).length &&
       new Set(s.draft).size === s.draft.length &&
       s.draft.every((k: unknown) => keyOK(k) && Object.hasOwn(s.words, k)),
   );
@@ -322,19 +328,31 @@ export function parseBackup(raw: string): State {
   assert(Array.isArray(s.history) && s.history.length <= 100000);
   for (const h of s.history)
     assert(
-      record(h) &&
+        record(h) &&
         dateOK(h.date) &&
         Array.isArray(h.entries) &&
         h.entries.length > 0 &&
-        h.entries.length <= 10 &&
+        h.entries.length <= 100000 &&
         h.entries.every(
           (e: unknown) =>
             record(e) &&
             keyOK(e.word) &&
             Object.hasOwn(s.words, e.word) &&
             text(e.example, 2000) &&
-            text(e.note),
+            text(e.note) &&
+            (e.isNew === undefined || typeof e.isNew === "boolean"),
         ),
     );
+  const seenInHistory = new Set<string>();
+  const chronologicalHistory = s.history
+    .map((list: SentList, index: number) => ({ list, index }))
+    .sort((a: { list: SentList; index: number }, b: { list: SentList; index: number }) =>
+      a.list.date.localeCompare(b.list.date) || b.index - a.index,
+    );
+  for (const { list } of chronologicalHistory)
+    for (const entry of list.entries) {
+      if (entry.isNew === undefined) entry.isNew = !seenInHistory.has(entry.word);
+      seenInHistory.add(entry.word);
+    }
   return s as State;
 }

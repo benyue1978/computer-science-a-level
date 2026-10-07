@@ -286,7 +286,7 @@ export function restoreAccountState(
       !Number.isInteger(progress.stage) || progress.stage < 0 || progress.stage > 3
     ) throw new Error("The cloud vocabulary data has invalid review progress.");
   if (
-    snapshot.draft.length > snapshot.limit ||
+    snapshot.draft.length > keys.size ||
     new Set(snapshot.draft).size !== snapshot.draft.length ||
     snapshot.draft.some((word) => typeof word !== "string" || !keys.has(word))
   ) throw new Error("The cloud vocabulary data has an invalid daily list.");

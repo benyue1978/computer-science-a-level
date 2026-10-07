@@ -5,10 +5,10 @@ import {
   feedback,
   listText,
   mergeSource,
+  newSentToday,
   parseBackup,
   parseSource,
   sendDraft,
-  sentToday,
   suggestions,
   today,
   syncSharedVocabularySources,
@@ -346,7 +346,9 @@ export default function Vocabulary() {
         return { ...s, draft, ...(draft.length ? {} : { draftDate: undefined }) };
       });
     else if (
-      state.draft.length + sentToday(state, day) < state.limit &&
+      (w.lastSent ||
+        state.draft.filter((word) => !state.words[word]?.lastSent).length +
+          newSentToday(state, day) < state.limit) &&
       w.lastSent !== day
     )
       update((s) => ({ ...s, draft: [...s.draft, w.word], draftDate: s.draftDate ?? day }));
@@ -354,7 +356,7 @@ export default function Vocabulary() {
       setMessage(
         w.lastSent === day
           ? "This word was already sent today."
-          : "Your list is full. Remove a word or increase the daily total.",
+          : "You’ve reached today’s new-word total. You can still add review words.",
       );
   }
   function toggleKnown(w: Word) {
@@ -479,11 +481,13 @@ export default function Vocabulary() {
       </main>,
     );
   const words = Object.values(state.words);
-  const alreadySent = sentToday(state, day);
+  const alreadySent = newSentToday(state, day);
   const dueCount = words.filter(
     (w) => !w.hidden && w.due && w.due <= day && w.lastSent !== day,
   ).length;
   const selected = state.draft.map((k) => state.words[k]);
+  const newWordsSelected = selected.filter((word) => !word.lastSent).length;
+  const reviewWordsSelected = selected.length - newWordsSelected;
   const dailyList = {
     date: state.draftDate ?? day,
     entries: selected.map((w) => ({
@@ -606,7 +610,7 @@ export default function Vocabulary() {
             w.hidden ||
             w.lastSent === day ||
             (!state.draft.includes(w.word) &&
-              state.draft.length + alreadySent >= state.limit)
+              !w.lastSent && newWordsSelected + alreadySent >= state.limit)
           }
           onClick={() => toggle(w)}
         >
@@ -885,10 +889,10 @@ export default function Vocabulary() {
                 <h2>Today’s little list</h2>
                 <div className="v-quota">
                   <span>
-                    {state.draft.length} of {state.limit} chosen
+                    {newWordsSelected} of {state.limit} new words chosen
                   </span>
                   <label>
-                    Daily total{" "}
+                    New words / day{" "}
                     <select
                       value={state.limit}
                       onChange={(e) =>
@@ -899,7 +903,7 @@ export default function Vocabulary() {
                         <option
                           value={n}
                           key={n}
-                          disabled={n < state.draft.length + alreadySent}
+                          disabled={n < newWordsSelected + alreadySent}
                         >
                           {n}
                         </option>
@@ -908,15 +912,16 @@ export default function Vocabulary() {
                   </label>
                 </div>
                 <p className="v-helper">
-                  {alreadySent} sent today ·{" "}
-                  {Math.max(0, state.limit - alreadySent - state.draft.length)}{" "}
-                  places left
+                  {alreadySent} new sent today ·{" "}
+                  {Math.max(0, state.limit - alreadySent - newWordsSelected)} new-word places left
+                  {reviewWordsSelected > 0 &&
+                    ` · ${reviewWordsSelected} review${reviewWordsSelected === 1 ? "" : "s"} selected`}
                 </p>
                 <div className="v-progress" aria-hidden="true">
                   {Array.from({ length: state.limit }, (_, i) => (
                     <span
                       className={
-                        i < state.draft.length + alreadySent ? "filled" : ""
+                        i < newWordsSelected + alreadySent ? "filled" : ""
                       }
                       key={i}
                     />
@@ -928,12 +933,12 @@ export default function Vocabulary() {
                   <span aria-hidden="true">Aa</span>
                   <h3>
                     {alreadySent >= state.limit
-                      ? "Today’s words are on their way."
+                      ? "Today’s new words are on their way."
                       : "A fresh page, every day."}
                   </h3>
                   <p>
                     {alreadySent >= state.limit
-                      ? "You’ve reached today’s total. Come back tomorrow, or increase the total up to ten."
+                      ? "You’ve reached today’s new-word total. You can still add any reviews that are due."
                       : "Add a word from the collection, then explain it your way."}
                   </p>
                 </div>

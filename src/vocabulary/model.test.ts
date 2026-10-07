@@ -7,6 +7,7 @@ import {
   suggestions,
   sendDraft,
   sentToday,
+  newSentToday,
   feedback,
   parseBackup,
   parseSource,
@@ -187,6 +188,42 @@ describe("vocabulary learning", () => {
     expect(sent.words.available.lastSent).toBe("2026-09-30");
     expect(sent.words.available.due).toBe("2026-10-03");
     expect(sentToday(sent, "2026-10-01")).toBe(0);
+  });
+  it("lets due reviews be sent in addition to the daily new-word quota", () => {
+    const reviewWords = ["reviewa", "reviewb", "reviewc", "reviewd", "reviewe", "reviewf", "reviewg"];
+    const s = mergeSource(setup(), {
+      id: "extra", name: "Extra", words: [...reviewWords, "alpha", "beta", "gamma", "delta", "epsilon"].map((word) => ({
+        word, frequency: 1, examples: [],
+      })),
+    });
+    for (const word of reviewWords) {
+      s.words[word].lastSent = "2026-10-01";
+      s.words[word].due = "2026-10-08";
+    }
+    s.draft = [...reviewWords, "alpha", "beta", "gamma", "delta", "epsilon"];
+
+    const sent = sendDraft(s, "2026-10-08");
+    expect(sent.history[0].entries).toHaveLength(12);
+    expect(sent.history[0].entries.filter((entry) => entry.isNew)).toHaveLength(5);
+    expect(newSentToday(sent, "2026-10-08")).toBe(5);
+    expect(sentToday(sent, "2026-10-08")).toBe(12);
+    expect(parseBackup(JSON.stringify(sent)).history[0].entries).toHaveLength(12);
+  });
+  it("backfills new-word markers from each word’s earliest sent list", () => {
+    const state = setup();
+    state.draft = ["available"];
+    const first = sendDraft(state, "2026-10-01");
+    first.draft = ["available"];
+    first.draftDate = "2026-10-04";
+    const reviewed = sendDraft(first, "2026-10-04");
+    for (const list of reviewed.history)
+      for (const entry of list.entries) delete entry.isNew;
+
+    const restored = parseBackup(JSON.stringify(reviewed));
+    expect(restored.history[0].entries[0].isNew).toBe(false);
+    expect(restored.history[1].entries[0].isNew).toBe(true);
+    expect(newSentToday(restored, "2026-10-04")).toBe(0);
+    expect(newSentToday(restored, "2026-10-01")).toBe(1);
   });
   it("accepts ordinary words that coincide with object property names", () => {
     const source = parseSource(

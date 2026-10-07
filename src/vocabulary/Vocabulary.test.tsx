@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { emptyState, mergeSource } from "./model";
+import { emptyState, mergeSource, today } from "./model";
 
 const mocks = vi.hoisted(() => ({
   loadState: vi.fn(),
@@ -117,6 +117,35 @@ describe("administrator explanation controls", () => {
     await act(async () => { finishCopy?.(); });
     expect(await screen.findByText("List copied. Paste it into your notebook or message.")).toBeVisible();
     expect(screen.getByRole("button", { name: "Copy today’s list" })).toBeEnabled();
+  });
+
+  it("keeps due reviews selectable after the new-word quota is full", async () => {
+    const state = mergeSource(accountState(), {
+      id: "extra", name: "Extra", words: ["alpha", "beta", "gamma", "delta", "epsilon"].map((word) => ({
+        word, frequency: 1, examples: [],
+      })),
+    });
+    state.words.apple.lastSent = "2026-10-01";
+    state.words.apple.due = today();
+    mocks.loadState.mockResolvedValue(state);
+    const user = userEvent.setup();
+    render(<Vocabulary />);
+    await screen.findByRole("heading", { name: "alpha" });
+
+    for (const word of ["alpha", "beta", "gamma", "delta", "epsilon"]) {
+      const card = await screen.findByRole("heading", { name: word }).then((heading) => heading.closest("article"));
+      expect(card).not.toBeNull();
+      await user.click(within(card as HTMLElement).getByRole("button", { name: "+ Add to today" }));
+    }
+    expect(screen.getByText("5 of 5 new words chosen")).toBeVisible();
+
+    const reviewCard = screen.getByRole("heading", { name: "apple" }).closest("article");
+    expect(reviewCard).not.toBeNull();
+    const reviewAddButton = within(reviewCard as HTMLElement).getByRole("button", { name: "+ Add to today" });
+    expect(reviewAddButton).toBeEnabled();
+    await user.click(reviewAddButton);
+    expect(screen.getByText("5 of 5 new words chosen")).toBeVisible();
+    expect(screen.getByText(/1 review selected/)).toBeVisible();
   });
 
   it("shows generation for a blank explanation in All words", async () => {
