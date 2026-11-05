@@ -110,13 +110,12 @@ test("home lists the available lessons and unknown paths recover", () => {
   );
 });
 
-test("home links to the Cambridge business learning page", () => {
+test("home links to vocabulary, past papers, and business", () => {
   window.history.replaceState({}, "", "/");
   render(<App />);
-  expect(screen.getByRole("link", { name: /Explore Business/ })).toHaveAttribute(
-    "href",
-    "/business",
-  );
+  expect(screen.getByRole("link", { name: /Open vocabulary/ })).toHaveAttribute("href", "/vocabulary");
+  expect(screen.getByRole("link", { name: /Open past papers/ })).toHaveAttribute("href", "/pastpaper/");
+  expect(screen.getByRole("link", { name: /Explore Business/ })).toHaveAttribute("href", "/business");
 });
 
 test("home links to the third lesson and its direct route renders", () => {
