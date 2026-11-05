@@ -1,0 +1,27 @@
+export type BusinessUnit = 1 | 2 | 3 | 4 | 5;
+
+export type BusinessTerm = {
+  id: string;
+  unit: BusinessUnit;
+  topicId: string;
+  term: string;
+  termZh: string;
+  definitionEn: string;
+  explanationZh: string;
+  exampleEn: string;
+  exampleZh: string;
+  usageNoteZh?: string;
+};
+
+export type SyllabusSection = {
+  id: string;
+  unit: BusinessUnit;
+  titleEn: string;
+  titleZh: string;
+};
+
+export type BusinessUnitInfo = {
+  id: BusinessUnit;
+  titleEn: string;
+  titleZh: string;
+};

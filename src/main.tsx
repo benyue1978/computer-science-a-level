@@ -5,12 +5,15 @@ import { lazy, Suspense } from "react";
 const DatabaseKeys = lazy(() => import("./database/DatabaseKeys"));
 const Vocabulary = lazy(() => import("./vocabulary/Vocabulary"));
 const VocabularyLemmaReview = lazy(() => import("./vocabulary/VocabularyLemmaReview"));
+const Business = lazy(() => import("./business/Business"));
 import "./styles.css";
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Suspense fallback={<p>Opening your notebook…</p>}>
       {window.location.pathname.replace(/\/$/, "") === "/learn/database-keys" ? (
         <DatabaseKeys />
+      ) : window.location.pathname.replace(/\/$/, "") === "/business" ? (
+        <Business />
       ) : window.location.pathname.replace(/\/$/, "") === "/vocabulary/merge" ? (
         <VocabularyLemmaReview />
       ) : window.location.pathname.replace(/\/$/, "") === "/vocabulary" ? (

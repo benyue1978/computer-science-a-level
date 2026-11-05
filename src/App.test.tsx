@@ -110,6 +110,15 @@ test("home lists the available lessons and unknown paths recover", () => {
   );
 });
 
+test("home links to the Cambridge business learning page", () => {
+  window.history.replaceState({}, "", "/");
+  render(<App />);
+  expect(screen.getByRole("link", { name: /Explore Business/ })).toHaveAttribute(
+    "href",
+    "/business",
+  );
+});
+
 test("home links to the third lesson and its direct route renders", () => {
   window.history.replaceState({}, "", "/");
   const home = render(<App />);
