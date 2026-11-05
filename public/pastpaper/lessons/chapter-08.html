@@ -1,0 +1,69 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>08 数据库 Databases</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=1">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-07.html">上一章</a> · <a href="chapter-09.html">下一章</a><h1>08 数据库 Databases</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-8.1">8.1 Database Concepts</h2>
+<p><a href="../index.html#topic=8.1">练习本知识点 →</a></p>
+<p>File-based approach 容易造成重复、不一致、格式依赖、共享与权限控制困难。Relational database 以相关表组织数据，通过键连接，配合 DBMS 减少这些问题。</p>
+<div class="table-wrap"><table>
+<tr><th>术语</th><th>含义</th></tr>
+<tr><td>Entity / attribute</td><td>要记录的对象类型及其属性</td></tr>
+<tr><td>Table / record(tuple) / field</td><td>表 / 一行数据 / 字段</td></tr>
+<tr><td>Candidate key</td><td>能唯一标识记录的最小属性集合</td></tr>
+<tr><td>Primary key</td><td>选作主要标识的 candidate key；唯一且非空</td></tr>
+<tr><td>Foreign key</td><td>引用其他表键值的字段/字段组</td></tr>
+<tr><td>Secondary key</td><td>供查找/索引使用，通常不要求唯一</td></tr>
+<tr><td>Referential integrity</td><td>外键的非空值必须引用存在的相关记录</td></tr>
+<tr><td>Index</td><td>额外查找结构，加速检索但占空间、增加更新成本</td></tr>
+</table></div>
+<p>Relationships：1:1、1:many、many:many。学生与课程的多对多关系用 Enrollment 关联表拆为两个 1:many；E-R diagram 应标明实体、键和基数。</p>
+<h3>Normalisation 规范化</h3>
+<ul>
+<li>1NF：每个单元格为该设计中的原子值，无重复组；记录可唯一识别。</li>
+<li>2NF：先满足 1NF，所有非键属性完全依赖整个候选键，无对复合键一部分的依赖。</li>
+<li>3NF：先满足 2NF，消除非键属性对键的传递依赖。</li>
+</ul>
+<p>例：<code>Enrollment(StudentID, CourseID, StudentName, CourseName, TeacherID, TeacherName, Grade)</code>，键为 <code>(StudentID,CourseID)</code>。</p>
+<p>1. StudentName 仅依赖 StudentID；CourseName、TeacherID 仅依赖 CourseID。分离为 Student、Course、Enrollment，解决部分依赖。</p>
+<p>2. 假设每门课只有一名教师且 TeacherID 决定 TeacherName，将教师独立成 Teacher(TeacherID,TeacherName)，Course 仅保存 TeacherID 外键。</p>
+<p>3. 最终 Enrollment(StudentID,CourseID,Grade)。不要根据名称猜依赖，必须依据题目业务规则。</p>
+<p>这样减少更新/插入/删除异常；实际需要连接查询。单字段主键的表不自动满足 3NF。</p>
+<h2 id="topic-8.2">8.2 DBMS</h2>
+<p><a href="../index.html#topic=8.2">练习本知识点 →</a></p>
+<p>DBMS 管理存取、完整性约束、安全、备份和数据模型。Data dictionary 记录字段名、数据类型、长度、约束、键与关系等元数据；logical schema 描述逻辑结构。Developer interface 用于建表、表单、应用开发；query processor 解析、检查并执行查询。权限应按用户/群组授予，恢复需结合备份。</p>
+<h2 id="topic-8.3">8.3 DDL and DML</h2>
+<p><a href="../index.html#topic=8.3">练习本知识点 →</a></p>
+<p>DDL 定义/修改结构；DML 查询、插入、修改、删除记录。以下示例使用题目所需的 SQL 子集，实际 DBMS 类型名可能稍有不同。</p>
+<pre><code>CREATE DATABASE School;
+CREATE TABLE Student (
+    StudentID INTEGER,
+    StudentName VARCHAR(60),
+    Active BOOLEAN,
+    PRIMARY KEY (StudentID)
+);
+CREATE TABLE Result (
+    ResultID INTEGER,
+    StudentID INTEGER,
+    Score REAL,
+    ExamDate DATE,
+    PRIMARY KEY (ResultID),
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
+);
+ALTER TABLE Student ADD ClassCode CHARACTER(3);</code></pre>
+<p>应认识 CHARACTER、VARCHAR(n)、BOOLEAN、INTEGER、REAL、DATE、TIME，按数据含义选择。</p>
+<pre><code>SELECT Student.StudentName, Result.Score
+FROM Student INNER JOIN Result
+ON Student.StudentID = Result.StudentID
+WHERE Result.Score &gt;= 80
+ORDER BY Result.Score DESC;
+
+SELECT StudentID, COUNT(*) AS Attempts,
+       SUM(Score) AS Total, AVG(Score) AS MeanScore
+FROM Result
+GROUP BY StudentID;
+
+INSERT INTO Student (StudentID, StudentName, Active)
+VALUES (101, &#x27;Mei&#x27;, TRUE);
+UPDATE Student SET Active = FALSE WHERE StudentID = 101;
+DELETE FROM Result WHERE ResultID = 9;</code></pre>
+<p>WHERE 筛选行，ORDER BY 排序，GROUP BY 分组再聚合；COUNT(*) 数行，COUNT(field) 不计该字段 NULL。连接条件不能遗漏，否则可能产生笛卡尔积。UPDATE/DELETE 缺少 WHERE 可能影响全部记录。考纲查询最多涉及两张表。</p>
+<h2>自测与易错点</h2>
+<p>1. 按业务依赖把一个订单表规范化到 3NF，标明每个主/外键。</p>
+<p>2. 写出按学生分组的平均分，再解释为何 StudentName 不应直接加入只按 StudentID 分组的查询（除非依赖/数据库规则允许）。</p>
+<p>3. 能区分 ALTER TABLE 改结构和 UPDATE 改记录。</p></main></html>

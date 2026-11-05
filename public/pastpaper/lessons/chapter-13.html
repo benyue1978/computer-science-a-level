@@ -1,0 +1,40 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>13 进阶数据表示 Data Representation</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=3">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-12.html">上一章</a> · <a href="chapter-14.html">下一章</a><h1>13 进阶数据表示 Data Representation</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-13.1">13.1 User-defined data types</h2>
+<p><a href="../index.html#topic=13.1">练习本知识点 →</a></p>
+<p>自定义类型用业务含义约束数据，提高可读性、复用性和一致性。</p>
+<pre><code>TYPE Day = (Mon, Tue, Wed, Thu, Fri, Sat, Sun)
+TYPE IntPointer = ^INTEGER
+TYPE StudentRecord
+    DECLARE ID : STRING
+    DECLARE Mark : INTEGER
+ENDTYPE
+TYPE LetterSet = SET OF CHAR</code></pre>
+<p>Enumerated type 是有限命名值集合；pointer 保存某数据位置的引用，需理解空指针及解引用。Set 是无重复元素集合，支持成员测试及集合运算；record 是命名字段组合；class 定义属性与方法，object 是其实例。非复合与复合分类按考纲：枚举/指针为 non-composite，set/record/class-object 为 composite。</p>
+<h2 id="topic-13.2">13.2 File organisation and access</h2>
+<p><a href="../index.html#topic=13.2">练习本知识点 →</a></p>
+<div class="table-wrap"><table>
+<tr><th>文件组织 organisation</th><th>存储方式</th><th>适用场景/访问</th></tr>
+<tr><td>Serial</td><td>按到达顺序保存，无须按键排序</td><td>日志、批量追加；通常顺序读</td></tr>
+<tr><td>Sequential</td><td>按 key 排序</td><td>按键顺序批处理；可顺序访问，有索引/地址支持时也可直接访问</td></tr>
+<tr><td>Random</td><td>通过 record key 与地址映射定位</td><td>频繁按键读写，需处理冲突和空槽</td></tr>
+</table></div>
+<p>Organisation 是存放安排；access 是如何查找/读取。Direct access 指定位目标而不必从头逐条读取，不等于“数据随意排列”。</p>
+<p>Hash function 将 key 映射到槽/地址，如 <code>h(key)=key MOD 10</code>。21 和 31 都映射 1，形成 collision。Linear probing 检查下一槽并在尾部回绕；chaining 用链保存同槽项目。读与写必须使用同样的 hash 和冲突策略。删除开放寻址项目通常需要 deleted 标记，直接当作从未用过的空槽可能截断后续查找。</p>
+<h2 id="topic-13.3">13.3 Floating-point numbers</h2>
+<p><a href="../index.html#topic=13.3">练习本知识点 →</a></p>
+<p>本考纲使用补码 mantissa 与补码 exponent，必须按题目位数/二进制小数点位置解读，不能默认 IEEE 754 格式。</p>
+<p><code>value = mantissa × 2^exponent</code>。若尾数有 m bits，二进制点在符号位之后，则位权为 <code>−1, 1/2, 1/4, …</code>。e-bit 指数补码范围是 <code>−2^(e−1)</code> 到 <code>2^(e−1)−1</code>。</p>
+<h3>转换例（8-bit mantissa，4-bit exponent）</h3>
+<ul>
+<li><code>01010000 0011</code>：尾数 <code>0.1010000₂ = 0.625</code>，指数 +3，值为 5。</li>
+<li><code>10110000 0011</code>：尾数 <code>−1+1/4+1/8 = −0.625</code>，指数 +3，值为 −5。</li>
+<li>十进制 6.5：<code>110.1₂ = 0.1101₂ × 2³</code> → <code>01101000 0011</code>。</li>
+</ul>
+<h3>Normalisation 规格化</h3>
+<p>非零补码尾数通常使最前两位不同：正数 <code>01…</code>，负数 <code>10…</code>。这样尽量使用有效位，增加精度，并在固定格式下提供规范表示。</p>
+<p>例：<code>00101000 0100</code> 表示 0.3125×16=5；尾数左移一位成 <code>01010000</code>，指数减少 1 成 <code>0011</code>，数值不变。移动时必须保持符号、检查边界，零通常作为特殊情况。</p>
+<h3>范围与精度</h3>
+<p>固定总位数下，更多尾数位提高 precision；更多指数位扩大 range。很多十进制小数（如 0.1）在二进制中无限循环，有限位会舍入/截断；重复计算可能累积误差。Overflow 为结果大到超出可表示范围；underflow 为非零结果太接近零，无法以该格式正常表示。不能把 underflow 解释成“所有负数太小”。</p>
+<h2>自测与易错点</h2>
+<p>1. <code>01100000 0010</code> 的值？答：0.75×4=3。</p>
+<p>2. 解释为何增加指数位不能直接改善小数有效精度。</p>
+<p>3. 对随机文件演示 21、31、41 依次插入以及查找 41 的完整 probing 路径。</p></main></html>

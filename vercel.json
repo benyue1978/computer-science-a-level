@@ -1,1 +1,9 @@
-{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
+{
+  "routes": [
+    { "src": "/pastpaper", "headers": { "Location": "/pastpaper/" }, "status": 308 },
+    { "src": "/pastpaper/", "dest": "/pastpaper/index.html" },
+    { "handle": "filesystem" },
+    { "src": "/pastpaper/(.*)", "status": 404 },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}

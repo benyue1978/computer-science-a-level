@@ -1,0 +1,30 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>14 通信与互联网技术 Communication and internet technologies</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=3">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-13.html">上一章</a> · <a href="chapter-15.html">下一章</a><h1>14 通信与互联网技术 Communication and internet technologies</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-14.1">14.1 Protocols</h2>
+<p><a href="../index.html#topic=14.1">练习本知识点 →</a></p>
+<p>Protocol 定义通信的格式、顺序、解释和错误处理规则，使不同设备能互操作。分层提供清晰接口、便于替换实现与定位问题；发送时 encapsulation 逐层添加控制信息，接收时反向解封装。</p>
+<div class="table-wrap"><table>
+<tr><th>TCP/IP 层</th><th>主要职责</th><th>相关例子</th></tr>
+<tr><td>Application</td><td>应用消息与服务规则</td><td>HTTP、FTP、SMTP、POP3、IMAP、BitTorrent</td></tr>
+<tr><td>Transport</td><td>端到端进程通信、端口；TCP 还提供排序/重传等可靠传输</td><td>TCP、UDP</td></tr>
+<tr><td>Internet</td><td>逻辑寻址及跨网路由</td><td>IP，router</td></tr>
+<tr><td>Link</td><td>本地链路帧、MAC 寻址与介质传输</td><td>Ethernet、Wi-Fi</td></tr>
+</table></div>
+<p>路径例：浏览器 HTTP 消息 → TCP 分段/端口 → IP 源目的地址 → 本地链路 frame；路由器逐跳选择下一网络并更新链路封装；接收主机逐层重组、交付应用。</p>
+<div class="table-wrap"><table>
+<tr><th>协议</th><th>用途与区别</th></tr>
+<tr><td>HTTP</td><td>请求/传输网页及其他 Web 资源；HTTPS 为 HTTP 加 TLS 保护</td></tr>
+<tr><td>FTP</td><td>文件传输；不要把原始 FTP 当成默认加密协议</td></tr>
+<tr><td>SMTP</td><td>邮件客户端提交及服务器之间发送/转送邮件</td></tr>
+<tr><td>POP3</td><td>从服务器获取邮件，典型用途为下载到本地；可配置保留服务器副本</td></tr>
+<tr><td>IMAP</td><td>在服务器管理邮箱状态，多设备同步</td></tr>
+<tr><td>BitTorrent</td><td>P2P 分块共享，不同 peer 可同时下载与上传块</td></tr>
+</table></div>
+<p>TCP 的确认、序号、重传与流量控制有开销；UDP 本身不提供这些可靠性保证，适用于能容忍丢包或由应用处理的场景。不要断言实时数据永远只用 UDP。</p>
+<h2 id="topic-14.2">14.2 Circuit switching and packet switching</h2>
+<p><a href="../index.html#topic=14.2">练习本知识点 →</a></p>
+<p>Circuit switching 先建立专用路径/保留资源，通信中持续占用，结束后释放。建立后延迟和带宽可较稳定；空闲时资源浪费、建立需要时间，适合持续传输需求。</p>
+<p>Packet switching 将消息拆成带头部的数据包，网络链路共享。数据包可能经不同路径、乱序或丢失；接收端按相应协议重组，必要时重传。带宽利用率高、可绕故障，但有头部开销、排队延迟/jitter，不能保证每包按同一路线到达。</p>
+<p>Router 读取目的 IP，查路由表，选择下一跳并转发；“最短”不是必然按地理距离，取决于路由 metric。端到端完整性/重组不应全部归给路由器。</p>
+<h2>自测与易错点</h2>
+<p>1. 发件到收件人读到邮件分别涉及 SMTP 与 POP3/IMAP 的哪一步？</p>
+<p>2. 给出分组交换对突发 Web 请求的两个优势，以及对实时音视频的一个挑战。</p>
+<p>3. 按四层逐一说清“应用消息、端口、IP、MAC”处理的对象。</p></main></html>

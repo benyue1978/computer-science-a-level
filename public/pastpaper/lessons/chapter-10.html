@@ -1,0 +1,77 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>10 数据类型与结构 Data Types and Structures</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=2">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-09.html">上一章</a> · <a href="chapter-11.html">下一章</a><h1>10 数据类型与结构 Data Types and Structures</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-10.1">10.1 Data Types and Records</h2>
+<p><a href="../index.html#topic=10.1">练习本知识点 →</a></p>
+<p>INTEGER 存整数；REAL 存可有小数的数据；CHAR 单个字符；STRING 字符串；BOOLEAN 真/假；DATE 日期。电话号码、含前导零的学号一般选 STRING，不用于算术的数字外观不代表必须用 INTEGER。</p>
+<p>Record 将不同类型的相关字段放在一个标识符下：</p>
+<pre><code>TYPE StudentRecord
+    DECLARE ID : STRING
+    DECLARE Mark : INTEGER
+ENDTYPE
+DECLARE Student : StudentRecord
+Student.ID ← &quot;0012&quot;
+Student.Mark ← 84
+OUTPUT Student.ID, Student.Mark</code></pre>
+<p>Record 是一个对象的不同属性；array 是同类型元素的有序集合。</p>
+<h2 id="topic-10.2">10.2 Arrays</h2>
+<p><a href="../index.html#topic=10.2">练习本知识点 →</a></p>
+<p>数组使用 index 定位；lower/upper bound 均包含时，元素个数为 <code>upper−lower+1</code>。二维数组适合成绩矩阵/棋盘，需分别遍历行列。</p>
+<pre><code>DECLARE Marks : ARRAY[1:30] OF INTEGER
+DECLARE Grid : ARRAY[1:3, 1:4] OF INTEGER
+FOR Row ← 1 TO 3
+    FOR Col ← 1 TO 4
+        Grid[Row, Col] ← 0
+    NEXT Col
+NEXT Row</code></pre>
+<h3>Linear search 线性查找</h3>
+<pre><code>Position ← 0
+Index ← 1
+WHILE Index &lt;= N AND Position = 0 DO
+    IF Marks[Index] = Target THEN
+        Position ← Index
+    ENDIF
+    Index ← Index + 1
+ENDWHILE</code></pre>
+<p>找到返回第一处位置；0 代表没找到（本例索引从 1 开始）。循环体只在 Index 合法时访问数组，不依赖越界表达式的短路求值。数组无需预先排序。</p>
+<h3>Bubble sort 冒泡排序（升序）</h3>
+<pre><code>Limit ← N
+REPEAT
+    Swapped ← FALSE
+    FOR Index ← 1 TO Limit - 1
+        IF Marks[Index] &gt; Marks[Index + 1] THEN
+            Temp ← Marks[Index]
+            Marks[Index] ← Marks[Index + 1]
+            Marks[Index + 1] ← Temp
+            Swapped ← TRUE
+        ENDIF
+    NEXT Index
+    Limit ← Limit - 1
+UNTIL Swapped = FALSE OR Limit &lt;= 1</code></pre>
+<p>适用 N≥2；N&lt;2 时无需排序。每一轮把未排序部分最大项推到右端；无交换即可提前结束。例 <code>[5,1,4]</code> 第一轮成为 <code>[1,4,5]</code>。交换必须暂存旧值。</p>
+<h2 id="topic-10.3">10.3 Files</h2>
+<p><a href="../index.html#topic=10.3">练习本知识点 →</a></p>
+<p>文件用于断电后保留数据、处理超出内存的数据、与其他程序共享输入输出。文本文件按行读取：</p>
+<pre><code>DECLARE Line : STRING
+OPENFILE &quot;marks.txt&quot; FOR READ
+WHILE NOT EOF(&quot;marks.txt&quot;) DO
+    READFILE &quot;marks.txt&quot;, Line
+    OUTPUT Line
+ENDWHILE
+CLOSEFILE &quot;marks.txt&quot;
+
+OPENFILE &quot;log.txt&quot; FOR APPEND
+WRITEFILE &quot;log.txt&quot;, &quot;Finished&quot;
+CLOSEFILE &quot;log.txt&quot;</code></pre>
+<p>READ 读；WRITE 新建/覆盖；APPEND 在末尾追加。要能处理空文件、末行、数据转换与关闭文件。READFILE 读出的文本不会自动成为正确范围内的整数。</p>
+<h2 id="topic-10.4">10.4 Introduction to ADT</h2>
+<p><a href="../index.html#topic=10.4">练习本知识点 →</a></p>
+<p>ADT = 一组数据及其合法操作的抽象定义，使用者关注操作语义，实现者决定存储方式。</p>
+<div class="table-wrap"><table>
+<tr><th>ADT</th><th>顺序与操作</th><th>典型应用/数组实现</th></tr>
+<tr><td>Stack 栈</td><td>LIFO；push/pop/peek</td><td>撤销、调用栈；数组+top</td></tr>
+<tr><td>Queue 队列</td><td>FIFO；enqueue/dequeue</td><td>打印任务；数组+front/rear，可循环使用</td></tr>
+<tr><td>Linked list 链表</td><td>节点包含 data 与 next，沿链接访问</td><td>动态逻辑顺序；数据数组+next 数组或记录数组</td></tr>
+</table></div>
+<p>插入/删除链表时改变链接，不必移动所有后续数据。链表在数组中实现仍受物理容量限制，需追踪 start pointer 与 free list。AS 要会描述、手工添加/修改/删除及数组实现思路；考纲明确本节不要求编写这些 ADT 的伪代码，A2 第 19 章会要求。</p>
+<h2>自测与易错点</h2>
+<p>1. <code>[3:12]</code> 有几个元素？答：10。</p>
+<p>2. 顺序 push A、push B、pop，输出 B；enqueue A、enqueue B、dequeue，输出 A。</p>
+<p>3. 用 <code>[9,3,7,1]</code> 逐轮追踪冒泡排序，分清“一次比较”和“一轮扫描”。</p></main></html>

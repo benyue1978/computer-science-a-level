@@ -1,0 +1,67 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>11 编程 Programming</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=2">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-10.html">上一章</a> · <a href="chapter-12.html">下一章</a><h1>11 编程 Programming</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-11.1">11.1 Programming Basics</h2>
+<p><a href="../index.html#topic=11.1">练习本知识点 →</a></p>
+<p>声明 type 与 identifier；initialisation 在第一次使用前赋初值；assignment 以 <code>←</code> 改变值，条件比较使用 <code>=</code>。常量有固定值，变量可变化。</p>
+<pre><code>CONSTANT MaxSize = 100
+DECLARE Count : INTEGER
+DECLARE Total : REAL
+Count ← 0
+Total ← 0.0
+INPUT Count
+OUTPUT &quot;Count: &quot;, Count</code></pre>
+<p>算术运算：<code>+ - * / DIV MOD ^</code>。例如 <code>17 DIV 5 = 3</code>、<code>17 MOD 5 = 2</code>；<code>/</code> 与整数商不同。关系运算 <code>= &lt;&gt; &lt; &lt;= &gt; &gt;=</code>；逻辑运算 <code>AND OR NOT</code>。使用括号明确优先级。</p>
+<p>Built-in function 返回一个值；library routine 提供已实现的处理。会依据给定函数说明选择参数、理解返回值。字符串函数按题目提供的定义使用，不假定索引从 0 开始，也不必死记某语言的函数名。</p>
+<h2 id="topic-11.2">11.2 Constructs</h2>
+<p><a href="../index.html#topic=11.2">练习本知识点 →</a></p>
+<pre><code>IF Score &gt;= 80 THEN
+    Grade ← &quot;A&quot;
+ELSE
+    IF Score &gt;= 60 THEN
+        Grade ← &quot;B&quot;
+    ELSE
+        Grade ← &quot;C&quot;
+    ENDIF
+ENDIF
+
+CASE OF Choice
+    1 : OUTPUT &quot;Add&quot;
+    2 : OUTPUT &quot;Search&quot;
+    OTHERWISE : OUTPUT &quot;Invalid&quot;
+ENDCASE</code></pre>
+<div class="table-wrap"><table>
+<tr><th>循环</th><th>何时检查</th><th>适用场景</th></tr>
+<tr><td>FOR ... TO ... NEXT</td><td>预设计数范围</td><td>已知处理 N 项</td></tr>
+<tr><td>WHILE ... DO ... ENDWHILE</td><td>执行前，可能零次</td><td>文件读取、条件可能起初不满足</td></tr>
+<tr><td>REPEAT ... UNTIL</td><td>执行后，至少一次；条件真时停止</td><td>菜单、至少输入一次的验证</td></tr>
+</table></div>
+<pre><code>REPEAT
+    INPUT Age
+UNTIL Age &gt;= 0 AND Age &lt;= 120</code></pre>
+<p>相同条件若用于 WHILE，要仔细决定条件代表“继续”还是“结束”。循环变量/条件状态必须变化。</p>
+<h2 id="topic-11.3">11.3 Structured Programming</h2>
+<p><a href="../index.html#topic=11.3">练习本知识点 →</a></p>
+<p>Procedure 完成一项操作，通过 CALL 调用；function 通过 RETURN 返回值并可用在表达式中。拆分模块提高可读性、复用和独立测试能力。</p>
+<pre><code>FUNCTION Square(BYVAL X : INTEGER) RETURNS INTEGER
+    RETURN X * X
+ENDFUNCTION
+
+PROCEDURE AddOne(BYREF X : INTEGER)
+    X ← X + 1
+ENDPROCEDURE
+
+DECLARE Number : INTEGER
+Number ← 4
+OUTPUT Square(Number)
+CALL AddOne(Number)
+OUTPUT Number</code></pre>
+<p>输出 16、5。BYVAL 复制参数值，修改局部形参不改变调用者变量；BYREF 关联调用者存储位置，可修改原值。</p>
+<ul>
+<li>Parameter 形参是定义中的 X；argument 实参是调用时的 Number。</li>
+<li>Header 给出名称、参数及返回类型；interface 说明模块接收什么、返回/修改什么。</li>
+<li>Local variable 属于子程序作用域，global variable 可被多个模块访问；尽量通过参数传值减少隐藏依赖。</li>
+<li>返回值与 OUTPUT 不相同：前者交还调用者用于进一步计算，后者向外显示。</li>
+<li>Efficient pseudocode 先保证正确，再避免不必要的重复运算/遍历；不因追求短而使逻辑含糊。</li>
+</ul>
+<h2>自测与易错点</h2>
+<p>1. 把 AddOne 的 BYREF 改成 BYVAL 后，最后输出为 4；解释原因。</p>
+<p>2. 独立写出输入 10 个数、累计正数并计算其平均值的程序，考虑没有正数。</p>
+<p>3. 选择循环必须解释“是否已知次数、是否允许零次、何时终止”。</p></main></html>

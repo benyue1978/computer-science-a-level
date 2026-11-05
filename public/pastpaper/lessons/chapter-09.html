@@ -1,0 +1,44 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>09 算法设计与问题求解 Algorithm Design and Problem-solving</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=2">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-08.html">上一章</a> · <a href="chapter-10.html">下一章</a><h1>09 算法设计与问题求解 Algorithm Design and Problem-solving</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-9.1">9.1 Computational Thinking Skills</h2>
+<p><a href="../index.html#topic=9.1">练习本知识点 →</a></p>
+<p>Abstraction 抽象：根据目的只保留必要细节，减少复杂度。例如公交路线模型保留站点、连接和车程，可省略车身颜色。必须解释为什么保留/忽略某信息。</p>
+<p>Decomposition 分解：将大问题拆成输入、验证、处理、存储、输出等可独立理解和实现的模块，有助于分工、测试、复用。与 abstraction 不同：前者拆任务，后者筛细节。</p>
+<h2 id="topic-9.2">9.2 Algorithms</h2>
+<p><a href="../index.html#topic=9.2">练习本知识点 →</a></p>
+<p>Algorithm 是解决问题的明确、有序步骤。设计时说明输入、输出、处理规则、结束条件及异常/边界情况。</p>
+<p>Identifier table 记录变量名、类型和用途，例如 Total: INTEGER 累计总分；Count: INTEGER 有效输入数。变量名应表达用途。</p>
+<p>三种基本结构：sequence 顺序；selection 根据条件选分支；iteration 重复处理。Structured English 用受限自然语言描述逻辑；pseudocode 用语言无关的结构；flowchart 使用开始/结束、输入输出、处理、判定等标准符号。</p>
+<p>Stepwise refinement 逐步细化：先写“计算平均分”，再拆成初始化、循环读取/累计、检查数量、除法与输出，直到每步可以直接实现。</p>
+<h3>例：读取分数，−1 结束</h3>
+<pre><code>DECLARE Mark, Count, Total : INTEGER
+DECLARE Mean : REAL
+Count ← 0
+Total ← 0
+INPUT Mark
+WHILE Mark &lt;&gt; -1 DO
+    IF Mark &gt;= 0 AND Mark &lt;= 100 THEN
+        Total ← Total + Mark
+        Count ← Count + 1
+    ELSE
+        OUTPUT &quot;Invalid mark&quot;
+    ENDIF
+    INPUT Mark
+ENDWHILE
+IF Count &gt; 0 THEN
+    Mean ← Total / Count
+    OUTPUT Mean
+ELSE
+    OUTPUT &quot;No valid marks&quot;
+ENDIF</code></pre>
+<p>关键：sentinel 不参与累计；每轮重新输入，避免死循环；Count=0 时不除零；非法输入不增加 Count。</p>
+<h3>条件、流程图与追踪</h3>
+<ul>
+<li>“不在 1–10”写为 <code>X &lt; 1 OR X &gt; 10</code>；不是 AND。</li>
+<li><code>NOT (A AND B)</code> 等价于 <code>NOT A OR NOT B</code>。</li>
+<li>从流程图转伪代码，先找判断和回边，判别前测/后测循环。</li>
+<li>Dry run 使用 trace table 逐步记录变量、条件和输出。输入 <code>80,120,60,-1</code> 最终 Total=140、Count=2、Mean=70，并输出一次错误提示。</li>
+<li>不同算法比较时检查正确性、可读性、运算次数和所需存储；本章重点是将问题转成清晰步骤。</li>
+</ul>
+<h2>自测与易错点</h2>
+<p>1. 不运行程序，追踪第一项就是 −1 的情况，应输出 No valid marks。</p>
+<p>2. 设计从 N 个可能全为负数的数中找最大值：使用第一项初始化，而非把最大值设为 0。</p>
+<p>3. 把以上算法画成流程图，确保每个判定的两条出口、循环回边和结束路径明确。</p></main></html>

@@ -1,0 +1,45 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>06 安全、隐私与数据完整性 Security, privacy and data integrity</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=1">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-05.html">上一章</a> · <a href="chapter-07.html">下一章</a><h1>06 安全、隐私与数据完整性 Security, privacy and data integrity</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-6.1">6.1 Data Security</h2>
+<p><a href="../index.html#topic=6.1">练习本知识点 →</a></p>
+<p>Security 是防止未经授权的访问、修改、破坏与丢失；privacy 关注个人信息的收集、使用和披露是否符合授权与合理预期；integrity 是数据准确、完整、一致的状态。获准读数据不代表获准向他人披露。</p>
+<div class="table-wrap"><table>
+<tr><th>威胁</th><th>原理/风险</th><th>对应措施及局限</th></tr>
+<tr><td>Virus</td><td>依附文件/程序传播，执行时感染或破坏</td><td>更新反病毒软件、补丁、限制执行；新病毒可能漏检</td></tr>
+<tr><td>Spyware</td><td>暗中收集行为、账户等信息</td><td>反间谍软件、可信安装来源、权限控制</td></tr>
+<tr><td>Unauthorised access/hacker</td><td>利用漏洞或被盗凭证访问系统</td><td>强认证、最小权限、更新、日志监测</td></tr>
+<tr><td>Phishing</td><td>伪装可信消息/网站诱骗用户交出信息</td><td>培训、检查域名、独立渠道核实、MFA</td></tr>
+<tr><td>Pharming</td><td>篡改 DNS/解析或相关配置，重定向到假站</td><td>保护 DNS/设备配置，核验证书、及时更新</td></tr>
+</table></div>
+<ul>
+<li>Accounts/access rights：每人使用可追责账户，按职责授予所需权限。</li>
+<li>Password + MFA：结合不同认证因素；生物识别方便但可能误识别，泄漏后难以更换。</li>
+<li>Firewall 根据规则过滤连接/流量，不保证阻止所有恶意附件或获准通道内的攻击。</li>
+<li>Anti-virus/anti-spyware 检测隔离威胁，需要更新。</li>
+<li>Encryption 把可读明文变成密文，保护存储/传输机密性；密钥泄漏会失去保护。</li>
+<li>Digital signature 用于验证来源及检测篡改，不能单独保密消息（详见第 17 章）。</li>
+<li>物理保护、定期离线/独立备份、恢复演练可减轻盗窃、故障和破坏损失。</li>
+</ul>
+<h2 id="topic-6.2">6.2 Data Integrity</h2>
+<p><a href="../index.html#topic=6.2">练习本知识点 →</a></p>
+<p><strong>Validation</strong> 检查是否符合规则；不保证事实正确。<strong>Verification</strong> 检查输入/传输与来源是否一致，也不保证来源本身正确。</p>
+<div class="table-wrap"><table>
+<tr><th>Validation</th><th>例子</th></tr>
+<tr><td>Range check</td><td>分数在 0–100</td></tr>
+<tr><td>Limit check</td><td>数量不超过库存上限</td></tr>
+<tr><td>Format check</td><td>代码符合两字母加四数字的模式</td></tr>
+<tr><td>Length check</td><td>学号恰好六字符</td></tr>
+<tr><td>Presence check</td><td>必填字段不为空</td></tr>
+<tr><td>Existence check</td><td>输入的商品编号已存在于商品表</td></tr>
+<tr><td>Check digit</td><td>由其他数位计算附加位，重新计算并比较</td></tr>
+</table></div>
+<p>Verification：visual check 人工与原件比对；double entry 两次独立输入后比较，仍可能两次犯同一错误。</p>
+<h3>传输检错</h3>
+<ul>
+<li>Parity bit：令一个数据单位中的 1 的数量为指定奇/偶。偶校验例：数据 <code>1011001</code> 有四个 1，附加 0；收到的总数变成奇数就说明错误。能检测任意奇数个位翻转，但偶数个位翻转可能漏检。</li>
+<li>Block parity：数据按行列排列，分别设置校验位；单个位错误可通过错误行与列交点定位，但不能保证定位所有多位错误。</li>
+<li>Checksum：发送者按规定算法计算校验值一起发送，接收方重算比较；不匹配要求重传。不同错误可能产生相同 checksum，它不是密码学认证。</li>
+<li>Check digit（数据编码中的附加数位）、parity（位数约束）、checksum（数据块的计算结果）不要混用。</li>
+</ul>
+<h2>自测与易错点</h2>
+<p>1. 错把年龄 21 输入为 22，为什么范围校验可能通过？如何增加核对？</p>
+<p>2. 为偶校验数据 <code>1100101</code> 加校验位（答：0），解释翻转两位为何可能不被发现。</p>
+<p>3. 场景题按“威胁 → 如何发生 → 措施 → 为什么有效”回答，不能用 encryption 回答所有安全问题。</p></main></html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <meta name="theme-color" content="#214c3e">
+  <title>9618 自习室 · 按章节学习与打印</title>
+  <link rel="stylesheet" href="assets/style.css?v=chapter-print-10">
+  <script defer src="data/catalog.js"></script>
+  <script defer src="data/p1.js"></script>
+  <script defer src="data/p2.js"></script>
+  <script defer src="data/p3.js"></script>
+  <script defer src="data/p4.js"></script>
+  <script defer src="data/guides.js?v=study-tips-5"></script>
+  <script defer src="assets/app.js?v=study-tips-5"></script>
+</head>
+<body>
+<a class="skip-link" href="#topic-workspace">跳到章节内容</a>
+<header class="site-header">
+  <a class="brand" href="index.html" aria-label="9618 自习室首页"><span class="brand-number">9618</span><span class="brand-name">自习室<small>计算机科学</small></span></a>
+  <div class="header-note">选章节 · 看笔记 · 打印刷题</div>
+  <a class="text-link coverage-link" href="coverage.html">题库收录说明 <span aria-hidden="true">↗</span></a>
+</header>
+<main class="shell chapter-shell">
+  <section class="intro chapter-intro" aria-labelledby="site-title">
+    <div class="intro-copy"><div class="eyebrow">剑桥计算机科学 · 9618</div><h1 id="site-title">选一个章节，<br>把知识和题目带走<span class="ink-dot">。</span></h1><p>每个考纲主题都汇集对应笔记与历年题。笔记可单独打印；题目可按练习方式和难度筛选，再打印题目与讲解。</p></div>
+    <div class="intro-count"><span class="smallcaps">题库收录</span><strong id="total-count">3,017</strong><span>道题 · 按考纲主题整理</span></div>
+  </section>
+  <section class="workspace chapter-workspace" aria-label="章节学习与打印">
+    <aside class="sidebar" aria-label="选择章节和筛选题目">
+      <div class="sidebar-top"><span class="eyebrow">01 / 选择章节</span><button class="inline-button" id="reset-filters">重置筛选</button></div>
+      <div class="paper-tabs" role="group" aria-label="选择试卷"><button data-paper="1" aria-pressed="true">P1</button><button data-paper="2" aria-pressed="false">P2</button><button data-paper="3" aria-pressed="false">P3</button><button data-paper="4" aria-pressed="false">P4</button></div>
+      <p class="paper-description" id="paper-description"></p>
+      <label class="field-label" for="topic-filter">考纲主题 </label><select id="topic-filter"><option value="">选择一个主题</option></select>
+      <div class="question-filter-group">
+        <div class="filter-heading"><span class="eyebrow">02 / 筛选题目</span><span class="filter-note">笔记不受题目筛选影响</span></div>
+        <label class="field-label" for="mode-filter">练习方式</label><select id="mode-filter"><option value="">所有题型</option><option value="memory">记忆</option><option value="understanding">理解</option><option value="procedure">步骤</option><option value="application">应用</option><option value="implementation">编程</option></select>
+        <label class="field-label" for="difficulty-filter">难度</label><select id="difficulty-filter"><option value="">全部难度</option><option value="1">1 · 入门</option><option value="2">2 · 基础</option><option value="3">3 · 进阶</option><option value="4">4 · 挑战</option></select>
+        <label class="field-label" for="search-filter">搜索题目</label><div class="search-box"><span aria-hidden="true">⌕</span><input type="search" id="search-filter" placeholder="术语或英文题干" autocomplete="off"></div>
+      </div>
+      <div class="study-tip"><span class="smallcaps">打印学习资料</span><h3>纸上作答，按自己的节奏学习。</h3><p>筛题后可只打印题目，也可打印中文讲解和官方评分标准。</p></div>
+    </aside>
+    <div class="study-main" id="topic-workspace">
+      <div class="choose-topic" id="choose-topic"><span class="eyebrow">先从考纲主题开始</span><h2>选择 P1–P4 中的一个主题</h2><p>选择后，这里会显示完整笔记和对应的历年题。</p></div>
+      <section class="lesson-card chapter-notes" id="notes-section" hidden aria-labelledby="lesson-title">
+        <div class="section-heading notes-heading"><div><span class="eyebrow">03 / 考纲知识笔记</span><h2 id="lesson-title"></h2><p id="lesson-subtitle" class="lesson-subtitle"></p></div><button class="button primary print-button" id="print-notes">打印本章笔记 <span aria-hidden="true">↗</span></button></div>
+        <div id="lesson-body" class="lesson-body"></div>
+      </section>
+      <section class="question-section" id="questions-section" hidden aria-labelledby="questions-title">
+        <div class="section-heading question-section-heading"><div><span class="eyebrow">04 / 历年题目</span><h2 id="questions-title">本章题目</h2></div><div id="result-summary" class="result-summary" aria-live="polite"></div></div>
+        <div class="selection-toolbar"><label class="select-all-label"><input type="checkbox" id="select-all"> <span>选中当前筛选结果</span></label><span id="selected-count" class="selected-count">已选 0 题</span><button class="button small" id="clear-selection">清空选择</button><button class="button small print-button" id="print-selected" disabled>打印所选题目</button><button class="button small subtle" id="print-filtered" disabled>打印全部筛选题</button></div>
+        <div id="question-list" class="question-list"></div>
+        <div class="pagination"><button class="button small" id="prev-page">← 上一页</button><span id="page-info"></span><button class="button small" id="next-page">下一页 →</button></div>
+      </section>
+    </div>
+  </section>
+</main>
+<footer class="site-footer"><span>9618 自习室 <span class="footer-divider">/</span> 笔记与题目都可以打印。</span><a href="coverage.html">来源与收录范围 ↗</a></footer>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<noscript><div class="notice">请启用 JavaScript 以筛选章节并生成打印页。</div></noscript>
+</body>
+</html>

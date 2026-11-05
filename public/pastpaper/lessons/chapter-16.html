@@ -1,0 +1,39 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>16 进阶系统软件 System Software</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=3">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-15.html">上一章</a> · <a href="chapter-17.html">下一章</a><h1>16 进阶系统软件 System Software</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-16.1">16.1 Purposes of an Operating System</h2>
+<p><a href="../index.html#topic=16.1">练习本知识点 →</a></p>
+<p>OS 通过调度、内存管理、缓冲及中断在程序间分配资源，减少 CPU/设备空闲。GUI、命令行和系统调用隐藏硬件细节，用户不必直接操作磁盘扇区或设备寄存器。</p>
+<h3>Process management</h3>
+<p>Process 是执行中的程序及其上下文。Ready 已准备运行但等待 CPU；running 正在使用 CPU；blocked 等待 I/O/事件，尚不能运行。</p>
+<p>转移：ready→running（调度）；running→ready（时间片到/被抢占）；running→blocked（请求 I/O）；blocked→ready（事件完成）。Blocked 不会仅因轮到它就直接开始运行。</p>
+<div class="table-wrap"><table>
+<tr><th>调度</th><th>规则</th><th>优点/问题</th></tr>
+<tr><td>FCFS</td><td>按就绪到达顺序</td><td>简单；长任务使短任务等待</td></tr>
+<tr><td>SJF</td><td>选择估计运行时间最短任务，通常非抢占</td><td>平均等待可较低；需估计时间，长任务可能饥饿</td></tr>
+<tr><td>SRT</td><td>抢占式选择剩余时间最短</td><td>新短任务可快速响应；切换开销、长任务可能饥饿</td></tr>
+<tr><td>Round robin</td><td>每个就绪进程轮用 time quantum</td><td>交互响应公平；时间片过小切换多，过大近似 FCFS</td></tr>
+</table></div>
+<p>计算题必须使用 arrival time、burst time、是否抢占和时间片；先画 Gantt 顺序，再计算 completion、turnaround=<code>完成−到达</code>、waiting=<code>周转−CPU运行时间</code>（简单无 I/O 模型）。</p>
+<p>Kernel 处理时钟/设备中断，保存寄存器上下文、更新进程状态并安排调度；context switch 有成本。</p>
+<h3>Memory management</h3>
+<p>Paging 把逻辑空间分为固定大小 page，物理内存分为同大小 frame；page table 映射页到帧。Segmentation 按程序逻辑分段，如代码、栈、数据，段长可变，使用段表及界限保护。</p>
+<p>分页通常有内部碎片；分段可能有外部碎片。Virtual memory 提供比当前实际分配物理内存更大的逻辑地址空间，将暂不用的页置于辅助存储。访问不在主存的页触发 page fault，OS 载入该页，必要时换出其他页。FIFO 换出最早载入页；LRU 换出最久未用页。</p>
+<p>Thrashing：工作集超出可用帧、频繁换页，系统大量时间消耗在磁盘 I/O 上。可减少并发进程、增加内存/帧等；虚拟内存不会使磁盘与 RAM 一样快。</p>
+<h2 id="topic-16.2">16.2 Translation Software</h2>
+<p><a href="../index.html#topic=16.2">练习本知识点 →</a></p>
+<p>Interpreter 可读取并分析语句/中间表示，然后调用相应执行操作，不必产生独立可保存的目标程序。</p>
+<p>Compiler 的主要阶段：</p>
+<p>1. Lexical analysis：将字符分为 tokens，处理标识符/关键字/常数等，建立或更新 symbol table，移除不必要空白/注释。</p>
+<p>2. Syntax analysis：依据 grammar 检查 token 顺序，构建语法结构；语法正确仍不保证业务逻辑正确。</p>
+<p>3. Code generation：由内部表示生成目标指令，分配寄存器/地址等。</p>
+<p>4. Optimisation：在保持语义前提下减少时间/空间开销，如常量折叠、去除冗余计算。具体编译器也可能在生成前后多处优化。</p>
+<h3>BNF 与 syntax diagram</h3>
+<p>BNF 用 non-terminal、terminal、<code>::=</code> 定义和 <code>|</code> 选择：</p>
+<pre><code>&lt;digit&gt; ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+&lt;unsigned&gt; ::= &lt;digit&gt; | &lt;digit&gt;&lt;unsigned&gt;</code></pre>
+<p><code>507</code> 可依次推导；<code>5A</code> 无法由该规则产生。递归必须有终止规则。Syntax diagram 用路径表达顺序、分支和重复，从入口沿合法路径走到出口即可得到合法串。</p>
+<h3>Reverse Polish Notation（RPN）</h3>
+<p>后缀表示将运算符放在操作数之后，不需优先级括号。<code>(3+4)*5 → 3 4 + 5 *</code>。</p>
+<p>求值：数字入栈；遇运算符，先 pop 右操作数，再 pop 左操作数，计算后 push。<code>8 3 - 2 *</code>：8、3 入栈 → 8−3=5 → 2 入栈 → 5×2=10。减法/除法弹栈顺序尤为重要；最终栈应恰有一个结果。</p>
+<h2>自测与易错点</h2>
+<p>1. A、B 在 t=0 到达，CPU时间 5、2，RR 时间片 2：A(0–2)、B(2–4)、A(4–6)、A(6–7)。</p>
+<p>2. 为什么 page fault 与语法错误不同？为什么 thrashing 时 CPU 利用率可能下降？</p>
+<p>3. 把 <code>6/(2+1)</code> 写成 RPN 并求值：<code>6 2 1 + /</code>，结果 2。</p></main></html>

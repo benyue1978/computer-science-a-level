@@ -1,0 +1,53 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>02 通信 Communication</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=1">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-01.html">上一章</a> · <a href="chapter-03.html">下一章</a><h1>02 通信 Communication</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-2.1">2.1 Networks including the internet</h2>
+<p><a href="../index.html#topic=2.1">练习本知识点 →</a></p>
+<h3>网络模型与拓扑</h3>
+<p>网络用于共享数据、打印机/存储/软件及集中管理。LAN 覆盖相对小的区域，通常由同一组织管理；WAN 跨越较大地域、连接多个网络，常依赖运营商链路。LAN 可以有线或无线；WAN 也有真实物理链路。</p>
+<div class="table-wrap"><table>
+<tr><th>模型</th><th>工作方式</th><th>适用与代价</th></tr>
+<tr><td>Client–server</td><td>客户端请求服务，服务器响应；客户端也可本地处理</td><td>学校/公司便于集中权限和备份；服务器维护成本与服务故障影响较大</td></tr>
+<tr><td>Peer-to-peer</td><td>节点可同时请求和提供资源</td><td>小型共享容易建立；分散权限、备份和版本管理更困难</td></tr>
+<tr><td>Thin client</td><td>大部分处理/存储在服务器</td><td>本地硬件需求低，依赖网络和服务器</td></tr>
+<tr><td>Thick client</td><td>较多处理/存储在本地</td><td>可离线处理更多工作，本地更新和硬件成本较高</td></tr>
+</table></div>
+<ul>
+<li>Bus：所有节点共享主干，信号沿总线传播，匹配地址的节点接收；布线少，但主干故障影响大、共享介质会碰撞。</li>
+<li>Star：节点分别连接中央设备；switch 根据目的 MAC 转发。单条支线故障通常只影响一个节点；中央设备故障影响整星，布线较多。中央设备不等于“服务器”。</li>
+<li>Mesh：节点间多条连接形成备用路径；full mesh 每两个节点直接连接，partial mesh 只保留部分连接。冗余强，建设管理成本高。</li>
+<li>Hybrid：组合不同拓扑，结合场景解释其实际路径和故障影响。</li>
+</ul>
+<h3>云与传输介质</h3>
+<p>Public cloud 由服务商向多个客户提供服务；private cloud 为特定组织专用，可以在本地或外部托管。云可弹性扩容、远程访问、减少自建硬件，但依赖连接、供应商及持续费用；备份与权限仍需规划。</p>
+<div class="table-wrap"><table>
+<tr><th>介质</th><th>原理/优势</th><th>局限</th></tr>
+<tr><td>铜线 copper</td><td>电信号；成本较低、易安装</td><td>电磁干扰与衰减</td></tr>
+<tr><td>光纤 fibre optic</td><td>光脉冲；高带宽、长距离、抗电磁干扰</td><td>接续成本、弯折限制；并非绝对无法窃听</td></tr>
+<tr><td>无线电 radio/Wi-Fi</td><td>允许移动，无需逐点布线</td><td>覆盖、障碍、共享频谱和窃听风险</td></tr>
+<tr><td>微波 microwave</td><td>定向、高容量点对点链路</td><td>通常需要视距，受遮挡/天气影响</td></tr>
+<tr><td>卫星 satellite</td><td>为偏远地区提供广域覆盖</td><td>成本与传播延迟；延迟取决于轨道，不全都一样</td></tr>
+</table></div>
+<h3>网络硬件与以太网</h3>
+<ul>
+<li>NIC/WNIC 提供有线/无线网络接口；MAC 标识链路层接口。</li>
+<li>Switch 连接 LAN 内设备，学习 MAC 与端口的对应关系；同一子网内通信通常由交换机直接完成，无需经过路由器。</li>
+<li>Router 根据目的 IP 与路由表在网络之间转发数据包。家庭设备常同时集成 NAT、DHCP、Wi-Fi 和防火墙，这些不是所有路由器的必然功能。</li>
+<li>WAP 连接无线终端与有线网络；bridge 连接/过滤 LAN 网段；repeater 重新生成信号以延长距离；server 提供具体服务。</li>
+<li>Ethernet 以 frame 传输，包含源/目的 MAC、载荷及错误检测字段。</li>
+<li>CSMA/CD：监听介质 → 空闲则发送并继续监听 → 检出碰撞则发 jam signal、停止 → 随机退避后重试。适用于共享、半双工以太网；现代交换式全双工链路不使用碰撞竞争机制。Wi-Fi 的碰撞避免不能与 CSMA/CD 混为一谈。</li>
+</ul>
+<h3>Internet、WWW 与流媒体</h3>
+<p>Internet 是互连网络基础设施；WWW 是通过 HTTP/HTTPS 访问互相链接资源的一项服务。电子邮件不是 WWW 本身。</p>
+<p>Modem 调制/解调信号，适应传输介质；PSTN 是公共交换电话网络；dedicated line 是专用链路；cellular network 通过基站和蜂窝提供移动接入。</p>
+<p>Streaming 边接收边播放，buffer 吸收速率波动。Real-time 对直播延迟敏感；on-demand 来自已存储内容，通常支持跳转。直播是否可暂停/回看取决于服务。持续有效吞吐量不足媒体 bit rate 时会耗尽缓冲并卡顿。例：8 Mbit/s 视频播放 120 秒需约 120 MB（忽略额外开销）。</p>
+<h3>IP、子网、URL 和 DNS</h3>
+<ul>
+<li>IPv4：32 bits，四组十进制 0–255，例如 <code>192.168.1.20</code>；IPv6：128 bits，通常八组十六进制，以冒号分隔。</li>
+<li>Public IP 在公共互联网可路由；private IP 用于内部网络、不能直接在公共互联网路由。私有地址并不保证安全。NAT 可让多个私有 IPv4 主机共享公网地址。</li>
+<li>Static IP 保持固定；dynamic IP 常通过 DHCP 租约分配，重新连接时可能相同或变化。</li>
+<li>子网划分将网络拆成较小管理单元，限制广播范围、便于路由与访问控制。例如 <code>/24</code> 掩码 <code>255.255.255.0</code> 下 <code>192.168.1.20</code> 的网络部分是 <code>192.168.1.0</code>。</li>
+<li>URL 如 <code>https://example.org/notes/ch1.html</code>：协议、域名、资源路径。DNS 解析域名到 IP，不是解析整个路径。</li>
+<li>浏览器解析 URL → 检查缓存/查询 DNS → 获得服务器 IP → 建立连接（HTTPS 还涉及 TLS）→ 发请求 → 收响应并渲染。</li>
+</ul>
+<h2>自测与易错点</h2>
+<p>1. 给学校机房选 client–server 和 star，分别说明集中管理好处与故障点。</p>
+<p>2. 描述同子网与跨子网两台主机通信时 switch/router 的不同作用。</p>
+<p>3. “更快、更安全”必须说明介质、距离、负载及权限条件，不能仅以 LAN/WAN 标签下结论。</p></main></html>

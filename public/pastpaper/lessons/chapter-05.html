@@ -1,0 +1,35 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>05 系统软件 System Software</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=1">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-04.html">上一章</a> · <a href="chapter-06.html">下一章</a><h1>05 系统软件 System Software</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-5.1">5.1 Operating Systems</h2>
+<p><a href="../index.html#topic=5.1">练习本知识点 →</a></p>
+<p>OS 管理硬件资源，为应用提供服务并向用户提供接口。</p>
+<div class="table-wrap"><table>
+<tr><th>管理任务</th><th>具体工作</th></tr>
+<tr><td>Memory</td><td>分配/释放内存，保护进程地址空间</td></tr>
+<tr><td>Process</td><td>创建/调度进程，分配 CPU 时间，处理中断</td></tr>
+<tr><td>File</td><td>目录、文件名、存取、权限与磁盘空间</td></tr>
+<tr><td>Hardware/I/O</td><td>驱动设备、缓冲、处理设备中断</td></tr>
+<tr><td>Security</td><td>用户认证、访问权限、审计与保护</td></tr>
+</table></div>
+<p>Utility software 维护系统：formatter 建立文件系统；virus checker 检测/隔离恶意软件；disk analysis 报告空间使用；disk repair 检查并修复可修复的文件系统问题、标记坏块；compression 减小文件；backup 创建可恢复副本。Defragmenter 整理碎片减少 HDD 寻道，不能把它当作 SSD 的常规提速手段，也不保证修复物理损坏。</p>
+<p>Program library 提供已编写的 routines，节省开发时间、复用经测试代码；仍需验证接口、版本兼容、许可与安全。DLL 在加载/运行时链接，共享库代码可减少重复占用、独立更新；缺失库或不兼容更新可能使程序失败。</p>
+<h2 id="topic-5.2">5.2 Language Translators</h2>
+<p><a href="../index.html#topic=5.2">练习本知识点 →</a></p>
+<div class="table-wrap"><table>
+<tr><th>工具</th><th>输入与执行方式</th><th>优势/代价</th></tr>
+<tr><td>Assembler</td><td>汇编→机器码</td><td>处理助记符、地址和标签，面向特定架构</td></tr>
+<tr><td>Compiler</td><td>对源代码进行翻译，生成目标代码/中间代码</td><td>生成本机代码后通常运行快；修改后要重新翻译，目标有平台依赖</td></tr>
+<tr><td>Interpreter</td><td>在运行时分析并执行源代码或中间表示</td><td>交互测试方便；通常有运行开销，运行环境必须可用</td></tr>
+</table></div>
+<p>考试比较应区分“翻译时间”和“以后每次运行时间”。编译成功不保证没有逻辑/运行时错误；编译输出也不一定是独立可执行文件。解释执行不是要求每行必定生成可保存的机器码。</p>
+<p>Java 是混合方式的例子：源代码编译为 bytecode，由 JVM 执行，可使用解释及 JIT。本章节只需理解部分编译、部分解释可兼顾可移植性与执行效率。</p>
+<p><strong>IDE 功能 → 帮助开发者的原因</strong>：</p>
+<ul>
+<li>Context-sensitive prompt/auto-complete：提示合法标识符与参数，减少输入错误。</li>
+<li>Dynamic syntax checking：编辑时标出语法问题。</li>
+<li>Prettyprint：缩进/语法高亮改善可读性；expand/collapse 隐藏暂不关注的代码块。</li>
+<li>Breakpoint：在指定位置暂停；single stepping：逐句运行。</li>
+<li>Watch/report window：查看变量/表达式的值，定位状态何时偏离预期。</li>
+</ul>
+<h2>自测与易错点</h2>
+<p>1. 一个应用找不到 DLL，解释原因并说明动态链接的一个优势。</p>
+<p>2. 为什么编译通过的程序仍可能除以零？为什么测试阶段适合使用断点？</p>
+<p>3. 区分 OS、utility、application、translator；不要仅罗列名称而不解释任务。</p></main></html>

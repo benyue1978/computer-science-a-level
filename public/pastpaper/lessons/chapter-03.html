@@ -1,0 +1,49 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>03 硬件 Hardware</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=1">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-02.html">上一章</a> · <a href="chapter-04.html">下一章</a><h1>03 硬件 Hardware</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-3.1">3.1 Computers and their components</h2>
+<p><a href="../index.html#topic=3.1">练习本知识点 →</a></p>
+<p>输入设备获取数据，输出设备呈现结果，primary memory 保存当前执行所需内容，secondary storage 长期保存程序和数据；removable storage 便于携带、转移和离线备份。</p>
+<p><strong>Embedded system 嵌入式系统</strong>为较大设备中的特定功能而设计，包含处理器、存储和 I/O，例如洗衣机控制器。可采用固件、实时操作系统或其他 OS；不能断言它没有操作系统。优势是针对任务优化、体积和功耗可较小；限制是升级、维修与通用性。</p>
+<h3>必须会描述的设备工作过程</h3>
+<div class="table-wrap"><table>
+<tr><th>设备</th><th>核心过程</th></tr>
+<tr><td>Laser printer</td><td>感光鼓充电；激光形成静电图案；碳粉附着；转印到纸；热压定影；清理鼓</td></tr>
+<tr><td>3D printer</td><td>CAD 模型切片；控制喷头/材料位置；逐层沉积或固化材料形成物体</td></tr>
+<tr><td>Microphone</td><td>声压使振膜振动并产生模拟电信号；经 ADC 采样量化</td></tr>
+<tr><td>Speaker</td><td>数字音频经 DAC；电流使线圈和振膜运动，产生声波</td></tr>
+<tr><td>Magnetic hard disk</td><td>盘片旋转，磁头定位到磁道/扇区，读取或改变磁化状态</td></tr>
+<tr><td>SSD / flash</td><td>非易失存储单元以电荷状态表示数据；无移动部件；写入/擦除有寿命限制</td></tr>
+<tr><td>Optical disc</td><td>激光照射螺旋轨道，检测反射变化读数据；可写介质用激光改变记录层</td></tr>
+<tr><td>Touchscreen</td><td>电阻式以压力接通导电层；电容式检测触摸导致的电容变化，再计算坐标</td></tr>
+<tr><td>VR headset</td><td>双目显示/声音产生沉浸感；陀螺仪、加速度计等跟踪姿态，更新视角</td></tr>
+</table></div>
+<p>HDD 通常单位容量成本低但有机械延迟；SSD 随机访问快、抗震、安静，但价格和耐写性需考虑。光盘适于分发/归档，容量、速度和兼容性有局限。</p>
+<p><strong>Buffer 缓冲区</strong>暂存待传数据，协调 CPU 与外设、网络或流媒体的速度差。生产者填充，消费者取出；需处理满/空状态，可配合中断通知。Buffer 不是永久存储，也不同于用于重复访问加速的 cache。</p>
+<h3>主存比较</h3>
+<div class="table-wrap"><table>
+<tr><th>类型</th><th>数据保持/原理</th><th>典型用途</th></tr>
+<tr><td>RAM</td><td>断电丢失，可读写</td><td>活跃程序、数据、栈与缓冲区</td></tr>
+<tr><td>ROM 类存储</td><td>非易失，正常使用以读取为主</td><td>启动代码、固件</td></tr>
+<tr><td>SRAM</td><td>双稳态电路保存位，不需周期刷新；快、贵、密度较低</td><td>cache</td></tr>
+<tr><td>DRAM</td><td>电容存电荷，需刷新；密度高、单位成本较低</td><td>主内存</td></tr>
+<tr><td>PROM</td><td>一次性编程</td><td>固定固件</td></tr>
+<tr><td>EPROM</td><td>紫外线擦除后重新编程，通常整片擦除</td><td>较旧的可更新固件</td></tr>
+<tr><td>EEPROM</td><td>电擦除并重新编程，可在电路中更新</td><td>配置/固件</td></tr>
+</table></div>
+<p>SRAM 与 DRAM 都是易失的；“不刷新”不等于断电保留。讨论功耗时要结合容量、工作状态，避免绝对判断。</p>
+<h3>Monitoring 与 control</h3>
+<p>Monitoring 采集、记录、显示或报警；control 根据测量与目标的差异自动驱动 actuator 改变系统。温控例：温度传感器 → 必要时 ADC → 处理器比较设定值 → 控制加热器 → 温度改变后再次测量。Feedback 是将输出造成的结果反馈到后续输入，用于持续调整。温度、压力、红外、声音传感器应按场景选；actuator 可为电机、阀门、继电器等。</p>
+<h2 id="topic-3.2">3.2 Logic Gates and Logic Circuits</h2>
+<p><a href="../index.html#topic=3.2">练习本知识点 →</a></p>
+<p>NOT 为输入取反。其余考纲基本门为两输入：</p>
+<div class="table-wrap"><table>
+<tr><th>A</th><th>B</th><th>AND</th><th>OR</th><th>NAND</th><th>NOR</th><th>XOR</th></tr>
+<tr><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+</table></div>
+<p>AND 全真才真；OR 至少一真；NAND 是 AND 取反；NOR 是 OR 取反；XOR 恰好一个输入为真。必须认识并手绘官方标准门符号。</p>
+<p>从表达式画电路：按括号和运算顺序给中间结果命名，逐门连接。从电路/表达式填真值表：n 个输入列出 2ⁿ 行，再计算中间列。由真值表写式：对输出为 1 的每一行写 minterm（输入 0 则取反），再 OR 合并。例如仅 <code>A=0,B=1</code> 或 <code>A=1,B=0</code> 时报警：<code>Q=(NOT A AND B) OR (A AND NOT B)</code>。</p>
+<h2>自测与易错点</h2>
+<p>1. 说明为什么 cache 用 SRAM，而主存多用 DRAM。</p>
+<p>2. 完整画出 <code>Q = (A OR B) AND NOT C</code> 的电路并列八行真值表。</p>
+<p>3. 用“感测 → 比较 → 执行 → 再感测”解释控制过程，不把传感器与执行器互换。</p></main></html>

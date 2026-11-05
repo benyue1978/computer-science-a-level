@@ -1,0 +1,16 @@
+.git
+.DS_Store
+.superpowers
+.playwright-mcp
+node_modules
+dist
+work
+outputs
+artifacts
+coverage
+playwright-report
+test-results
+.env*
+*.tsbuildinfo
+vocabulary-backup-*.json
+/Cambridge IGCSE and O Level Computer Science Second Edition.pdf

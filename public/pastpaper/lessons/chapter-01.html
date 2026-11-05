@@ -1,0 +1,49 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>01 信息表示 Information representation</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=1">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-02.html">下一章</a><h1>01 信息表示 Information representation</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-1.1">1.1 Data Representation 数据表示</h2>
+<p><a href="../index.html#topic=1.1">练习本知识点 →</a></p>
+<h3>单位与进制</h3>
+<ul>
+<li>bit 是一位二进制；byte = 8 bits；nibble = 4 bits。传输速率通常用 bit/s，文件大小通常用 byte。</li>
+<li>十进制前缀：kB = 10³ B，MB = 10⁶ B，GB = 10⁹ B，TB = 10¹² B。</li>
+<li>二进制前缀：KiB = 2¹⁰ B，MiB = 2²⁰ B，GiB = 2³⁰ B，TiB = 2⁴⁰ B。题目给定单位优先，不把 MB 自动当作 MiB。</li>
+<li>二进制位权从右到左为 1、2、4、8……；十六进制每位对应 4 bits，A–F 代表 10–15。</li>
+<li>十进制整数转二进制：连续除以 2，余数逆序排列；二进制转十进制：位权相加。例：<code>10110110₂ = B6₁₆ = 182₁₀</code>。</li>
+<li>BCD（Binary Coded Decimal）每个十进制数位独立编码为 4 bits：<code>59 → 0101 1001</code>，不同于普通二进制 <code>0011 1011</code>。1010–1111 不是有效的单个 BCD 数位。</li>
+<li>BCD 适合十进制显示、需要十进制精确表示的计算；代价是占用位数较多。十六进制用于阅读地址、机器码、RGB 颜色和 IPv6，计算机内部仍保存二进制。</li>
+</ul>
+<h3>有符号整数与运算</h3>
+<div class="table-wrap"><table>
+<tr><th>表示法（n bits）</th><th>范围</th><th>特征</th></tr>
+<tr><td>无符号 unsigned</td><td>0 到 2ⁿ−1</td><td>所有位都是非负位权</td></tr>
+<tr><td>反码 one&#x27;s complement</td><td>−(2ⁿ⁻¹−1) 到 +(2ⁿ⁻¹−1)</td><td>负数由正数逐位取反；有正零和负零</td></tr>
+<tr><td>补码 two&#x27;s complement</td><td>−2ⁿ⁻¹ 到 2ⁿ⁻¹−1</td><td>最高位权是 −2ⁿ⁻¹；只有一个零</td></tr>
+</table></div>
+<p>8-bit 的 +13 是 <code>00001101</code>，−13 的反码是 <code>11110010</code>，补码是 <code>11110011</code>。补码转十进制可以直接用负的最高位权：<code>11110011 = −128+64+32+16+2+1 = −13</code>。</p>
+<p>二进制加法遵循 <code>1+1=10</code>、<code>1+1+1=11</code>。减法可转换为加上减数的补码，并保留指定位宽。8-bit <code>7−10 = 00000111+11110110 = 11111101 = −3</code>。</p>
+<p><strong>Overflow 溢出</strong>表示真实结果超出可表示范围。补码加法中，同号相加却得到异号结果就是溢出：<code>01111111+00000001=10000000</code>，不能解释成正确的 128。最高位有进位不等于有符号溢出。</p>
+<h3>字符编码</h3>
+<p>Character set 为字符指定数值编码。ASCII 基础字符集为 7 bits（128 个编码）；extended ASCII 通常为 8 bits，但有不同代码页。Unicode 提供更大的统一字符空间；Unicode 不等于“每个字符固定 16 bits”，UTF-8 等编码的长度可以变化。不需背诵具体 ASCII 码，但要会读题目给出的编码表。</p>
+<h2 id="topic-1.2">1.2 Multimedia 多媒体</h2>
+<p><a href="../index.html#topic=1.2">练习本知识点 →</a></p>
+<p><strong>Bitmap 位图</strong>是像素 pixel 的网格；每个像素由 colour depth/bit depth 指定颜色编码。b bits 能表示最多 2ᵇ 种颜色。文件头 header 保存尺寸、位深等元数据。</p>
+<p><code>未压缩图像数据字节数 = 宽 × 高 × 每像素位数 ÷ 8</code>。例如 800×600、24-bit：1,440,000 B = 1.44 MB；文件头另计。分辨率提升增加像素数，位深提升增加可表示颜色，都会增大体积。屏幕分辨率与图像像素尺寸是不同概念。</p>
+<p><strong>Vector 矢量图</strong>保存 drawing list：对象（线、圆、多边形等）及其坐标、大小、颜色、填充等 properties。适合可缩放的图标、工程图；位图适合照片和逐像素编辑。矢量图放大时根据几何描述重绘，通常不会出现像素化；体积取决于对象复杂度，不能一概认定矢量永远更小。</p>
+<p><strong>Sound 声音</strong>：麦克风得到模拟信号，ADC 定时采样并量化成数字。</p>
+<ul>
+<li>sampling rate：每秒采样次数，单位 Hz；提高后更好地描述时间上的变化。</li>
+<li>sampling resolution/bit depth：每个样本的位数；提高后振幅级数增多、量化误差减小。</li>
+<li><code>未压缩声音字节数 = 采样率 × 每样本位数 × 秒数 × 声道数 ÷ 8</code>。</li>
+<li>例：44,100 Hz、16-bit、双声道、10 秒 → 1,764,000 B。采样率与位深加倍分别令数据量加倍。</li>
+</ul>
+<h2 id="topic-1.3">1.3 Compression 压缩</h2>
+<p><a href="../index.html#topic=1.3">练习本知识点 →</a></p>
+<p>压缩减少存储占用、传输时间与所需带宽，但压缩/解压需要处理时间。</p>
+<ul>
+<li>Lossless 无损：解压后与原数据一致，适合程序、文字、需要精确保留的图像。可通过重复串的字典替换、重复图形对象引用等去除冗余。</li>
+<li>Lossy 有损：丢弃部分不易感知的信息，不能完全还原；适合允许质量损失的照片、音频。声音可去除不易听到的频率成分；图像可减少细节或颜色精度。</li>
+<li>RLE（Run-Length Encoding）：保存连续重复值及次数。例如 <code>AAAABBCCCCC → (4,A)(2,B)(5,C)</code>。适合大片相同颜色的位图，重复很少时反而可能变大；计算必须计入次数和符号各自的存储成本。</li>
+<li>文本通常需要无损；矢量图可通过重复对象/属性的编码减少冗余；“压缩”不必然代表降低质量。</li>
+</ul>
+<h2>自测与易错点</h2>
+<p>1. 8-bit −42 的补码？答：<code>11010110</code>。解释 BCD 42 为什么是 <code>0100 0010</code>。</p>
+<p>2. 1024×768、16-bit 位图的数据大小？答：1,572,864 B = 1.5 MiB（不含文件头）。</p>
+<p>3. 能独立完成进制转换、固定宽度加减、溢出判断和图像/音频大小计算；每一步标明 bits 或 bytes。</p></main></html>

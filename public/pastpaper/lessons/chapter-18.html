@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>18 人工智能 Artificial Intelligence</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=3">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-17.html">上一章</a> · <a href="chapter-19.html">下一章</a><h1>18 人工智能 Artificial Intelligence</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-18.1">18.1 Artificial Intelligence</h2>
+<p><a href="../index.html#topic=18.1">练习本知识点 →</a></p>
+<h3>Graphs 与路径搜索</h3>
+<p>Graph 包含 vertices/nodes 与 edges，可有方向与权重。可用来表示地点/道路、状态/动作或其他关系。路径长度由边数或权重定义，先看题意。</p>
+<p>Dijkstra 适用于非负边权的最短路径：起点暂定距离 0，其余无穷大；反复选择未确定且距离最小的节点，确定后 relax 邻居；若新距离更小就更新距离与 predecessor。到目标被正式选定时可结束，或继续求全图最短路。</p>
+<p>A* 使用 <code>f(n)=g(n)+h(n)</code>；g 是起点到当前节点的已知实际路径成本，h 是当前到目标的估计成本。以较小 f 选择候选，更新 g 与父节点。Admissible heuristic 不高估真实剩余成本；consistent heuristic 有助于保证图搜索实现的最优性。启发不合适会失去最优保证，h=0 时退化为相应的 Dijkstra 搜索。</p>
+<h3>手算例</h3>
+<p>无向图边：S–A=2，S–B=5，A–B=1，A–G=7，B–G=2。</p>
+<p>Dijkstra：S 确定后 A=2、B=5；选 A 后 B=3、G=9；选 B 后 G=5；选 G，最短路 S→A→B→G，成本 5。</p>
+<p>A* 取 h(S)=4、h(A)=3、h(B)=2、h(G)=0：扩展 S 后 A 的 f=2+3=5，B 的 f=5+2=7；扩展 A 后更新 B 的 f=3+2=5、G 的 f=9；扩展 B 后 G 的 f=5；最终同一路径。并列值按题目约定处理。</p>
+<p>考试需追踪距离/候选表、已访问状态、父节点并重建路径。考纲明确不要求编写构建、访问或搜索 graph 的程序算法。</p>
+<h3>ML、DL 与 reinforcement learning</h3>
+<p>AI 是更大范围；Machine Learning 用数据/经验拟合模型；Deep Learning 使用多层神经网络，是 ML 的一类；Reinforcement Learning 研究 agent 通过与环境交互获得 reward 来学习 policy，可与 deep learning 结合。</p>
+<div class="table-wrap"><table>
+<tr><th>学习方式</th><th>数据/信号</th><th>例子</th></tr>
+<tr><td>Supervised</td><td>输入配已知标签/目标</td><td>已标注图片分类、预测房价</td></tr>
+<tr><td>Unsupervised</td><td>未标注数据，寻找结构</td><td>客户聚类</td></tr>
+<tr><td>Reinforcement</td><td>状态、动作、奖励与长期回报</td><td>游戏策略、机器人控制</td></tr>
+</table></div>
+<p>监督学习可用于 classification（类别）与 regression（连续值）。选用方法时看是否有标签、输出类型、交互成本和反馈形式。</p>
+<h3>Artificial neural networks</h3>
+<p>神经元计算 <code>z = Σ(wᵢxᵢ)+b</code>，再经 activation 得输出；网络由输入层、隐藏层、输出层及带权连接组成。通过训练调整参数，从例子中学习特征/映射；深层结构可逐级组合复杂特征，需要较多数据与计算。</p>
+<p>Backpropagation：前向计算预测 → 用 loss 衡量与目标差异 → 从输出向前计算误差对权重的梯度 → 用学习率更新参数 → 多轮重复。它是训练的梯度计算过程，不是“神经网络把错误答案倒着输出”。</p>
+<p>Regression：如线性模型 <code>ŷ=wx+b</code> 拟合连续目标，通过减小预测与真实值差异确定参数。例：按面积预测房价；误差可以用平方误差评价。模型可能欠拟合或过拟合，需使用未参加训练的数据检查泛化，训练误差小不等于未来预测可靠。</p>
+<h2>自测与易错点</h2>
+<p>1. 独立手算上述 graph，给每个距离更新写出来自哪条边。</p>
+<p>2. 为什么分类需要标签，而聚类通常不需要？</p>
+<p>3. 分清 g、h、f；不要把 A* 的启发估计误当作已走路径成本。</p></main></html>

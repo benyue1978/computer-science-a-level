@@ -1,0 +1,108 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>20 进阶编程 Further Programming</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=3">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-19.html">上一章</a> · <h1>20 进阶编程 Further Programming</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-20.1">20.1 Programming Paradigms</h2>
+<p><a href="../index.html#topic=20.1">练习本知识点 →</a></p>
+<p>Paradigm 是组织计算的思考方式。P3 涵盖本章全部范式；P4 不考 low-level 与 declarative programming，但考程序实现及测试证据。</p>
+<h3>Low-level 与 imperative</h3>
+<p>Low-level 接近硬件，通过机器/汇编指令控制寄存器与内存；需要能用 immediate、direct、indirect、indexed、relative 寻址写/追踪代码，详见第 4 章。</p>
+<p>Imperative/procedural 以改变状态的语句、选择、循环和子程序组织求解，承接 AS 第 11 章。设计时区分输入、处理、输出及参数接口。</p>
+<h3>Object-oriented programming（OOP）</h3>
+<div class="table-wrap"><table>
+<tr><th>术语</th><th>含义</th></tr>
+<tr><td>Class / object / instance</td><td>类是属性与方法的定义；对象是类的实例</td></tr>
+<tr><td>Attribute/property</td><td>对象保存的状态</td></tr>
+<tr><td>Method</td><td>操作对象状态的行为</td></tr>
+<tr><td>Encapsulation</td><td>将数据与方法结合，控制外部直接访问</td></tr>
+<tr><td>Getter / setter</td><td>受控读取/修改属性，可执行验证</td></tr>
+<tr><td>Inheritance</td><td>子类继承并扩展父类特征，表示 is-a</td></tr>
+<tr><td>Polymorphism</td><td>相同接口/方法调用在不同类型对象上表现不同</td></tr>
+<tr><td>Containment/aggregation</td><td>一个对象包含/引用其他对象，表示 has-a</td></tr>
+</table></div>
+<pre><code>class Account:
+    def __init__(self, owner, balance=0):
+        if balance &lt; 0:
+            raise ValueError(&quot;Negative opening balance&quot;)
+        self.__owner = owner
+        self.__balance = balance
+
+    def get_balance(self):
+        return self.__balance
+
+    def deposit(self, amount):
+        if amount &lt;= 0:
+            raise ValueError(&quot;Amount must be positive&quot;)
+        self.__balance += amount
+
+    def description(self):
+        return &quot;Standard account&quot;
+
+
+class SavingsAccount(Account):
+    def __init__(self, owner, rate):
+        super().__init__(owner)
+        self.__rate = 0
+        self.set_rate(rate)
+
+    def set_rate(self, rate):
+        if not 0 &lt;= rate &lt;= 1:
+            raise ValueError(&quot;Rate must be between 0 and 1&quot;)
+        self.__rate = rate
+
+    def description(self):
+        return &quot;Savings account&quot;
+
+
+class Customer:
+    def __init__(self, name, account):
+        self.name = name
+        self.account = account  # has-a / aggregation：引用已有对象</code></pre>
+<p><code>SavingsAccount</code> 是 <code>Account</code>；<code>Customer</code> 有一个 <code>Account</code>。将两种账户放在同一集合，对每个对象调用 description 可得到不同结果，是 overriding 支持的多态示例。Python 双下划线使用 name mangling，不是不可绕过的安全边界；考试表达关注受控访问原则。真实金额通常避免二进制浮点误差，可用最小货币单位整数或十进制定点表示。</p>
+<h3>Declarative programming</h3>
+<p>声明事实、规则和目标，由推理机制找满足条件的解，而非逐条写求解步骤。以下为 Prolog 风格说明，具体语法按题目：</p>
+<pre><code>parent(anna, ben).
+parent(ben, cara).
+grandparent(X, Z) :- parent(X, Y), parent(Y, Z).</code></pre>
+<p>目标 <code>grandparent(anna, Who).</code>：匹配规则，先以 X=anna 找 Y=ben，再找 Z=cara，因此 Who=cara。变量经 unification 统一；失败时可 backtrack 尝试其他事实。事实表达已知关系，规则表达推导，goal 是查询。不能将 <code>parent(X,Y)</code> 的参数方向随意颠倒。</p>
+<h2 id="topic-20.2">20.2 File Processing and Exception Handling</h2>
+<p><a href="../index.html#topic=20.2">练习本知识点 →</a></p>
+<p>READ 读已有文件；WRITE 创建/覆盖；APPEND 末尾追加，结束要关闭。文本与记录格式需约定字段、分隔、类型与换行。</p>
+<pre><code>def load_marks(path):
+    marks = []
+    with open(path, &quot;r&quot;, encoding=&quot;utf-8&quot;) as source:
+        for line in source:
+            text = line.strip()
+            if text:
+                mark = int(text)
+                if not 0 &lt;= mark &lt;= 100:
+                    raise ValueError(&quot;Mark out of range&quot;)
+                marks.append(mark)
+    return marks
+
+
+try:
+    values = load_marks(&quot;marks.txt&quot;)
+except FileNotFoundError:
+    print(&quot;Marks file was not found&quot;)
+except ValueError as error:
+    print(&quot;Invalid mark data:&quot;, error)
+else:
+    print(&quot;Loaded&quot;, len(values), &quot;marks&quot;)</code></pre>
+<p><code>with</code> 保证正常或异常离开时关闭文件。Exception 是执行时出现的异常事件；try 包围可能失败的操作，except 针对类型处理；else 在未发生异常时运行；finally 执行必要清理。只捕获能恰当处理的错误，不用空的 except 掩盖缺陷。Validation 提前检查规则，exception handling 处理实际失败，二者可配合。</p>
+<h3>Serial、sequential、random 实践</h3>
+<ul>
+<li>Serial：追加记录后按存入顺序处理。</li>
+<li>Sequential：按键排序保存，批处理或合并时维持顺序；插入可能需要重写文件。</li>
+<li>Random/direct：由 record key、索引或 hash 得到记录地址，定位并读/写；需要固定记录长度或可靠位置索引。</li>
+</ul>
+<p>官方伪代码可表达：</p>
+<pre><code>OPENFILE &quot;students.dat&quot; FOR RANDOM
+SEEK &quot;students.dat&quot;, Position
+GETRECORD &quot;students.dat&quot;, Student
+SEEK &quot;students.dat&quot;, Position
+PUTRECORD &quot;students.dat&quot;, Student
+CLOSEFILE &quot;students.dat&quot;</code></pre>
+<p>Python 的 <code>seek()</code> 通常按字节偏移（文本流另有位置规则），不自动对应官方伪代码的“第几条记录”。固定长二进制记录可按 <code>offset=index*record_size</code> 寻址；变长 UTF-8 文本不能简单按字符数乘长度定位。Hash 冲突处理见第 13 章。</p>
+<h3>P4 实作与提交</h3>
+<p>使用所选语言的控制台环境，按题目要求保存源程序、命名文件，并提交完整代码与测试证据。练习应包括：数组与记录、查找排序、ADT、递归、OOP、文件读取与异常处理；提前练习空输入、错误格式和边界情况。最终提交要求以当次题目、考点说明及官方要求为准。</p>
+<h2>自测与易错点</h2>
+<p>1. 新增一个重写 description 的子类，说明继承、多态和封装分别体现在哪里。</p>
+<p>2. 为 load_marks 测试缺失文件、空文件、合法数据、非整数和越界分数，写预期结果。</p>
+<p>3. 给定事实和规则手工求 goal；区别“没有匹配解”和“程序语法不合法”。</p></main></html>

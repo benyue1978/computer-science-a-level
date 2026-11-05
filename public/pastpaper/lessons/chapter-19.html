@@ -1,0 +1,176 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>19 进阶算法与递归 Computational thinking and Problem-solving</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=3">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-18.html">上一章</a> · <a href="chapter-20.html">下一章</a><h1>19 进阶算法与递归 Computational thinking and Problem-solving</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-19.1">19.1 Algorithms</h2>
+<p><a href="../index.html#topic=19.1">练习本知识点 →</a></p>
+<p>本章是 P3 理论与 P4 实践的共同基础。下面 Python 示例用于理解实现，书面题仍按题目要求写伪代码。Python 从 0 索引，和前面从 1 索引的例子有意区分。</p>
+<h3>查找与排序</h3>
+<p>Linear search 无需排序，逐项检查，最坏 O(n)。Binary search 必须按同一比较规则排序、能有效访问中间项；每次排除约一半候选，最坏 O(log n)。</p>
+<pre><code>def linear_search(items, target):
+    for i in range(len(items)):
+        if items[i] == target:
+            return i
+    return -1
+
+
+def binary_search(items, target):
+    low, high = 0, len(items) - 1
+    while low &lt;= high:
+        mid = (low + high) // 2
+        if items[mid] == target:
+            return mid
+        if items[mid] &lt; target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1</code></pre>
+<p>例：在 <code>[2,5,8,12,16,23,38]</code> 找 16，检查索引 3（12）→5（23）→4（16）。没找到时边界交错，不能让 low/high 停在 mid 导致不前进。重复值情况下此实现返回某一匹配项，不保证第一个。</p>
+<pre><code>def bubble_sort(items):
+    for end in range(len(items) - 1, 0, -1):
+        swapped = False
+        for i in range(end):
+            if items[i] &gt; items[i + 1]:
+                items[i], items[i + 1] = items[i + 1], items[i]
+                swapped = True
+        if not swapped:
+            break
+
+
+def insertion_sort(items):
+    for i in range(1, len(items)):
+        current = items[i]
+        j = i - 1
+        while j &gt;= 0 and items[j] &gt; current:
+            items[j + 1] = items[j]
+            j -= 1
+        items[j + 1] = current</code></pre>
+<p>Insertion sort 保持左侧前缀有序，将当前项左侧更大项右移，再放入空位；不是每步把全局最大项移到尾端。<code>[5,2,4] → [2,5,4] → [2,4,5]</code>。</p>
+<h3>Big O 时间与空间</h3>
+<div class="table-wrap"><table>
+<tr><th>算法/操作</th><th>最好时间</th><th>最坏时间</th><th>额外空间（所示实现）</th></tr>
+<tr><td>Linear search</td><td>O(1)</td><td>O(n)</td><td>O(1)</td></tr>
+<tr><td>Iterative binary search</td><td>O(1)</td><td>O(log n)</td><td>O(1)</td></tr>
+<tr><td>Bubble（提前停止）</td><td>O(n)</td><td>O(n²)</td><td>O(1)</td></tr>
+<tr><td>Insertion sort</td><td>O(n)</td><td>O(n²)</td><td>O(1)</td></tr>
+<tr><td>无平衡保证的 BST search/insert</td><td>O(1) 可能</td><td>O(n)</td><td>迭代 search 为 O(1)</td></tr>
+</table></div>
+<p>Big O 描述随输入规模增长的上界，讨论时说明最好/平均/最坏情形。两个嵌套循环不必然 O(n²)，需看每个循环次数；二分访问链表不自动达到数组同样的效率。Space 要区分输入存储与辅助空间。</p>
+<h3>栈：数组与 top</h3>
+<p>定义 top 为最后一个已占用索引，空栈 top=−1。</p>
+<pre><code>PUSH(Item):
+    IF Top = Capacity - 1 THEN report overflow
+    ELSE
+        Top ← Top + 1
+        Stack[Top] ← Item
+    ENDIF
+
+POP():
+    IF Top = -1 THEN report underflow
+    ELSE
+        Item ← Stack[Top]
+        Top ← Top - 1
+        RETURN Item
+    ENDIF</code></pre>
+<p>这里是说明性算法片段，转为正式伪代码时补齐声明、PROCEDURE/FUNCTION 与错误处理。Push/pop O(1)。</p>
+<h3>循环队列：front、rear、count</h3>
+<p>本约定 front 指下一取出位，rear 指下一写入位，初始均为 0，Count=0，Capacity&gt;0。</p>
+<pre><code>ENQUEUE(Item):
+    IF Count = Capacity THEN report full
+    ELSE
+        Queue[Rear] ← Item
+        Rear ← (Rear + 1) MOD Capacity
+        Count ← Count + 1
+    ENDIF
+
+DEQUEUE():
+    IF Count = 0 THEN report empty
+    ELSE
+        Item ← Queue[Front]
+        Front ← (Front + 1) MOD Capacity
+        Count ← Count - 1
+        RETURN Item
+    ENDIF</code></pre>
+<p>使用 Count 可区分 front=rear 时的满/空。部分题目令 rear 指最后已写入项，不能混用不同约定。Enqueue/dequeue O(1)。</p>
+<h3>链表：数组实现与 free list</h3>
+<p>设 <code>Data[i]</code>、<code>Next[i]</code>；Start 指首节点，Free 指首空闲节点，Null=−1。每个槽属于已用链或空闲链。</p>
+<pre><code>SEARCH(Target):
+    Current ← Start
+    WHILE Current &lt;&gt; Null DO
+        IF Data[Current] = Target THEN RETURN Current
+        Current ← Next[Current]
+    ENDWHILE
+    RETURN Null
+
+INSERT_AT_HEAD(Item):
+    IF Free = Null THEN report full
+    ELSE
+        New ← Free
+        Free ← Next[Free]
+        Data[New] ← Item
+        Next[New] ← Start
+        Start ← New
+    ENDIF</code></pre>
+<p>在已知 Prev 后插入：先 <code>Next[New]←Next[Prev]</code>，再 <code>Next[Prev]←New</code>。有序链表插入还需先查找正确位置。</p>
+<pre><code>DELETE_FIRST(Target):
+    Previous ← Null
+    Current ← Start
+    WHILE Current &lt;&gt; Null DO
+        IF Data[Current] = Target THEN
+            IF Previous = Null THEN
+                Start ← Next[Current]
+            ELSE
+                Next[Previous] ← Next[Current]
+            ENDIF
+            Next[Current] ← Free
+            Free ← Current
+            RETURN
+        ENDIF
+        Previous ← Current
+        Current ← Next[Current]
+    ENDWHILE</code></pre>
+<p>删除时先从已用链脱开，再归还 free list；考虑空链、头节点、尾节点和不存在。查找 O(n)；已知位置后的链接修改 O(1)，但定位成本仍可能 O(n)。</p>
+<h3>Binary tree 与 dictionary</h3>
+<p>Binary tree 每节点最多两个子节点；binary search tree（BST）另有左小右大的排序约束。重复键规则必须事先定义。</p>
+<pre><code>class Node:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+
+def bst_insert(root, value):
+    if root is None:
+        return Node(value)
+    current = root
+    while True:
+        if value == current.value:
+            return root  # 本例忽略重复值
+        direction = &quot;left&quot; if value &lt; current.value else &quot;right&quot;
+        child = getattr(current, direction)
+        if child is None:
+            setattr(current, direction, Node(value))
+            return root
+        current = child
+
+
+def bst_find(root, target):
+    while root is not None:
+        if target == root.value:
+            return True
+        root = root.left if target &lt; root.value else root.right
+    return False</code></pre>
+<p>数组实现可用 Value、Left、Right 数组，加 root/free 指针；节点地址不必按数值顺序。BST 平衡时路径约 O(log n)，连续有序插入可退化为 O(n)。本考纲要求树的查找/插入，不要求二叉树删除算法。</p>
+<p>Dictionary 是 key→value 映射，可用键值对数组（线性检索）、BST 或 hash table 实现。Hash table 在良好分布/适当负载下平均可接近 O(1)，最坏 O(n)，还需碰撞处理。不能只以 Python 内建 dict 的名称替代实现原理。</p>
+<p>Graph 是另一个 ADT，适合一般网络关系，节点可有多条边，不同于每节点最多两子节点的二叉树。按考纲理解用途和结构，无需编写图结构代码。</p>
+<h2 id="topic-19.2">19.2 Recursion</h2>
+<p><a href="../index.html#topic=19.2">练习本知识点 →</a></p>
+<p>递归子程序调用自身。必须有 base case，以及每次更接近 base case 的 recursive case。</p>
+<pre><code>def factorial(n):
+    if n &lt; 0:
+        raise ValueError(&quot;n must be non-negative&quot;)
+    if n == 0:
+        return 1
+    return n * factorial(n - 1)</code></pre>
+<p><code>factorial(3)</code> 展开 <code>3*f(2)→3*2*f(1)→3*2*1*f(0)</code>，随后 unwinding 返回 1、1、2、6。每次调用的 stack frame 保存参数、局部变量及返回位置。该实现时间 O(n)、调用栈 O(n)；相同阶乘可用迭代将额外空间降到 O(1)。</p>
+<p>递归适合树、分治或递归定义结构；代价为调用开销与栈深限制。编译器/运行环境需建立调用帧与返回机制，不是把源码无限复制。漏写终止条件或状态不推进会导致栈溢出/递归限制错误。</p>
+<h2>自测与易错点</h2>
+<p>1. 对空、一项、重复、已排序、逆序、查找失败逐项追踪。</p>
+<p>2. 容量 3 的循环队列：入 A/B/C，出 A，再入 D，逻辑顺序应为 B/C/D。</p>
+<p>3. 链表删头节点必须改 Start；递归要同时画“向下调用”和“向上返回”。</p></main></html>

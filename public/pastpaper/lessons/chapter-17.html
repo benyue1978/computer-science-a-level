@@ -1,0 +1,24 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>17 进阶安全 Security</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=3">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-16.html">上一章</a> · <a href="chapter-18.html">下一章</a><h1>17 进阶安全 Security</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-17.1">17.1 Encryption, Encryption Protocols and Digital Certificates</h2>
+<p><a href="../index.html#topic=17.1">练习本知识点 →</a></p>
+<p>Plaintext 是明文，ciphertext 是密文，encryption 用算法和密钥加密，decryption 解密。密钥应受保护，算法公开本身不等于不安全。</p>
+<h3>Symmetric 与 asymmetric</h3>
+<div class="table-wrap"><table>
+<tr><th>类型</th><th>密钥关系</th><th>好处</th><th>局限</th></tr>
+<tr><td>Symmetric</td><td>加解密使用同一秘密密钥（或直接相关的秘密密钥）</td><td>大量数据处理高效</td><td>安全分发密钥困难，多方管理复杂</td></tr>
+<tr><td>Asymmetric</td><td>public/private key pair</td><td>可公开公钥，用于认证/密钥建立等</td><td>计算开销较大，必须确认公钥归属</td></tr>
+</table></div>
+<p>向 Bob 发送私密信息：Alice 用 Bob 的公钥加密，Bob 用自己的私钥解密。不要用 Alice 的公钥加密后声称只有 Bob 能读。</p>
+<p>Digital signature：发送者对消息计算 hash，用自己的私钥生成签名；接收者用发送者公钥验证，并与收到消息的 hash 对照。用于来源认证、完整性与支持不可否认性；本身不隐藏消息。不要把签名一律描述成“用私钥加密整封消息”，实际签名算法有专门步骤。</p>
+<h3>Digital certificate</h3>
+<p>证书把身份/域名与公钥绑定，并由 CA（Certificate Authority）签名，通常包含 subject、issuer、公钥、有效期等。</p>
+<p>获取：申请者提交身份/域名及公钥信息 → CA 按其证书类型验证 → 签发证书。验证：检查信任链/CA 签名、域名与有效期及适用的撤销状态等。证书提供可信公钥，用它验证签名或完成安全连接；证书文件本身不自动为任意消息生成签名。</p>
+<h3>SSL/TLS</h3>
+<p>TLS 是建立受保护客户端–服务器通信的协议；SSL 为早期相关协议，考纲并列提及时理解同类目的，实际安全场景使用 TLS。</p>
+<p>概念流程：客户端请求安全连接 → 服务器提供证书及握手参数 → 客户端验证身份并协商/建立会话密钥 → 后续大量数据采用高效的对称加密与完整性保护。具体握手取决于版本，不要声称所有 TLS 都“用 RSA 加密会话密钥”。</p>
+<p>适用于登录、支付、个人资料传输。HTTPS 使用 TLS；它保护传输与服务器身份验证，并不保证网站内容诚实或终端没有恶意软件。</p>
+<h3>Quantum cryptography</h3>
+<p>考纲语境重点是 QKD（quantum key distribution）：利用量子态分发密钥，测量会扰动量子态，可通过比较样本检测窃听迹象；随后仍可用经典对称算法加密数据。优点是提供不同于纯计算难度假设的密钥分发安全基础；局限有专用设备、距离/损耗、成本、实现缺陷，且仍需认证经典通信通道。它不同于“量子计算破解算法”，也不是绝对无法攻击整个系统。</p>
+<h2>自测与易错点</h2>
+<p>1. 完整说明“给 Bob 保密”和“证明由 Alice 发送”分别使用谁的什么密钥。</p>
+<p>2. 验证成功的签名为什么不能阻止别人读明文？</p>
+<p>3. 按“绑定身份与公钥 → CA 信任 → 握手 → 会话加密”解释证书如何支持 TLS。</p></main></html>

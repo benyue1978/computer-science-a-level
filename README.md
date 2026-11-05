@@ -53,6 +53,12 @@ npm run preview
 
 The site is deployed to Vercel from `main`. The vocabulary page uses Supabase Auth and Postgres for account sync; only the public Supabase URL and publishable key are exposed to the browser. OAuth client secrets remain in Supabase Auth configuration.
 
+## Past paper study room
+
+Open `/pastpaper/` (also linked on the home page) for the Cambridge 9618 chapter notes, P1–P4 question bank and printable question/answer guides. The complete static site is in `public/pastpaper/`, including its original relative asset paths, source PDFs and question images. Vite copies it into `dist/pastpaper/` on every build.
+
+To refresh the study room, replace `public/pastpaper/` with the complete contents of `/Users/song.yue/git/cs_pastpaper/9618_study_site/` and rebuild. Keep `assets/`, `data/`, `lessons/`, `media/` and `sources/` together. Vercel redirects `/pastpaper` to `/pastpaper/`; missing study-room files return 404 instead of the main React app.
+
 ## Daily vocabulary
 
 Open `/vocabulary` (also linked on the home page). Choose five words per day by default, adjustable to ten including reviews. Add or edit Chinese/English explanations from any word card in All words or Known list; the same saved note appears when you pick that word for today’s list. Signed-in vocabulary admins can generate a missing explanation from All words or Today. Generated text is saved as their private note; publishing it for everyone remains a separate action. Copy the list, send it yourself, then mark it sent. Sent words return after 3 days; Remembered advances to 7, 14, then 30 days, while Needs practice brings the word back tomorrow. Overdue reviews take priority over frequent new words. Words marked already known appear in the Known list and can be moved back to active words. Initially hidden common words remain separate under All words → Hidden.

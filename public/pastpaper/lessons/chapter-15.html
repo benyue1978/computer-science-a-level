@@ -1,0 +1,56 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>15 硬件与虚拟机 Hardware and Virtual Machines</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=3">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-14.html">上一章</a> · <a href="chapter-16.html">下一章</a><h1>15 硬件与虚拟机 Hardware and Virtual Machines</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-15.1">15.1 Processors, Parallel Processing and Virtual Machines</h2>
+<p><a href="../index.html#topic=15.1">练习本知识点 →</a></p>
+<h3>RISC 与 CISC</h3>
+<div class="table-wrap"><table>
+<tr><th>比较</th><th>RISC</th><th>CISC</th></tr>
+<tr><td>指令集</td><td>较少、较简单</td><td>较多、可有复杂操作</td></tr>
+<tr><td>指令格式</td><td>通常较规则/固定长度</td><td>常有多种长度和格式</td></tr>
+<tr><td>内存操作</td><td>典型 load/store，计算主要在寄存器间</td><td>某些指令可直接操作内存</td></tr>
+<tr><td>寄存器与控制</td><td>通常强调较多寄存器、规则译码与流水线</td><td>复杂译码，可能用微码分解复杂操作</td></tr>
+<tr><td>完成同一工作</td><td>可能需更多简单指令</td><td>可能用较少复杂指令</td></tr>
+</table></div>
+<p>这些是教学模型中的典型特征，不代表现代处理器严格二分。中断都要保存并恢复上下文；复杂、多周期指令会增加到达安全响应点的时间，寄存器多也增加潜在保存量。不能只背“RISC 的中断永远更快”。</p>
+<p>Pipelining 让不同指令重叠处于 fetch/decode/execute 阶段，提高稳定状态的吞吐量，并不缩短每条指令必须经历的全部阶段。假设 k 阶段、每阶段一个周期，理想 n 条指令耗时约 <code>k+n−1</code> 周期，而非 kn；分支、数据依赖和资源竞争会造成停顿或清空流水线。</p>
+<p>Flynn 四种架构：SISD 单指令流单数据流；SIMD 同一操作处理多个数据（向量/图像）；MISD 多指令流同数据流，少见；MIMD 多处理器各运行指令处理各自数据。Massively parallel 系统以大量处理单元协作，需要任务可分解、数据分配与通信同步，通信开销与串行部分限制加速。</p>
+<h3>Virtual machine</h3>
+<p>System VM 通过 hypervisor 提供虚拟 CPU、内存、磁盘等环境以运行 guest OS；process VM 如 JVM 为程序提供抽象执行环境。两种场景都属于虚拟化，但层次不同。</p>
+<p>优点：隔离环境、测试不同 OS、整合服务器、快照和迁移、支持平台抽象。限制：资源开销、主机故障影响多个 guest、硬件支持与性能受限；快照不自动取代独立备份。</p>
+<h2 id="topic-15.2">15.2 Boolean Algebra and Logic Circuits</h2>
+<p><a href="../index.html#topic=15.2">练习本知识点 →</a></p>
+<p>用 <code>+</code> 表示 OR、<code>·</code> 表示 AND、<code>¬</code> 表示 NOT。</p>
+<ul>
+<li>Identity：A+0=A，A·1=A；domination：A+1=1，A·0=0。</li>
+<li>Idempotent：A+A=A，A·A=A；complement：A+¬A=1，A·¬A=0。</li>
+<li>Absorption：A+A·B=A；A·(A+B)=A。</li>
+<li>De Morgan：¬(A·B)=¬A+¬B；¬(A+B)=¬A·¬B。</li>
+<li>化简例：<code>A·B + A·¬B = A·(B+¬B)=A</code>。每一步注明规律，并可用真值表验证。</li>
+</ul>
+<h3>加法器</h3>
+<p>Half adder：输入 A、B，Sum=<code>A XOR B</code>，Carry=<code>A AND B</code>。</p>
+<p>Full adder：输入 A、B、Cin，Sum=<code>A XOR B XOR Cin</code>，Cout=<code>A·B + A·Cin + B·Cin</code>。</p>
+<div class="table-wrap"><table>
+<tr><th>A</th><th>B</th><th>Cin</th><th>Sum</th><th>Cout</th></tr>
+<tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+<tr><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+<tr><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+<tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+</table></div>
+<p>可用两个 half adder 和一个 OR 门组成 full adder，需会由这些表达式画出门电路。</p>
+<h3>Flip-flops</h3>
+<p>Flip-flop 保存一位状态 Q，有反馈，属于 sequential logic。题目可能采用 NOR 或 NAND、不同有效电平/时钟配置，先判断符号。</p>
+<p>NOR 型 active-high SR latch：S=0,R=0 保持；1,0 置位 Q=1；0,1 复位 Q=0；1,1 为禁止/无效状态。电路为两个交叉反馈 NOR 门，S 驱动产生 ¬Q 的门、R 驱动产生 Q 的门。</p>
+<p>JK flip-flop 在有效时钟事件：J=K=0 保持；J=1,K=0 置位；J=0,K=1 复位；J=K=1 翻转 Q。其反馈可理解为受时钟控制的 set=<code>J AND ¬Q</code>、reset=<code>K AND Q</code>；画具体电路时遵循题目时钟/门型。不能把“保持”误写成 Q=0。</p>
+<h3>Karnaugh map</h3>
+<p>1. 按 Gray code <code>00,01,11,10</code> 放行列，邻格仅一变量变化。</p>
+<p>2. 为求 sum-of-products，把输出 1 圈成 1、2、4、8……格的矩形，尽量大；可重叠，边界可环绕，不能对角相连。</p>
+<p>3. 每组保留不变变量，变化变量消去，各组 OR。</p>
+<p>4. 覆盖全部 1、避免覆盖 0，最后回查真值表。</p>
+<p>例：三变量中 A=1 的四格全部为 1，圈四格后化简为 Q=A，B、C 被消去。K-map 减少门数量/逻辑复杂度，但有多种等价最简表示。</p>
+<h2>自测与易错点</h2>
+<p>1. 理想三阶段流水线执行 10 条指令需 12 周期；解释为何实际可能更多。</p>
+<p>2. 用代数和 K-map 分别化简 <code>A·B+A·¬B</code>。</p>
+<p>3. 画 SR/JK 电路时明确时钟和有效电平，再列状态表。</p></main></html>

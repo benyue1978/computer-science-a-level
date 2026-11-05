@@ -1,0 +1,64 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>04 处理器基础 Processor Fundamentals</title><link rel="icon" href="data:,"><style>body{margin:0;background:#f6f3eb;color:#253a32;font:17px/1.85 Georgia,"Songti SC","Noto Serif CJK SC",serif}main{max-width:940px;margin:auto;padding:32px 24px 100px}a{color:#1f6b52}h1{font-size:2rem;line-height:1.4}h2{margin-top:2.7rem;border-top:1px solid #c7d1c7;padding-top:22px}h3{margin-top:1.7rem}code{background:#e9ece3;padding:2px 5px;white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#e9ece3;padding:20px;overflow:auto;font-size:14px;line-height:1.6}pre code{white-space:pre;overflow-wrap:normal}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:10px;border:1px solid #c7d1c7;text-align:left}.table-wrap{overflow:auto}aside{border-left:3px solid #74947d;padding:10px 20px}nav{display:flex;gap:20px;flex-wrap:wrap}li{margin:7px 0}@media print{body{background:#fff}nav{display:none}main{max-width:none;padding:0}pre{white-space:pre-wrap}}</style><main><nav><a href="../index.html">← 返回题库</a><a href="../index.html#paper=1">按题练习</a><a href="../sources/9618_2027-2029_syllabus_v2.pdf">官方考纲</a></nav><a href="chapter-03.html">上一章</a> · <a href="chapter-05.html">下一章</a><h1>04 处理器基础 Processor Fundamentals</h1><p>中文知识点提要 · Cambridge 9618 · 2027–2029 考纲</p><h2 id="topic-4.1">4.1 CPU Architecture</h2>
+<p><a href="../index.html#topic=4.1">练习本知识点 →</a></p>
+<p>Von Neumann 架构的 stored program concept：指令和数据存储在同一主存地址空间，CPU 从内存读取指令执行。IAS（Immediate Access Store）是可直接访问的主存概念，不是辅助存储。</p>
+<div class="table-wrap"><table>
+<tr><th>部件/寄存器</th><th>职责</th></tr>
+<tr><td>ALU</td><td>算术、逻辑、比较与移位</td></tr>
+<tr><td>CU</td><td>译码指令，发控制信号协调执行</td></tr>
+<tr><td>System clock</td><td>提供同步节拍；一条指令可能需要多个时钟周期</td></tr>
+<tr><td>PC</td><td>下一条待取指令的地址</td></tr>
+<tr><td>MAR</td><td>本次要读/写的内存地址，可对应指令或数据</td></tr>
+<tr><td>MDR</td><td>在 CPU 与内存之间传输的指令或数据</td></tr>
+<tr><td>CIR</td><td>当前正在译码/执行的指令</td></tr>
+<tr><td>ACC</td><td>运算操作数/中间结果；本考纲简化指令集中的通用寄存器</td></tr>
+<tr><td>IX</td><td>变址寻址的偏移</td></tr>
+<tr><td>Status register</td><td>zero、carry、overflow、interrupt 等标志</td></tr>
+</table></div>
+<p>General-purpose register 可保存多种运算数据；special-purpose register 有特定作用。</p>
+<p>Address bus 携带地址，简化模型下从 CPU 指向主存/I/O；data bus 双向携带数据/指令；control bus 含读写、中断等信号，方向视信号而定。n-bit 地址总线能区分 2ⁿ 个地址；只有题目说每地址一个 byte 时才对应 2ⁿ B。</p>
+<h3>Fetch–decode–execute</h3>
+<p>以下采用 <code>M[address]</code> 表示内存内容，避免双重括号歧义：</p>
+<pre><code>MAR ← PC
+MDR ← M[MAR]       // CU 发出 read，内容经数据总线传回
+PC  ← PC + 1       // 简化模型按一个地址单位递增
+CIR ← MDR
+// CU 译码 opcode 与 operand；取操作数；执行并保存结果</code></pre>
+<p>跳转可改写 PC，所以执行顺序不一定一直递增。寄存器间的内部复制不应全部说成经过外部地址总线。</p>
+<p><strong>中断 interrupt</strong>使 CPU 响应 I/O、时钟、硬件故障或软件异常。简化模型在当前指令结束时检查可响应中断 → 根据优先级/屏蔽状态决定处理 → 保存 PC 和寄存器等上下文 → 执行 ISR → 恢复并继续。不是每次中断都丢弃当前任务。</p>
+<h3>性能与接口</h3>
+<ul>
+<li>更高 clock frequency 通常可更快完成节拍，但还受每指令周期、架构、散热影响。</li>
+<li>多核能并行执行可分配的任务，不会令所有程序按核数等比例加速。</li>
+<li>更宽 data bus 每次传更多位；更宽 address bus 增大可寻址空间，含义不同。</li>
+<li>Cache 保存常用/近期指令与数据，命中时减少等待主存；容量增加的效果受访问模式影响。</li>
+<li>USB：通用串行外设连接、设备识别与驱动支持；HDMI：数字音视频；VGA：模拟视频，通常不含音频。</li>
+</ul>
+<h2 id="topic-4.2">4.2 Assembly Language</h2>
+<p><a href="../index.html#topic=4.2">练习本知识点 →</a></p>
+<p>汇编以 mnemonic 和地址/标签表达机器指令；assembler 转成 machine code。两遍汇编：第一遍分配地址、建立 label→address 符号表；第二遍解析标签并生成机器码，可处理 forward reference。</p>
+<div class="table-wrap"><table>
+<tr><th>寻址</th><th>取值方式</th><th>示例</th></tr>
+<tr><td>Immediate</td><td>操作数就是数值</td><td><code>LDM #5</code> → ACC=5</td></tr>
+<tr><td>Direct</td><td>操作数给数据地址</td><td><code>LDD 100</code> → ACC=M[100]</td></tr>
+<tr><td>Indirect</td><td>先到给定地址取真正地址</td><td><code>LDI 100</code> → ACC=M[M[100]]</td></tr>
+<tr><td>Indexed</td><td>基址加 IX</td><td><code>LDX 100</code> → ACC=M[100+IX]</td></tr>
+<tr><td>Relative</td><td>相对于 PC 的位移</td><td>目标=题目规定的 PC 基准+offset</td></tr>
+</table></div>
+<p>常用指令：<code>LDR #n</code> 设 IX；<code>MOV IX</code> 将 ACC 复制到 IX；<code>STO a</code> 写内存；<code>ADD/SUB</code> 算术；<code>INC/DEC</code> 增减；<code>CMP/CMI</code> 比较；<code>JMP</code> 无条件跳转；<code>JPE/JPN</code> 根据比较真/假跳转；<code>IN/OUT</code> 输入字符编码/按编码输出字符；<code>END</code> 结束。<code>JPN</code> 不能望文生义当成 jump-if-negative，必须按题目指令表解释。</p>
+<pre><code>LDM #6
+ADD #4
+STO 200
+END</code></pre>
+<p>结果 ACC=10、M[200]=10。Tracing 应逐行记录 PC、ACC、IX、被修改的内存及输出；<code>OUT</code> 的 65 可能是字符 A，不能自动写成十进制文本 65。</p>
+<h2 id="topic-4.3">4.3 Bit manipulation</h2>
+<p><a href="../index.html#topic=4.3">练习本知识点 →</a></p>
+<ul>
+<li>Logical shift 空位补 0；arithmetic right shift 复制符号位，保留补码符号；cyclic shift 把移出的位放回另一端。</li>
+<li>算术左移通常左移补 0，但必须检查符号与溢出；“左移就是乘 2”只有结果可表示时才成立。负数右移与整数除法舍入规则需按题目定义。</li>
+<li>掩码 mask：<code>X AND mask</code> 测试/保留位；<code>X OR mask</code> 置 1；<code>X AND (NOT mask)</code> 清 0；<code>X XOR mask</code> 翻转。</li>
+<li>例（bit 0 为最低位）：X=<code>10100100</code>，测试 bit 2：AND <code>00000100</code> 非零；设置 bit 1：OR <code>00000010</code> → <code>10100110</code>；清 bit 5：AND <code>11011111</code> → <code>10000100</code>。</li>
+</ul>
+<h2>自测与易错点</h2>
+<p>1. 若 M[100]=200、M[200]=7、IX=3、M[103]=9，三种加载结果：LDD 100→200，LDI 100→7，LDX 100→9。</p>
+<p>2. 解释中断中为什么需要保存 PC；完整写出取指寄存器传送过程。</p>
+<p>3. 用位操作控制一组灯时，说明其他灯为何不受影响。</p></main></html>
