@@ -45,7 +45,7 @@ const sourceLabel = (term: BusinessTerm, level: BusinessLevel) => {
 };
 
 export default function Business() {
-  const [level, setLevel] = useState<BusinessLevel>("A2");
+  const [level, setLevel] = useState<BusinessLevel>("AS");
   const [query, setQuery] = useState("");
   const [openTopics, setOpenTopics] = useState<Set<string>>(() => new Set(["1:1.1.1", "6:6.1.1"]));
   const [closedTopics, setClosedTopics] = useState<Set<string>>(() => new Set());

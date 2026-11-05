@@ -13,15 +13,15 @@ describe("Business in Context", () => {
     const user = userEvent.setup();
     render(<Business />);
 
-    expect(screen.getByText("THE A2 COLLECTION")).toBeVisible();
-    expect(screen.getByRole("heading", { name: "Business and its environment" })).toBeVisible();
-    await user.click(screen.getByRole("tab", { name: "AS" }));
     expect(screen.getByText("THE AS COLLECTION")).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Business and its environment" })).toBeVisible();
     await user.click(screen.getByRole("tab", { name: "A2" }));
     expect(screen.getByText("THE A2 COLLECTION")).toBeVisible();
     await user.type(screen.getByRole("searchbox", { name: "搜索英中术语" }), "Globalisation");
     expect(screen.getByRole("heading", { name: "Globalisation" })).toBeVisible();
     expect(screen.queryByRole("heading", { name: "Added value" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: "AS" }));
+    expect(screen.getByText("THE AS COLLECTION")).toBeVisible();
   });
 
   it("prints an A2 subsection with its cross-listed terms and the whole A2 chapter", async () => {
