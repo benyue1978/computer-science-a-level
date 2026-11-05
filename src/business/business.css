@@ -82,15 +82,42 @@
   position: sticky;
   top: 0;
   z-index: 4;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(240px, 1fr);
   align-items: end;
-  justify-content: space-between;
   gap: 20px;
   padding: 15px 18px;
   margin: 0 0 16px;
   border: 1px solid var(--b-line);
   background: rgba(255, 253, 247, 0.96);
   box-shadow: 0 5px 16px rgba(46, 47, 39, 0.05);
+}
+.business-level-switch {
+  display: inline-flex;
+  align-self: end;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid #cbcaba;
+  background: #fbfaf4;
+}
+.business-level-switch button {
+  min-width: 54px;
+  min-height: 32px;
+  padding: 5px 11px;
+  border: 0;
+  background: transparent;
+  color: var(--b-muted);
+  cursor: pointer;
+  font: 11px "DM Sans", "PingFang SC", sans-serif;
+}
+.business-level-switch button[aria-selected="true"] {
+  background: #e8ebdf;
+  color: #34402f;
+  font-weight: 700;
+}
+.business-level-switch button:focus-visible {
+  outline: 3px solid var(--b-clay);
+  outline-offset: 2px;
 }
 .business-search {
   display: grid;
@@ -354,6 +381,12 @@
   color: #80543a;
   font-size: 11px;
 }
+.business-related-topics {
+  margin: 9px 0 -4px;
+  color: #777b6e;
+  font-size: 10px;
+  line-height: 1.6;
+}
 .business-footer {
   display: flex;
   justify-content: space-between;
@@ -454,8 +487,16 @@
   .business-tools {
     top: 0;
     display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
     gap: 10px;
     padding: 11px;
+  }
+  .business-level-switch button {
+    min-width: 43px;
+    min-height: 30px;
+    padding: 4px 8px;
+    font-size: 10px;
   }
   .business-search {
     width: 100%;
@@ -540,6 +581,10 @@
   }
   .business-term-ref {
     font-size: 8px;
+  }
+  .business-related-topics {
+    margin-top: 7px;
+    font-size: 9px;
   }
   .business-definition > p:last-child,
   .business-explanation > p:last-child {

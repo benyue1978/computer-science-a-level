@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { businessTerms, syllabusSections } from "./businessData";
+import { a2BusinessTerms, a2SyllabusSections, businessTerms, syllabusSections } from "./businessData";
 
 const normalizeWords = (text: string) =>
   text.toLocaleLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/);
@@ -49,5 +49,59 @@ describe("Business glossary data", () => {
       if (!phraseUsed) missingTermUses.push(term.term);
     }
     expect(missingTermUses, "Terms missing from their example sentences").toEqual([]);
+  });
+
+  it("covers the A2 source list while merging repeated concepts", () => {
+    expect(a2BusinessTerms).toHaveLength(197);
+    expect(a2BusinessTerms.filter((term) => term.unit === 6)).toHaveLength(78);
+    expect(a2BusinessTerms.filter((term) => term.unit === 7)).toHaveLength(37);
+    expect(a2BusinessTerms.filter((term) => term.unit === 8)).toHaveLength(19);
+    expect(a2BusinessTerms.filter((term) => term.unit === 9)).toHaveLength(24);
+    expect(a2BusinessTerms.filter((term) => term.unit === 10)).toHaveLength(39);
+    const sourceNumbers = a2BusinessTerms.flatMap((term) => term.sourceRefs ?? []);
+    expect([...new Set(sourceNumbers)].sort((first, second) => first - second)).toEqual(
+      Array.from({ length: 203 }, (_, index) => index + 1),
+    );
+
+    const globalisation = a2BusinessTerms.find((term) => term.term === "Globalisation");
+    expect(globalisation?.sourceRefs).toEqual([1, 99]);
+    expect(globalisation?.relatedTopicIds).toContain("8.2.3");
+
+    const outsourcing = a2BusinessTerms.find((term) => term.term === "Outsourcing");
+    expect(outsourcing?.sourceRefs).toEqual([52, 112]);
+    expect(outsourcing?.relatedTopicIds).toContain("9.3.1");
+
+    for (const refs of [[2, 101], [3, 102], [4, 103], [7, 100]] as const) {
+      const merged = a2BusinessTerms.find((entry) => entry.sourceRefs?.join(",") === refs.join(","));
+      expect(merged?.sourceRefs).toEqual(refs);
+      expect(merged?.relatedTopicIds).toContain("8.2.3");
+    }
+
+    expect(a2BusinessTerms.filter((term) => term.sourceRefs?.includes(111))).toHaveLength(2);
+    expect(a2BusinessTerms.filter((term) => term.sourceRefs?.includes(157))).toHaveLength(2);
+  });
+
+  it("provides bilingual context and syllabus references for every A2 entry", () => {
+    const ids = a2BusinessTerms.map((term) => term.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    const uniqueExamples = new Set(a2BusinessTerms.map((term) => term.exampleEn.trim()));
+    expect(uniqueExamples.size).toBe(a2BusinessTerms.length);
+
+    for (const term of a2BusinessTerms) {
+      expect(a2SyllabusSections[term.topicId]).toBeDefined();
+      expect(a2SyllabusSections[term.topicId].unit).toBe(term.unit);
+      for (const relatedTopicId of term.relatedTopicIds ?? []) {
+        expect(a2SyllabusSections[relatedTopicId]).toBeDefined();
+      }
+      expect(term.termZh.trim()).not.toBe("");
+      expect(term.definitionEn.trim()).not.toBe("");
+      expect(term.explanationZh.trim()).not.toBe("");
+      expect(term.exampleEn.trim()).not.toBe("");
+      expect(term.exampleZh.trim()).not.toBe("");
+      const exampleWords = new Set(normalizeWords(term.exampleEn));
+      const bracketed = term.term.match(/\(([^)]+)\)/);
+      const phrases = [term.term.replace(/\s*\([^)]*\)/g, ""), ...(bracketed ? [bracketed[1]] : [])];
+      expect(phrases.some((phrase) => normalizeWords(phrase).every((word) => exampleWords.has(word)))).toBe(true);
+    }
   });
 });

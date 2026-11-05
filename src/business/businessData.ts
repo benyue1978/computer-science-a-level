@@ -4,6 +4,7 @@ import unit3 from "./data/unit3";
 import unit4 from "./data/unit4";
 import unit5 from "./data/unit5";
 import type { BusinessTerm, BusinessUnitInfo, SyllabusSection } from "./businessTypes";
+export { a2BusinessTerms, a2BusinessUnits, a2SyllabusSections } from "./a2BusinessData";
 
 export const businessUnits: BusinessUnitInfo[] = [
   { id: 1, titleEn: "Business and its environment", titleZh: "企业与商业环境" },
