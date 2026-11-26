@@ -12,7 +12,7 @@ createRoot(document.getElementById("root")!).render(
     <Suspense fallback={<p>Opening your notebook…</p>}>
       {window.location.pathname.replace(/\/$/, "") === "/learn/database-keys" ? (
         <DatabaseKeys />
-      ) : window.location.pathname.replace(/\/$/, "") === "/business" ? (
+      ) : window.location.pathname.replace(/\/$/, "") === "/business-vocabulary" ? (
         <Business />
       ) : window.location.pathname.replace(/\/$/, "") === "/vocabulary/merge" ? (
         <VocabularyLemmaReview />

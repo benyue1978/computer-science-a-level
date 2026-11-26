@@ -2,7 +2,10 @@
   "routes": [
     { "src": "/pastpaper", "headers": { "Location": "/pastpaper/" }, "status": 308 },
     { "src": "/pastpaper/", "dest": "/pastpaper/index.html" },
+    { "src": "/business", "headers": { "Location": "/business/" }, "status": 308 },
+    { "src": "/business/", "dest": "/business/index.html" },
     { "handle": "filesystem" },
+    { "src": "/business/(.*)", "status": 404 },
     { "src": "/pastpaper/(.*)", "status": 404 },
     { "src": "/(.*)", "dest": "/index.html" }
   ]

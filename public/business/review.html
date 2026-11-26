@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#244d3e">
+  <title>待复核题目 · 9609 Business Study</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script defer src="data/catalog.js"></script>
+  <script defer src="data/questions.js"></script>
+  <script defer src="assets/review.js"></script>
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-number">9609</span><span class="brand-name">Business Study<small>待复核题目</small></span></a><nav class="site-nav" aria-label="主要导航"><a href="index.html">学习单元</a><a href="exam-skills.html">答题结构</a><a href="glossary.html">术语词表</a><a aria-current="page" href="review.html">待复核题目</a><a href="coverage.html">收录说明</a></nav></header>
+  <main class="shell">
+    <section class="page-title"><div class="eyebrow">Manual review queue</div><h1>这些题目还没可靠地放进考纲。</h1><p>题干只给出计算目标、案例简称或宽泛指令时，自动匹配可能猜错。这些条目暂未放进任何具体考纲点，避免错误归类。</p></section>
+    <section class="filter-panel review-filter-panel" aria-label="筛选待复核题目"><div class="field"><label for="review-search">搜索</label><input id="review-search" type="search" placeholder="年份、考季、卷次、指令词"></div><div class="field"><label for="review-paper">试卷</label><select id="review-paper"><option value="">全部 Paper</option><option value="1">Paper 1</option><option value="2">Paper 2</option><option value="3">Paper 3</option><option value="4">Paper 4</option></select></div></section>
+    <div class="question-actions"><span id="review-count" aria-live="polite"></span><span id="review-selected-count">已选 0 题</span><button class="text-button" id="review-select-visible" type="button">选择当前可见题目</button><button class="text-button" id="review-clear" type="button">清除选择</button><button class="button secondary" id="review-print-visible" type="button">打印当前列表</button><button class="button" id="review-print-selected" type="button" disabled>打印已选索引</button></div>
+    <section id="review-list" class="review-list"></section>
+  </main>
+  <footer class="footer"><span>待复核项目确认考纲归属后，再并入相应小节。</span><a href="coverage.html">查看归类方法与边界</a></footer>
+</body>
+</html>

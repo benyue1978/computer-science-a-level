@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#244d3e">
+  <title>打印预览 · 9609 Business Study</title>
+  <link rel="stylesheet" href="assets/print.css">
+  <script defer src="data/catalog.js"></script>
+  <script defer src="data/guides.js"></script>
+  <script defer src="data/section-guides.js"></script>
+  <script defer src="data/formulas.js"></script>
+  <script defer src="data/terms.js"></script>
+  <script defer src="data/questions.js"></script>
+  <script defer src="assets/print.js"></script>
+</head>
+<body>
+  <header class="print-toolbar">
+    <div class="toolbar-title"><a href="index.html">← 返回学习单元</a><strong id="print-title">打印预览</strong><span id="print-summary"></span></div>
+    <label id="format-control">打印格式
+      <select id="print-format">
+        <option value="combined">考点索引 + 得分提示</option>
+        <option value="questions">只打印考点索引</option>
+        <option value="answers">只打印答题思路与得分检查</option>
+        <option value="separate">考点索引册 + 独立讲解册</option>
+      </select>
+    </label>
+    <button class="print-action" id="print-now" type="button">打开打印对话框</button>
+  </header>
+  <main id="print-content" class="print-content"></main>
+  <noscript><p>请启用 JavaScript 以生成打印内容。</p></noscript>
+</body>
+</html>
