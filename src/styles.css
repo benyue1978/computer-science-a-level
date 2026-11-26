@@ -1421,3 +1421,102 @@ footer {
 .catalogue-business-vocabulary {
   margin-top: 18px;
 }
+.business-study-panel {
+  display: grid;
+  grid-template-columns: 142px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 8px;
+  padding: 28px 32px;
+  border: 1px solid #c9b18b;
+  background: #f2ecdf;
+}
+.business-study-mark {
+  display: flex;
+  min-height: 112px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid #c9b18b;
+  background: #f8f5eb;
+  color: #75613e;
+}
+.business-study-mark span {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+}
+.business-study-mark strong {
+  font: 43px Georgia, serif;
+  line-height: 1;
+}
+.business-study-copy .eyebrow {
+  margin-bottom: 7px;
+  color: #806b45;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+}
+.business-study-copy h2 {
+  margin: 0;
+  font-size: 30px;
+}
+.business-study-copy > p:not(.eyebrow) {
+  max-width: 680px;
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.business-study-copy > span {
+  color: #806b45;
+  font-size: 10px;
+  letter-spacing: .4px;
+}
+.business-study-panel > a {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  gap: 22px;
+  padding: 0 0 0 18px;
+  border-bottom: 1px solid #806b45;
+  color: #55482f;
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.business-study-panel > a:hover {
+  color: #8f432b;
+}
+.catalogue-tools {
+  display: grid;
+  gap: 14px;
+}
+.catalogue-tools .catalogue-business-vocabulary,
+.catalogue-tools .catalogue-pastpaper {
+  margin-top: 0;
+}
+@media (max-width: 700px) {
+  .business-study-panel {
+    grid-template-columns: 74px minmax(0, 1fr);
+    gap: 18px;
+    padding: 20px;
+  }
+  .business-study-mark {
+    min-height: 86px;
+  }
+  .business-study-mark span {
+    font-size: 7px;
+    letter-spacing: .7px;
+  }
+  .business-study-mark strong {
+    font-size: 30px;
+  }
+  .business-study-copy h2 {
+    font-size: 24px;
+  }
+  .business-study-panel > a {
+    grid-column: 2;
+    justify-self: start;
+    padding-left: 0;
+  }
+}
