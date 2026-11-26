@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Home from "./Home";
+import ComputerScience from "./ComputerScience";
 import { content, type Language } from "./content";
 import { readMemory, resetMemory, writeMemory } from "./memory";
 import ProcessorRegisters from "./ProcessorRegisters";
@@ -45,12 +46,16 @@ export default function App() {
     window.location.pathname.replace(/\/$/, "") === "/learn/rtn-notation";
   const fetchCycleLesson =
     window.location.pathname.replace(/\/$/, "") === "/learn/fetch-cycle";
+  const computerScienceLibrary =
+    window.location.pathname.replace(/\/$/, "") === "/computer-science";
   const home = window.location.pathname === "/";
   useEffect(() => {
     document.documentElement.lang = language === "en" ? "en" : "zh-Hans";
     document.title =
       (home
         ? (language === "en" ? "Computer Science · Learning catalogue" : "计算机科学 · 学习目录")
+        : computerScienceLibrary
+        ? (language === "en" ? "Computer Science · Topic library" : "计算机科学 · 主题学习")
         : fetchCycleLesson
         ? fetchCycleContent[language].title
         : rtnNotationLesson
@@ -68,7 +73,7 @@ export default function App() {
           : t.title) +
       " · " +
       t.brand;
-  }, [home, busesLesson, copyingLesson, fetchCycleLesson, fetchRegistersLesson, instructionCycleLesson, language, processorLesson, rtnNotationLesson, t]);
+  }, [home, computerScienceLibrary, busesLesson, copyingLesson, fetchCycleLesson, fetchRegistersLesson, instructionCycleLesson, language, processorLesson, rtnNotationLesson, t]);
   const move = (to: number) => {
     setStage(to);
     setSelected(null);
@@ -157,6 +162,8 @@ export default function App() {
       </header>
       {home ? (
         <Home language={language} />
+      ) : computerScienceLibrary ? (
+        <ComputerScience language={language} />
       ) : copyingLesson ? (
         <CopyingValues language={language} />
       ) : busesLesson ? (
